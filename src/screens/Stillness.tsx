@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { BREATHS, INTENTS, VISUALISATIONS, type Intent } from '../content/stillness'
-import { eyeStage, sitDoneOn, sitStreak, totalMinutes } from '../domain/stillness'
+import { eyeStage, sitDoneOn, sitStreak } from '../domain/stillness'
+import { meditationMinutes } from '../domain/progression'
 import { todayKey } from '../dates'
 import { useStore } from '../store'
 import { Back, useNav } from '../nav'
@@ -18,7 +19,7 @@ export function Stillness() {
   const { push } = useNav()
   const [intent, setIntent] = useState<Intent>('focus')
   const s = state.stillness
-  const mins = totalMinutes(s)
+  const mins = meditationMinutes(state)
   const eye = eyeStage(mins)
   const today = todayKey()
   const done = sitDoneOn(s, today)

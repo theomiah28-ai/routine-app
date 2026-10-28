@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import { ASCENT } from '../content/ascent'
-import { elapsed, longest, relapse, stageIndex } from '../domain/transmutation'
-import { srFromHabit } from '../migrate'
-import { todayKey } from '../dates'
+import { stageIndex } from '../domain/transmutation'
+import { ascentDays, linked, relapseToday } from '../domain/progression'
+import { isChecked } from '../domain/streaks'
+import { dateKey, todayKey } from '../dates'
+import { uid } from '../seed'
 import { useStore } from '../store'
 import { Back, useNav } from '../nav'
 import { Ascent } from '../symbols/Ascent'
-import { GoldButton, Screen, Sheet } from '../ui'
+import { Check, GoldButton, Screen, Sheet } from '../ui'
 
 export function useNow(intervalMs = 30_000) {
   const [now, setNow] = useState(Date.now())
@@ -24,37 +26,43 @@ export function useNow(intervalMs = 30_000) {
 
 export function Transmutation() {
   const { state, update } = useStore()
-  const { push } = useNav()
+  const { push, pop } = useNav()
   const now = useNow()
   const [confirm, setConfirm] = useState(false)
-  const t = state.transmutation
-  const e = elapsed(t.start, now)
-  const stage = stageIndex(e.days)
-  const next = ASCENT[stage + 1]
-  const toGo = next ? next.day - 1 - e.days : 0
+  const today = todayKey()
+  const habit = linked(state, 'transmutation')
+  const days = ascentDays(state, today)
+  const stage = stageIndex(days)
+  const next = ASCENT.find((s) => s.day > days)
+  const toGo = next ? next.day - days : 0
   const yearAgo = now - 365 * 86400e3
+  const tickedToday = !!habit && isChecked(state.checks, habit.id, today)
+  const relapsedToday = state.transmutation.relapses.some((r) => dateKey(new Date(r)) === today)
 
-  const pickHabit = (habitId: string | null) =>
+  const linkHabit = (id: string | null) =>
     update((s) => {
-      if (!habitId) {
-        s.transmutation = { start: Date.now(), longestDays: 0, relapses: [] }
+      if (id) {
+        const h = s.habits.find((x) => x.id === id)
+        if (h) h.link = 'transmutation'
         return
       }
-      // Rebuild the run from that habit's ticks (same rules as migration), then retire it from Routine
-      const h = s.habits.find((x) => x.id === habitId)
-      if (!h) return
-      s.transmutation = { ...srFromHabit(h, s.checks, todayKey()), relapses: [] }
-      s.habits = s.habits.filter((h) => h.id !== habitId)
-      for (const k in s.checks) s.checks[k] = s.checks[k].filter((x) => x !== habitId)
+      s.habits.push({ id: uid(), name: 'No PMO', kind: 'quit', days: [], createdAt: today, timeOfDay: 'anytime', link: 'transmutation' })
+    })
+
+  const tickToday = () =>
+    update((s) => {
+      if (!habit) return
+      const list = s.checks[today] ?? []
+      s.checks[today] = list.includes(habit.id) ? list.filter((x) => x !== habit.id) : [...list, habit.id]
     })
 
   return (
     <Screen bg="gold" full>
-      <div className="topbar"><Back label="Today" /></div>
+      <div className="topbar"><Back /></div>
       <div className="label gold" style={{ marginTop: 16 }}>Transmutation</div>
       <div className="big-num" style={{ marginTop: 6 }}>
-        {e.days}
-        <small>{e.days === 1 ? 'day' : 'days'} · {e.hours} hrs</small>
+        {days}
+        <small>{days === 1 ? 'clean day' : 'clean days'}</small>
       </div>
       {next ? (
         <div className="sub" style={{ marginTop: 8 }}>
@@ -64,29 +72,36 @@ export function Transmutation() {
         <div className="sub" style={{ marginTop: 8, color: 'var(--gold)' }}>Mastery reached</div>
       )}
 
-      <div style={{ margin: '18px -6px 0' }}>
-        <Ascent days={e.days} onStage={(i) => push({ name: 'stage', index: i })} />
+      {habit && !relapsedToday && (
+        <button className={'card' + (tickedToday ? ' glow' : '')} style={{ marginTop: 16 }} onClick={tickToday}>
+          <Check on={tickedToday} />
+          <span className="grow">{tickedToday ? 'Clean today' : `Tick “${habit.name}” for today`}<small>Each clean day climbs the Ascent</small></span>
+        </button>
+      )}
+
+      <div style={{ margin: '14px -6px 0' }}>
+        <Ascent days={days} onStage={(i) => push({ name: 'stage', index: i })} />
       </div>
 
       <div className="stats" style={{ marginTop: 18 }}>
-        <div className="stat"><b>{ASCENT[stage].name}</b><span>current stage</span></div>
-        <div className="stat"><b>{longest(t, now)}d</b><span>longest</span></div>
-        <div className="stat"><b>{t.relapses.filter((r) => r > yearAgo).length}</b><span>resets, 1 yr</span></div>
+        <div className="stat"><b>{days ? ASCENT[stage].name : '—'}</b><span>current stage</span></div>
+        <div className="stat"><b>{Math.max(state.transmutation.longestDays, days)}d</b><span>longest</span></div>
+        <div className="stat"><b>{state.transmutation.relapses.filter((r) => r > yearAgo).length}</b><span>resets, 1 yr</span></div>
       </div>
 
-      <button className="btn danger" style={{ marginTop: 18 }} onClick={() => setConfirm(true)}>I relapsed</button>
+      {habit && <button className="btn danger" style={{ marginTop: 18 }} onClick={() => setConfirm(true)}>I relapsed</button>}
 
       <GoldButton dock onClick={() => push({ name: 'urge' })}>Transmute an urge</GoldButton>
 
       <Sheet open={confirm} onClose={() => setConfirm(false)}>
         <h2 className="title">Reset to day 0?</h2>
         <p className="note" style={{ margin: '8px 0 18px' }}>
-          Your {e.days}-day streak ends and the Ascent starts again from Foundation. Your longest run is kept as a record.
+          Your {days}-day streak ends and the Ascent starts again from Foundation. Your longest run is kept as a record.
         </p>
         <button
           className="btn"
           onClick={() => {
-            update((s) => void (s.transmutation = relapse(s.transmutation, Date.now())))
+            update((s) => void Object.assign(s, relapseToday(s, Date.now())))
             setConfirm(false)
           }}
         >
@@ -95,15 +110,15 @@ export function Transmutation() {
         <button className="btn ghost" style={{ marginTop: 8 }} onClick={() => setConfirm(false)}>Cancel</button>
       </Sheet>
 
-      <Sheet open={!!t.needsPick} onClose={() => pickHabit(null)}>
-        <h2 className="title">Which habit was your SR tracker?</h2>
-        <p className="note" style={{ margin: '8px 0 14px' }}>Your streak moves into the Ascent and the habit leaves your routine.</p>
+      <Sheet open={!habit} onClose={pop}>
+        <h2 className="title">Start the Ascent</h2>
+        <p className="note" style={{ margin: '8px 0 14px' }}>The Ascent grows from a daily NoFap habit on Today. Use one you already have, or add it now.</p>
         {state.habits.filter((h) => h.kind === 'quit').map((h) => (
-          <button key={h.id} className="card" onClick={() => pickHabit(h.id)}>
+          <button key={h.id} className="card" onClick={() => linkHabit(h.id)}>
             <span className="grow">{h.name}</span><span className="chev">›</span>
           </button>
         ))}
-        <button className="btn ghost" style={{ marginTop: 8 }} onClick={() => pickHabit(null)}>None, start today</button>
+        <button className="btn" style={{ marginTop: 8 }} onClick={() => linkHabit(null)}>Add “No PMO” to Today</button>
       </Sheet>
     </Screen>
   )

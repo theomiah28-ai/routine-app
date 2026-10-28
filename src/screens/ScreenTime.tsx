@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { brainState, SAMPLE_APPS, todayMinutes } from '../domain/screentime'
+import { avgMinutes, brainState, SAMPLE_APPS, todayMinutes } from '../domain/screentime'
 import { todayKey } from '../dates'
 import { useStore } from '../store'
 import { Back } from '../nav'
@@ -42,6 +42,15 @@ export function ScreenTime() {
       </div>
 
       <div style={{ margin: '30px 0 10px' }}><Brain state={b} /></div>
+      <div className="brains" style={{ margin: '4px 0 14px' }}>
+        {[{ label: '7 days', mins: avgMinutes(st, today, 7) }, { label: '30 days', mins: avgMinutes(st, today, 30) }].map((x) => (
+          <div key={x.label}>
+            <Brain state={brainState(x.mins, st)} width={70} />
+            <b>{x.label}</b>
+            <small>{hm(x.mins)} / day</small>
+          </div>
+        ))}
+      </div>
       <div style={{ textAlign: 'center' }}>
         <span className={'brain-chip ' + b}>Brain state · {COPY[b].chip}</span>
         <p className="note" style={{ marginTop: 8 }}>

@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { ASCENT } from '../content/ascent'
 import { breathAt, orbScale, type BreathPattern } from '../domain/breath'
-import { elapsed, stageIndex } from '../domain/transmutation'
+import { stageIndex } from '../domain/transmutation'
+import { ascentDays } from '../domain/progression'
+import { todayKey } from '../dates'
 import { useStore } from '../store'
 import { useNav } from '../nav'
 import { BreathOrb } from '../symbols/BreathOrb'
@@ -41,7 +43,7 @@ export function Urge() {
   const [step, setStep] = useState<0 | 1 | 2>(0)
   const ms = useBreathClock(step === 0)
   const b = breathAt(BOX_60, ms)
-  const days = elapsed(state.transmutation.start, Date.now()).days
+  const days = ascentDays(state, todayKey())
   const stage = ASCENT[stageIndex(days)]
   const next = ASCENT[stageIndex(days) + 1]
 

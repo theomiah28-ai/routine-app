@@ -1,5 +1,6 @@
 import { ASCENT } from '../content/ascent'
-import { elapsed, stageIndex } from '../domain/transmutation'
+import { ascentDays } from '../domain/progression'
+import { todayKey } from '../dates'
 import { useStore } from '../store'
 import { Back } from '../nav'
 import { Screen } from '../ui'
@@ -8,7 +9,7 @@ import { WhyLink } from './WhyLink'
 export function StageDetail({ index }: { index: number }) {
   const { state } = useStore()
   const s = ASCENT[index]
-  const reached = stageIndex(elapsed(state.transmutation.start, Date.now()).days) >= index
+  const reached = ascentDays(state, todayKey()) >= s.day
 
   return (
     <Screen bg="gold">

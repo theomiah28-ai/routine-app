@@ -16,3 +16,13 @@ describe('screen time', () => {
     expect(todayMinutes({ ...st, manual: { '2026-10-28': 45 } }, '2026-10-28')).toBe(45)
   })
 })
+
+describe('averages', () => {
+  it('averages entered days and falls back to the sample', async () => {
+    const { avgMinutes } = await import('./screentime')
+    const base: ScreenTimeState = { limit: 120, foggy: 120, rotting: 240, manual: { '2026-10-28': 60, '2026-10-27': 120 } }
+    expect(avgMinutes(base, '2026-10-28', 2)).toBe(90)
+    expect(avgMinutes(base, '2026-10-28', 7)).toBe(90)
+    expect(avgMinutes({ ...base, manual: {} }, '2026-10-28', 7)).toBe(SAMPLE_TOTAL)
+  })
+})

@@ -5,6 +5,8 @@ import { useStore } from '../store'
 import { useNav } from '../nav'
 import { SortableList } from '../ui'
 import { startWorkout } from './Workout'
+import { Statue } from '../symbols/Statue'
+import { statuePoints, statueStage } from '../domain/progression'
 import type { SplitDay } from '../types'
 
 export function Gym() {
@@ -12,6 +14,7 @@ export function Gym() {
   const { push } = useNav()
   const [editing, setEditing] = useState(false)
   const nextId = nextDayId(state)
+  const statue = statueStage(statuePoints(state))
   const next = state.days.find((d) => d.id === nextId)
 
   const loggedIds = new Set(state.sessions.flatMap((s) => s.entries.map((e) => e.exerciseId)))
@@ -48,6 +51,16 @@ export function Gym() {
         <input className="input" style={{ fontSize: 24, fontWeight: 700, margin: '8px 0 4px' }} value={state.splitName} onChange={(e) => update((s) => void (s.splitName = e.target.value))} />
       ) : (
         <h1>{state.splitName}</h1>
+      )}
+      {!editing && (
+        <div className="statue-head">
+          <Statue stage={statue.index} size={120} />
+          <div>
+            <span className="label gold">The statue · {statue.name}</span>
+            <div className="jr-bar"><i style={{ width: `${Math.max(2, statue.pct * 100)}%` }} /></div>
+            <small className="sub">{statue.next ? `Next: ${statue.next.name}. Every workout carves, every PB carves deeper.` : 'Masterpiece.'}</small>
+          </div>
+        </div>
       )}
 
       {state.active && (

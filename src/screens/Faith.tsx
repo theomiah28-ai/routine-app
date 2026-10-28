@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { THEMES, verseText } from '../content/faith'
-import { faithDone, faithStreak, planToday, verseOfDay, type FaithItem } from '../domain/faith'
+import { faithDone, planToday, verseOfDay, type FaithItem } from '../domain/faith'
+import { faithDays, faithStage } from '../domain/progression'
 import { todayKey } from '../dates'
 import { useStore } from '../store'
 import { Back, useNav } from '../nav'
@@ -15,7 +16,8 @@ export function Faith() {
   const [gratitude, setGratitude] = useState(false)
   const today = todayKey()
   const f = state.faith
-  const streak = faithStreak(f, today)
+  const streak = faithDays(state, today)
+  const stage = faithStage(streak)
   const verse = verseOfDay(today)
   const plan = planToday(f, today)
   const [note, setNote] = useState(f.days[today]?.note ?? '')
@@ -29,7 +31,9 @@ export function Faith() {
       <div style={{ marginTop: 8 }}><Cross brightness={crossBrightness(streak)} /></div>
       <div style={{ textAlign: 'center' }}>
         <div style={{ fontSize: 30, fontWeight: 700, letterSpacing: '-0.02em' }}>{streak} {streak === 1 ? 'day' : 'days'}</div>
-        <div style={{ fontSize: 13, color: '#c9b88a' }}>walking in the light</div>
+        <div style={{ fontSize: 13, color: '#c9b88a' }}>walking in the light · {stage.name}</div>
+        {stage.next && <div className="jr-bar" style={{ maxWidth: 220, margin: '10px auto 2px' }}><i style={{ width: `${Math.max(2, stage.pct * 100)}%` }} /></div>}
+        {stage.next && <div className="sub" style={{ fontSize: 11.5 }}>Day {stage.next.day} · {stage.next.name}</div>}
       </div>
 
       <div className="verse">

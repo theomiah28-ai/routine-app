@@ -1,31 +1,42 @@
-import { ASCENT } from '../content/ascent'
-import { elapsed, stageIndex } from '../domain/transmutation'
-import { eyeStage, sitStreak, totalMinutes } from '../domain/stillness'
-import { faithStreak } from '../domain/faith'
-import { workLog, workStreak } from '../domain/work'
-import { brainState, todayMinutes } from '../domain/screentime'
+import type { ReactNode } from 'react'
+import { sectionProgress, ascentDays, meditationMinutes, faithDays, statuePoints, statueStage, type SectionProgress } from '../domain/progression'
+import { eyeStage } from '../domain/stillness'
+import { workLog } from '../domain/work'
+import { avgMinutes, brainState, todayMinutes } from '../domain/screentime'
 import { consistency } from '../domain/progress'
-import { exerciseHistory, topWeight } from '../domain/gym'
 import { addDays, todayKey } from '../dates'
 import { useStore } from '../store'
-import { useNav } from '../nav'
+import { useNav, type Route } from '../nav'
 import { Ascent } from '../symbols/Ascent'
 import { Eye } from '../symbols/Eye'
 import { Cross } from '../symbols/Cross'
 import { Brain } from '../symbols/Brain'
+import { Statue } from '../symbols/Statue'
 import { Ring, Screen } from '../ui'
 import { crossBrightness } from './Faith'
-import { formatMinutes } from './Stillness'
 
-function Spark({ values }: { values: number[] }) {
-  if (values.length < 2) return <div className="sub" style={{ fontSize: 12 }}>Log a few sessions</div>
-  const min = Math.min(...values)
-  const max = Math.max(...values)
-  const pts = values.map((v, i) => `${(i / (values.length - 1)) * 120},${36 - (max === min ? 18 : ((v - min) / (max - min)) * 32)}`).join(' ')
+const ROUTE: Record<string, Route> = {
+  transmutation: { name: 'transmutation' },
+  stillness: { name: 'stillness' },
+  faith: { name: 'faith' },
+  gym: { name: 'gym' },
+  work: { name: 'work' },
+}
+
+function Row({ p, symbol, onClick }: { p: SectionProgress; symbol: ReactNode; onClick: () => void }) {
   return (
-    <svg width="120" height="40" viewBox="0 0 120 40" style={{ overflow: 'visible' }}>
-      <polyline fill="none" stroke="#e8c46a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" points={pts} />
-    </svg>
+    <button className="jr-row" onClick={onClick}>
+      <div className="jr-sym">{symbol}</div>
+      <div className="jr-body">
+        <span className="label gold">{p.title}</span>
+        <div className="row" style={{ alignItems: 'baseline', marginTop: 4 }}>
+          <b>{p.value}</b>
+          <span className="sub" style={{ fontSize: 12 }}>{p.stage}</span>
+        </div>
+        <div className="jr-bar"><i style={{ width: `${Math.max(2, Math.min(100, p.pct * 100))}%` }} /></div>
+        <small>{p.next ? `Next: ${p.next}` : 'Complete'}</small>
+      </div>
+    </button>
   )
 }
 
@@ -33,84 +44,65 @@ export function Journey() {
   const { state } = useStore()
   const { push } = useNav()
   const today = todayKey()
-  const sr = elapsed(state.transmutation.start, Date.now())
-  const mins = totalMinutes(state.stillness)
-  const eye = eyeStage(mins)
-  const faith = faithStreak(state.faith, today)
-  const w = state.work
-  const deep = workLog(w, today).deepMinutes
-  const brain = brainState(todayMinutes(state.screenTime, today), state.screenTime)
+  const progress = sectionProgress(state, today)
   const month = consistency(state, addDays(today, -29), today, 'all')
+  const st = state.screenTime
+  const brains = [
+    { label: 'Today', mins: todayMinutes(st, today) },
+    { label: '7 days', mins: avgMinutes(st, today, 7) },
+    { label: '30 days', mins: avgMinutes(st, today, 30) },
+  ]
+  const deep = workLog(state.work, today).deepMinutes
 
-  // The most-logged lift's top-set trend
-  const lifts = Object.keys(state.exercises).map((id) => ({ id, h: exerciseHistory(state, id) })).sort((a, b) => b.h.length - a.h.length)
-  const lift = lifts[0]?.h.length ? lifts[0] : null
+  const symbols: Record<string, ReactNode> = {
+    transmutation: (
+      <div style={{ width: 64, height: 92, overflow: 'hidden' }}>
+        <div style={{ transform: 'scale(0.2)', transformOrigin: 'top left', width: 320 }}><Ascent days={ascentDays(state, today)} compact /></div>
+      </div>
+    ),
+    stillness: <Eye openness={eyeStage(meditationMinutes(state)).openness} width={70} />,
+    faith: <Cross brightness={crossBrightness(faithDays(state, today))} height={60} />,
+    gym: <Statue stage={statueStage(statuePoints(state)).index} size={58} />,
+    work: (
+      <Ring pct={state.work.targets.deepMinutes ? deep / state.work.targets.deepMinutes : 0} size={56} stroke={6}>
+        <span style={{ fontSize: 11, fontWeight: 700 }}>{Math.round(deep / 6) / 10}h</span>
+      </Ring>
+    ),
+  }
 
   return (
     <Screen>
       <div className="date" style={{ marginTop: 8 }}>Journey</div>
       <h1>Who you're becoming</h1>
+      <p className="sub" style={{ marginTop: 0 }}>Every tick on Today grows these.</p>
 
       <button className="jr-tile wide" onClick={() => push({ name: 'progress' })}>
         <div>
-          <span className="label">Progress</span>
+          <span className="label">Consistency</span>
           <b>{Math.round(month * 100)}%</b>
-          <small>consistency, last 30 days</small>
+          <small>last 30 days · tap for the calendar</small>
         </div>
         <Ring pct={month} size={64} stroke={6} />
       </button>
 
-      <div className="jr-grid">
-        <button className="jr-tile tall" onClick={() => push({ name: 'transmutation' })}>
-          <span className="label gold">Transmutation</span>
-          <div style={{ margin: '6px -6px 0', height: 168, overflow: 'hidden' }}>
-            <div style={{ transform: 'scale(0.38)', transformOrigin: 'top left', width: '263%' }}><Ascent days={sr.days} compact /></div>
-          </div>
-          <b>{sr.days}d</b>
-          <small>{ASCENT[stageIndex(sr.days)].name}</small>
-        </button>
-
-        <div className="jr-col">
-          <button className="jr-tile" onClick={() => push({ name: 'stillness' })}>
-            <span className="label gold">Stillness</span>
-            <div style={{ margin: '6px 0 2px' }}><Eye openness={eye.openness} width={130} /></div>
-            <small>{eye.name} · {formatMinutes(mins)}</small>
-          </button>
-          <button className="jr-tile" onClick={() => push({ name: 'faith' })}>
-            <span className="label gold">Faith</span>
-            <Cross brightness={crossBrightness(faith)} height={64} />
-            <small>{faith}-day walk</small>
-          </button>
-        </div>
+      <div style={{ marginTop: 8 }}>
+        {progress.map((p) => (
+          <Row key={p.section} p={p} symbol={symbols[p.section]} onClick={() => push(ROUTE[p.section])} />
+        ))}
       </div>
 
-      <div className="jr-grid">
-        <button className="jr-tile" onClick={() => push({ name: 'work' })}>
-          <span className="label gold">Work</span>
-          <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0 6px' }}>
-            <Ring pct={w.targets.deepMinutes ? deep / w.targets.deepMinutes : 0} size={74} stroke={7}>
-              <span style={{ fontSize: 13, fontWeight: 700 }}>{Math.round(deep / 6) / 10}h</span>
-            </Ring>
-          </div>
-          <small>{workStreak(w, today)}-day streak</small>
-        </button>
-        <button className="jr-tile" onClick={() => push({ name: 'screentime' })}>
-          <span className="label gold">Screen time</span>
-          <div style={{ margin: '8px 0 2px' }}><Brain state={brain} width={104} /></div>
-          <small style={{ textTransform: 'capitalize' }}>{brain} · preview</small>
-        </button>
-      </div>
-
-      <button className="jr-tile wide" onClick={() => push({ name: 'gym' })}>
-        <div>
-          <span className="label gold">Gym</span>
-          <b>{state.sessions.length}</b>
-          <small>{lift ? `sessions · ${state.exercises[lift.id].name} trend` : 'sessions'}</small>
+      <button className="jr-row" style={{ display: 'block' }} onClick={() => push({ name: 'screentime' })}>
+        <span className="label gold">Screen time · your brain</span>
+        <div className="brains">
+          {brains.map((b) => (
+            <div key={b.label}>
+              <Brain state={brainState(b.mins, st)} width={82} />
+              <b>{b.label}</b>
+              <small>{Math.floor(b.mins / 60)}h {b.mins % 60}m{b.label === 'Today' ? '' : ' / day'}</small>
+            </div>
+          ))}
         </div>
-        <Spark values={lift ? lift.h.map((x) => topWeight(x.sets)) : []} />
       </button>
-
-      <div className="sub" style={{ textAlign: 'center', marginTop: 16 }}>{sitStreak(state.stillness, today)}-day sit streak · {state.milestones.length} milestones earned</div>
     </Screen>
   )
 }
