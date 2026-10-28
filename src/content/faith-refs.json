@@ -1,0 +1,373 @@
+{
+ "verses": [
+  {
+   "ref": "Jeremiah 29:11",
+   "theme": "purpose"
+  },
+  {
+   "ref": "Deuteronomy 8:18",
+   "theme": "prosperity"
+  },
+  {
+   "ref": "Proverbs 13:4",
+   "theme": "discipline"
+  },
+  {
+   "ref": "Romans 12:2",
+   "theme": "renew"
+  },
+  {
+   "ref": "James 4:8",
+   "theme": "closer"
+  },
+  {
+   "ref": "Joshua 1:9",
+   "theme": "courage"
+  },
+  {
+   "ref": "Proverbs 16:3",
+   "theme": "purpose"
+  },
+  {
+   "ref": "Proverbs 10:4",
+   "theme": "prosperity"
+  },
+  {
+   "ref": "Proverbs 12:24",
+   "theme": "discipline"
+  },
+  {
+   "ref": "Philippians 4:8",
+   "theme": "renew"
+  },
+  {
+   "ref": "Matthew 6:33",
+   "theme": "closer"
+  },
+  {
+   "ref": "Isaiah 41:10",
+   "theme": "courage"
+  },
+  {
+   "ref": "Proverbs 19:21",
+   "theme": "purpose"
+  },
+  {
+   "ref": "Proverbs 10:22",
+   "theme": "prosperity"
+  },
+  {
+   "ref": "1 Corinthians 9:27",
+   "theme": "discipline"
+  },
+  {
+   "ref": "2 Corinthians 10:5",
+   "theme": "renew"
+  },
+  {
+   "ref": "Psalms 46:10",
+   "theme": "closer"
+  },
+  {
+   "ref": "Deuteronomy 31:6",
+   "theme": "courage"
+  },
+  {
+   "ref": "Ephesians 2:10",
+   "theme": "purpose"
+  },
+  {
+   "ref": "Proverbs 13:11",
+   "theme": "prosperity"
+  },
+  {
+   "ref": "Hebrews 12:11",
+   "theme": "discipline"
+  },
+  {
+   "ref": "Ephesians 4:23",
+   "theme": "renew"
+  },
+  {
+   "ref": "Jeremiah 29:13",
+   "theme": "closer"
+  },
+  {
+   "ref": "Philippians 4:13",
+   "theme": "courage"
+  },
+  {
+   "ref": "Romans 8:28",
+   "theme": "purpose"
+  },
+  {
+   "ref": "Proverbs 21:5",
+   "theme": "prosperity"
+  },
+  {
+   "ref": "Proverbs 25:28",
+   "theme": "discipline"
+  },
+  {
+   "ref": "Isaiah 26:3",
+   "theme": "renew"
+  },
+  {
+   "ref": "John 15:5",
+   "theme": "closer"
+  },
+  {
+   "ref": "Isaiah 40:31",
+   "theme": "courage"
+  },
+  {
+   "ref": "Philippians 3:14",
+   "theme": "purpose"
+  },
+  {
+   "ref": "Proverbs 22:29",
+   "theme": "prosperity"
+  },
+  {
+   "ref": "2 Timothy 1:7",
+   "theme": "discipline"
+  },
+  {
+   "ref": "Proverbs 4:23",
+   "theme": "renew"
+  },
+  {
+   "ref": "Matthew 11:28",
+   "theme": "closer"
+  },
+  {
+   "ref": "Psalms 27:1",
+   "theme": "courage"
+  },
+  {
+   "ref": "Proverbs 16:9",
+   "theme": "purpose"
+  },
+  {
+   "ref": "Psalms 1:3",
+   "theme": "prosperity"
+  },
+  {
+   "ref": "Galatians 6:9",
+   "theme": "discipline"
+  },
+  {
+   "ref": "2 Corinthians 5:17",
+   "theme": "renew"
+  },
+  {
+   "ref": "Psalms 27:4",
+   "theme": "closer"
+  },
+  {
+   "ref": "2 Timothy 4:7",
+   "theme": "courage"
+  },
+  {
+   "ref": "Habakkuk 2:2",
+   "theme": "purpose"
+  },
+  {
+   "ref": "Joshua 1:8",
+   "theme": "prosperity"
+  },
+  {
+   "ref": "Proverbs 6:6",
+   "theme": "discipline"
+  },
+  {
+   "ref": "Colossians 3:2",
+   "theme": "renew"
+  },
+  {
+   "ref": "Psalms 63:1",
+   "theme": "closer"
+  },
+  {
+   "ref": "Psalms 118:6",
+   "theme": "courage"
+  },
+  {
+   "ref": "Colossians 3:23",
+   "theme": "purpose"
+  },
+  {
+   "ref": "3 John 1:2",
+   "theme": "prosperity"
+  },
+  {
+   "ref": "1 Corinthians 9:24",
+   "theme": "discipline"
+  },
+  {
+   "ref": "Proverbs 23:7",
+   "theme": "renew"
+  },
+  {
+   "ref": "Revelation 3:20",
+   "theme": "closer"
+  },
+  {
+   "ref": "1 Corinthians 16:13",
+   "theme": "courage"
+  },
+  {
+   "ref": "Ecclesiastes 9:10",
+   "theme": "purpose"
+  },
+  {
+   "ref": "Proverbs 3:9-10",
+   "theme": "prosperity"
+  },
+  {
+   "ref": "Proverbs 14:23",
+   "theme": "discipline"
+  },
+  {
+   "ref": "1 Corinthians 2:16",
+   "theme": "renew"
+  },
+  {
+   "ref": "Psalms 16:11",
+   "theme": "closer"
+  },
+  {
+   "ref": "Romans 8:31",
+   "theme": "courage"
+  }
+ ],
+ "plans": [
+  {
+   "id": "wisdom-wealth",
+   "name": "Wisdom & Wealth",
+   "subtitle": "Proverbs, one chapter a day",
+   "theme": "prosperity",
+   "days": [
+    "Proverbs 1",
+    "Proverbs 2",
+    "Proverbs 3",
+    "Proverbs 4",
+    "Proverbs 5",
+    "Proverbs 6",
+    "Proverbs 7",
+    "Proverbs 8",
+    "Proverbs 9",
+    "Proverbs 10",
+    "Proverbs 11",
+    "Proverbs 12",
+    "Proverbs 13",
+    "Proverbs 14",
+    "Proverbs 15",
+    "Proverbs 16",
+    "Proverbs 17",
+    "Proverbs 18",
+    "Proverbs 19",
+    "Proverbs 20",
+    "Proverbs 21",
+    "Proverbs 22",
+    "Proverbs 23",
+    "Proverbs 24",
+    "Proverbs 25",
+    "Proverbs 26",
+    "Proverbs 27",
+    "Proverbs 28",
+    "Proverbs 29",
+    "Proverbs 30",
+    "Proverbs 31"
+   ]
+  },
+  {
+   "id": "pit-to-palace",
+   "name": "From Pit to Palace",
+   "subtitle": "The story of Joseph",
+   "theme": "purpose",
+   "days": [
+    "Genesis 37",
+    "Genesis 38",
+    "Genesis 39",
+    "Genesis 40",
+    "Genesis 41",
+    "Genesis 42",
+    "Genesis 43",
+    "Genesis 44",
+    "Genesis 45",
+    "Genesis 46",
+    "Genesis 47",
+    "Genesis 48",
+    "Genesis 49",
+    "Genesis 50"
+   ]
+  },
+  {
+   "id": "build-the-wall",
+   "name": "Build the Wall",
+   "subtitle": "Nehemiah: vision under pressure",
+   "theme": "discipline",
+   "days": [
+    "Nehemiah 1",
+    "Nehemiah 2",
+    "Nehemiah 3",
+    "Nehemiah 4",
+    "Nehemiah 5",
+    "Nehemiah 6",
+    "Nehemiah 7",
+    "Nehemiah 8",
+    "Nehemiah 9",
+    "Nehemiah 10",
+    "Nehemiah 11",
+    "Nehemiah 12",
+    "Nehemiah 13"
+   ]
+  },
+  {
+   "id": "renew-your-mind",
+   "name": "Renew Your Mind",
+   "subtitle": "Transformed by the renewing of your mind",
+   "theme": "renew",
+   "days": [
+    "Romans 12",
+    "Philippians 4",
+    "Ephesians 4",
+    "Colossians 3",
+    "2 Corinthians 4",
+    "2 Corinthians 5",
+    "James 1",
+    "Romans 8",
+    "Isaiah 40",
+    "1 Peter 1"
+   ]
+  },
+  {
+   "id": "strong-courageous",
+   "name": "Strong & Courageous",
+   "subtitle": "Joshua and the Psalms of the brave",
+   "theme": "courage",
+   "days": [
+    "Joshua 1",
+    "Joshua 2",
+    "Joshua 3",
+    "Joshua 4",
+    "Joshua 5",
+    "Joshua 6",
+    "Psalms 1",
+    "Psalms 18",
+    "Psalms 23",
+    "Psalms 27",
+    "Psalms 37",
+    "Psalms 46",
+    "Psalms 91",
+    "Psalms 112",
+    "Psalms 121",
+    "Psalms 127",
+    "Psalms 139",
+    "Joshua 23",
+    "Joshua 24"
+   ]
+  }
+ ]
+}
