@@ -1,8 +1,8 @@
 import { addDays, dateKey } from '../dates'
 import type { PracticeLog, StillnessState } from '../types'
 
-/** Minutes in silence at which each Eye stage begins. */
-export const EYE_STAGES = [0, 60, 300, 600, 1500, 3000, 6000, 15000]
+/** Minutes in silence at which each Eye stage begins: 0, 1h, 10h, 25h, 50h, 100h, 200h, fully awake at 365h. */
+export const EYE_STAGES = [0, 1, 10, 25, 50, 100, 200, 365].map((h) => h * 60)
 export const EYE_NAMES = ['Closed', 'Stirring', 'Waking', 'Clarity', 'Presence', 'Insight', 'Vision', 'Awake']
 
 export const totalMinutes = (s: StillnessState) => s.logs.reduce((n, l) => n + l.minutes, 0)

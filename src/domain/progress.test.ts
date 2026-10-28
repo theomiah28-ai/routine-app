@@ -30,12 +30,11 @@ describe('progress', () => {
 
   it('filter limits to section items', () => {
     const s = base()
-    s.work.createdAt = addDays(today, -5)
+    s.habits.push({ id: 'g', name: 'Gym', kind: 'build', days: [], createdAt: addDays(today, -70), timeOfDay: 'anytime', link: 'gym' })
     s.checks[today] = ['a']
-    // routine habit + Morning Sit + work targets (sections share work.createdAt)
-    expect(dayPct(s, today, 'all')).toBeCloseTo(1 / 3)
+    expect(dayPct(s, today, 'all')).toBe(0.5)
     expect(dayPct(s, today, 'routine')).toBe(1)
-    expect(dayPct(s, today, 'work')).toBe(0)
+    expect(dayPct(s, today, 'gym')).toBe(0)
     expect(dayPct(s, today, 'faith')).toBeNull()
   })
 

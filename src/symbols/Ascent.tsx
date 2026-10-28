@@ -22,9 +22,9 @@ const PATH = ASCENT.slice(1).reduce((d, _, i) => {
 export function ascentProgress(days: number): number {
   const i = stageIndex(days)
   if (i === ASCENT.length - 1) return 1
-  const a = ASCENT[i].day - 1
-  const b = ASCENT[i + 1].day - 1
-  return (i + Math.min(1, (days - a) / (b - a))) / (ASCENT.length - 1)
+  const a = ASCENT[i].day
+  const b = ASCENT[i + 1].day
+  return (i + Math.max(0, Math.min(1, (days - a) / (b - a)))) / (ASCENT.length - 1)
 }
 
 export function Ascent({ days, onStage, compact }: { days: number; onStage?: (i: number) => void; compact?: boolean }) {
@@ -56,7 +56,7 @@ export function Ascent({ days, onStage, compact }: { days: number; onStage?: (i:
 
       {ASCENT.map((s, i) => {
         const y = nodeY(i)
-        const on = i <= reached
+        const on = i <= reached && days >= ASCENT[i].day
         return (
           <g key={s.day} onClick={() => onStage?.(i)} style={{ cursor: onStage ? 'pointer' : undefined }}>
             <rect x={X - 20} y={y - 18} width={W - X + 10} height={36} fill="transparent" />

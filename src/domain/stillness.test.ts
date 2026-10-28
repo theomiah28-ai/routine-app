@@ -11,8 +11,9 @@ const st = (logs: PracticeLog[]): StillnessState => ({ sitMinutes: 30, logs })
 describe('stillness', () => {
   it('eye stage from minutes', () => {
     expect(eyeStage(0)).toMatchObject({ index: 0, name: 'Closed', nextAt: 60 })
-    expect(eyeStage(860)).toMatchObject({ index: 3, name: 'Clarity', nextAt: 1500 })
-    expect(eyeStage(20000)).toMatchObject({ index: 7, name: 'Awake', nextAt: null, openness: 1 })
+    expect(eyeStage(860)).toMatchObject({ index: 2, name: 'Waking', nextAt: 1500 })
+    expect(eyeStage(1500)).toMatchObject({ index: 3, name: 'Clarity', nextAt: 3000 })
+    expect(eyeStage(365 * 60)).toMatchObject({ index: 7, name: 'Awake', nextAt: null, openness: 1 })
     expect(eyeStage(0).openness).toBeGreaterThan(0)
   })
 

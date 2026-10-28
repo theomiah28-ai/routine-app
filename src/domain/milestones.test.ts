@@ -6,13 +6,15 @@ import type { State } from '../types'
 
 const now = Date.now()
 const today = todayKey()
-const DAY = 864e5
 
 function base(): State {
   const s = seedState()
-  s.habits = []
-  s.transmutation = { start: now - 2 * DAY, longestDays: 0, relapses: [] }
+  s.habits = [{ id: 'sr', name: 'No PMO', kind: 'quit', days: [], createdAt: addDays(today, -60), timeOfDay: 'anytime', link: 'transmutation' }]
+  for (let i = 0; i < 2; i++) s.checks[addDays(today, -i)] = ['sr']
   return s
+}
+const srDays = (s: State, n: number) => {
+  for (let i = 0; i < n; i++) s.checks[addDays(today, -i)] = ['sr']
 }
 const ids = (s: State) => detectMilestones(s, now).map((m) => m.id)
 
@@ -20,22 +22,30 @@ describe('milestones', () => {
   it('ascent milestone at day 7 once', () => {
     const s = base()
     expect(ids(s).some((i) => i.startsWith('ascent:'))).toBe(false)
-    s.transmutation.start = now - 6.5 * DAY
+    srDays(s, 7)
     expect(ids(s)).toContain('ascent:7')
   })
 
   it('no duplicate when already recorded', () => {
     const s = base()
-    s.transmutation.start = now - 6.5 * DAY
+    srDays(s, 7)
     s.milestones = detectMilestones(s, now)
     expect(ids(s)).toEqual([])
   })
 
-  it('gym sessions 10', () => {
+  it('statue stage at 12 workouts', () => {
     const s = base()
-    s.sessions = Array.from({ length: 10 }, (_, i) => ({ id: 's' + i, dayId: 'd', dayName: 'A', start: i, end: i, entries: [] }))
-    expect(ids(s)).toContain('gym-sessions:10')
-    expect(ids(s)).not.toContain('gym-sessions:25')
+    s.sessions = Array.from({ length: 12 }, (_, i) => ({ id: 's' + i, dayId: 'd', dayName: 'A', start: i, end: i, entries: [] }))
+    expect(ids(s)).toContain('statue:2')
+    expect(ids(s)).not.toContain('statue:3')
+  })
+
+  it('faith milestones skipped when faith is off', () => {
+    const s = base()
+    s.faith.days = Object.fromEntries(Array.from({ length: 8 }, (_, i) => [addDays(today, -i), { prayer: true }]))
+    expect(ids(s)).toContain('faith:7')
+    s.settings.faith = false
+    expect(ids(s).some((i) => i.startsWith('faith'))).toBe(false)
   })
 
   it('habit streak 7', () => {
@@ -48,9 +58,9 @@ describe('milestones', () => {
 
   it('celebrates only the highest per family', () => {
     const s = base()
-    s.sessions = Array.from({ length: 30 }, (_, i) => ({ id: 's' + i, dayId: 'd', dayName: 'A', start: i, end: i, entries: [] }))
+    srDays(s, 35)
     const found = celebrateOnly(detectMilestones(s, now))
-    expect(found.filter((m) => !m.seen).map((m) => m.id)).toEqual(['gym-sessions:25'])
-    expect(found.find((m) => m.id === 'gym-sessions:10')?.seen).toBe(true)
+    expect(found.filter((m) => !m.seen && m.id.startsWith('ascent')).map((m) => m.id)).toEqual(['ascent:30'])
+    expect(found.find((m) => m.id === 'ascent:7')?.seen).toBe(true)
   })
 })

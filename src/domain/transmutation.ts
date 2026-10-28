@@ -8,11 +8,11 @@ export function elapsed(start: number | null, now: number): { ms: number; days: 
   return { ms, days: Math.floor(ms / DAY), hours: Math.floor((ms % DAY) / 3600e3) }
 }
 
-/** Highest stage reached. "Day N" is reached once N-1 full days have passed, so Day 1 is reached at the start. */
+/** Highest stage reached for a count of clean days ("Day N" on the Nth day). Foundation while still at 0. */
 export function stageIndex(days: number): number {
   let i = 0
   ASCENT.forEach((s, idx) => {
-    if (days >= s.day - 1) i = idx
+    if (days >= s.day) i = idx
   })
   return i
 }

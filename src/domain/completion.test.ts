@@ -13,68 +13,38 @@ function base(): State {
   s.habits = [
     { id: 'a', name: 'Read', kind: 'build', days: [], createdAt: since, timeOfDay: 'anytime' },
     { id: 'g', name: 'Gym', kind: 'build', days: [], createdAt: since, timeOfDay: 'anytime', link: 'gym' },
-    { id: 'm', name: 'Meditate', kind: 'build', days: [], createdAt: since, timeOfDay: 'morning', link: 'stillness' },
+    { id: 'sr', name: 'No PMO', kind: 'quit', days: [], createdAt: since, timeOfDay: 'anytime', link: 'transmutation' },
   ]
-  s.faith.createdAt = since
-  s.work.createdAt = since
-  s.transmutation = { start: parseKey(since).getTime(), longestDays: 0, relapses: [] }
   return s
 }
 
 describe('dayItems', () => {
   it('counts scheduled habits only', () => {
     const s = base()
-    const wd = parseKey(today).getDay()
-    s.habits[0].days = [(wd + 1) % 7]
+    s.habits[0].days = [(parseKey(today).getDay() + 1) % 7]
     expect(dayItems(s, today).some((i) => i.id === 'habit:a')).toBe(false)
   })
 
-  it('transmutation counts done while streak unbroken', () => {
-    const s = base()
-    expect(dayItems(s, today).find((i) => i.section === 'transmutation')?.done).toBe(true)
-    s.transmutation.start = null
-    expect(dayItems(s, today).some((i) => i.section === 'transmutation')).toBe(false)
+  it('linked habits carry their section', () => {
+    const items = dayItems(base(), today)
+    expect(items.find((i) => i.id === 'habit:g')?.section).toBe('gym')
+    expect(items.find((i) => i.id === 'habit:sr')?.section).toBe('transmutation')
+    expect(items.find((i) => i.id === 'habit:a')?.section).toBe('routine')
   })
 
-  it('relapse day is not done', () => {
-    const s = base()
-    const r = parseKey(today).getTime() + 3600e3
-    s.transmutation = { start: r, longestDays: 9, relapses: [r] }
-    expect(dayItems(s, today).find((i) => i.section === 'transmutation')?.done).toBe(false)
-    expect(dayItems(s, yesterday).find((i) => i.section === 'transmutation')?.done).toBe(true)
+  it('only habits count — no section items', () => {
+    expect(dayItems(base(), today).every((i) => i.id.startsWith('habit:'))).toBe(true)
   })
 
   it('completion for a past day', () => {
     const s = base()
     s.checks[yesterday] = ['a']
-    const items = dayItems(s, yesterday)
-    expect(items.find((i) => i.id === 'habit:a')?.done).toBe(true)
+    expect(dayItems(s, yesterday).find((i) => i.id === 'habit:a')?.done).toBe(true)
     expect(dayItems(s, today).find((i) => i.id === 'habit:a')?.done).toBe(false)
   })
 
-  it('screen time excluded', () => {
-    expect(dayItems(base(), today).some((i) => i.section === 'screentime')).toBe(false)
-  })
-
-  it('gym habit counted once and a stillness-linked habit stands in for the sit', () => {
-    const s = base()
-    const items = dayItems(s, today)
-    expect(items.filter((i) => i.section === 'gym' || i.id === 'habit:g')).toHaveLength(1)
-    expect(items.filter((i) => i.section === 'stillness').map((i) => i.id)).toEqual(['habit:m'])
-    s.checks[today] = ['m']
-    expect(dayItems(s, today).find((i) => i.id === 'habit:m')?.done).toBe(true)
-  })
-
-  it('sit item used when no habit is linked to stillness', () => {
-    const s = base()
-    s.habits = s.habits.filter((h) => h.link !== 'stillness')
-    expect(dayItems(s, today).filter((i) => i.section === 'stillness').map((i) => i.id)).toEqual(['stillness:sit'])
-  })
-
-  it('nothing before sections existed', () => {
-    const s = base()
-    const before = addDays(today, -20)
-    expect(dayItems(s, before)).toEqual([])
+  it('nothing before a habit existed', () => {
+    expect(dayItems(base(), addDays(today, -20))).toEqual([])
   })
 })
 
@@ -82,10 +52,6 @@ describe('completion', () => {
   it('reports done/total/pct', () => {
     const s = base()
     s.checks[today] = ['a', 'g']
-    const c = completion(s, today)
-    // a, g, sit, prayer, reading, gratitude, work, transmutation
-    expect(c.total).toBe(8)
-    expect(c.done).toBe(3)
-    expect(c.pct).toBeCloseTo(3 / 8)
+    expect(completion(s, today)).toEqual({ done: 2, total: 3, pct: 2 / 3 })
   })
 })
