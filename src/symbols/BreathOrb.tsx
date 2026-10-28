@@ -20,7 +20,7 @@ export function BreathOrb({ scale, trace, children, size = 300 }: { scale: numbe
         {trace !== undefined && (
           <>
             <rect x={o} y={o} width={sq} height={sq} rx={size * 0.1} fill="none" stroke="#2a2519" strokeWidth="2" />
-            <rect x={o} y={o} width={sq} height={sq} rx={size * 0.1} fill="none" stroke="#e8c46a" strokeWidth="3" strokeLinecap="round" pathLength={1} strokeDasharray={`${trace} 1`} transform={`rotate(180 ${c} ${c}) scale(-1 1) translate(${-size} 0)`} />
+            <rect x={o} y={o} width={sq} height={sq} rx={size * 0.1} fill="none" stroke="#e8c46a" strokeWidth="3" strokeLinecap="round" pathLength={1} strokeDasharray={`${trace} 1`} />
           </>
         )}
         <circle cx={c} cy={c} r={r * 1.18} fill="#e8c46a" opacity="0.4" filter="url(#orb-glow)" />

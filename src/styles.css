@@ -253,3 +253,10 @@ textarea.input { resize: none; min-height: 90px; line-height: 1.45; }
 .flow-dots i.on { background: var(--gold); }
 .has-tabs .dock { bottom: calc(var(--tabbar) + var(--safe-bottom)); padding-bottom: 12px; }
 .has-tabs .screen.full { padding-bottom: calc(var(--tabbar) + var(--safe-bottom) + 100px); }
+
+/* stillness */
+.sit-card { margin-top: 22px; background: linear-gradient(160deg, #261e0e, var(--surface) 75%); border-radius: 18px; padding: 16px; box-shadow: inset 0 0 0 1px #3a2f17; }
+.vis-line { font-family: Georgia, 'Times New Roman', serif; font-size: 24px; line-height: 1.45; color: #e8dfc8; text-align: center; animation: vis 1.6s var(--ease); margin: 0; }
+@keyframes vis { from { opacity: 0; filter: blur(4px); transform: translateY(6px); } }
+.eye-rays { animation: rays 8s ease-in-out infinite; transform-origin: 135px 100px; }
+@keyframes rays { 50% { transform: scale(1.04); } }

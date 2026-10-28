@@ -13,6 +13,10 @@ import { ExerciseProgress } from './screens/ExerciseProgress'
 import { Transmutation } from './screens/Transmutation'
 import { StageDetail } from './screens/StageDetail'
 import { Urge } from './screens/Urge'
+import { Stillness } from './screens/Stillness'
+import { Sit } from './screens/Sit'
+import { Breath } from './screens/Breath'
+import { Visualise } from './screens/Visualise'
 
 function Soon({ title }: { title: string }) {
   return (
@@ -36,6 +40,10 @@ function screenFor(r: Route): ReactNode {
     case 'transmutation': return <Transmutation />
     case 'stage': return <StageDetail index={r.index} />
     case 'urge': return <Urge />
+    case 'stillness': return <Stillness />
+    case 'sit': return <Sit />
+    case 'breath': return <Breath id={r.id} />
+    case 'visualise': return <Visualise id={r.id} />
     default: return <Soon title={r.name} />
   }
 }
