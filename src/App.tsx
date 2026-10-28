@@ -115,7 +115,11 @@ export function App() {
   const { state, update } = useStore()
   const [tab, setTab] = useState<Tab>('today')
   const [stacks, setStacks] = useState<Record<Tab, Route[]>>(() => ({
-    today: state.active ? [ROOT.today, { name: 'gym' }, { name: 'workout' }] : [ROOT.today],
+    today: state.active
+      ? [ROOT.today, { name: 'gym' }, { name: 'workout' }]
+      : state.stillness.activeSit
+        ? [ROOT.today, { name: 'sit' }]
+        : [ROOT.today],
     journey: [ROOT.journey],
     learn: [ROOT.learn],
     you: [ROOT.you],

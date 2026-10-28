@@ -31,6 +31,11 @@ function runStart(h: Habit, checks: State['checks'], today: string): number {
   return parseKey(first > today ? today : first).getTime()
 }
 
+/** Transmutation state rebuilt from a V1-style daily SR habit. */
+export function srFromHabit(h: Habit, checks: State['checks'], today: string): { start: number; longestDays: number } {
+  return { start: runStart(h, checks, today), longestDays: bestStreak(h, checks, today) }
+}
+
 /** Bring any saved state (V1 or V2) up to the current V2 shape. */
 export function migrate(raw: unknown, now: number): State {
   const s = raw as { version?: number }
@@ -57,7 +62,7 @@ export function migrate(raw: unknown, now: number): State {
   const sr = habits.find((h) => h.kind === 'quit' && SR.test(h.name))
   const sections = defaultSections(today, now)
   if (sr) {
-    sections.transmutation = { start: runStart(sr, v1.checks, today), longestDays: bestStreak(sr, v1.checks, today), relapses: [] }
+    sections.transmutation = { ...srFromHabit(sr, v1.checks, today), relapses: [] }
   } else {
     sections.transmutation = { start: null, longestDays: 0, relapses: [], needsPick: true }
   }

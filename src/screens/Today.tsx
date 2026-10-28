@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react'
-import { addDays, formatLong, todayKey } from '../dates'
+import { addDays, dateKey, formatLong } from '../dates'
+import { useNow } from './Transmutation'
 import { currentStreak, isChecked, isScheduled } from '../domain/streaks'
 import { completion } from '../domain/completion'
 import { useStore } from '../store'
@@ -28,9 +29,11 @@ export function Today() {
   const { push } = useNav()
   const [day, setDay] = useState<'today' | 'yesterday'>('today')
   const [editing, setEditing] = useState(false)
-  const today = todayKey()
+  // Re-reads the clock every minute and when the app comes back, so midnight rolls over
+  const now = useNow(60_000)
+  const today = dateKey(new Date(now))
   const key = day === 'today' ? today : addDays(today, -1)
-  const hour = new Date().getHours()
+  const hour = new Date(now).getHours()
   const c = completion(state, key)
 
   const visible = editing ? state.habits : state.habits.filter((h) => isScheduled(h, key) && key >= h.createdAt)

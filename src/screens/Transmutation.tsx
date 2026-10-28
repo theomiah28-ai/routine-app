@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { ASCENT } from '../content/ascent'
 import { elapsed, longest, relapse, stageIndex } from '../domain/transmutation'
-import { isChecked } from '../domain/streaks'
-import { addDays, parseKey, todayKey } from '../dates'
+import { srFromHabit } from '../migrate'
+import { todayKey } from '../dates'
 import { useStore } from '../store'
 import { Back, useNav } from '../nav'
 import { Ascent } from '../symbols/Ascent'
@@ -40,11 +40,10 @@ export function Transmutation() {
         s.transmutation = { start: Date.now(), longestDays: 0, relapses: [] }
         return
       }
-      // Rebuild the run from that habit's ticks, then retire it from Routine
-      const today = todayKey()
-      let key = isChecked(s.checks, habitId, today) ? today : addDays(today, -1)
-      while (isChecked(s.checks, habitId, key)) key = addDays(key, -1)
-      s.transmutation = { start: parseKey(addDays(key, 1) > today ? today : addDays(key, 1)).getTime(), longestDays: 0, relapses: [] }
+      // Rebuild the run from that habit's ticks (same rules as migration), then retire it from Routine
+      const h = s.habits.find((x) => x.id === habitId)
+      if (!h) return
+      s.transmutation = { ...srFromHabit(h, s.checks, todayKey()), relapses: [] }
       s.habits = s.habits.filter((h) => h.id !== habitId)
       for (const k in s.checks) s.checks[k] = s.checks[k].filter((x) => x !== habitId)
     })

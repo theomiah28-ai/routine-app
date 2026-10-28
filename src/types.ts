@@ -83,9 +83,18 @@ export interface PracticeLog {
   completed: boolean
 }
 
+export interface ActiveSit {
+  start: number
+  minutes: number
+  /** When the app last went to the background mid-sit */
+  hiddenAt?: number
+}
+
 export interface StillnessState {
   sitMinutes: number
   logs: PracticeLog[]
+  /** A Morning Sit in progress, so it survives the app being closed */
+  activeSit?: ActiveSit | null
 }
 
 export interface FaithDay {

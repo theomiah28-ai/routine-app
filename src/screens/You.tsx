@@ -25,13 +25,22 @@ export function You() {
   const [guide, setGuide] = useState(false)
   const set = state.settings
 
-  const exportBackup = () => {
-    const blob = new Blob([JSON.stringify(state)], { type: 'application/json' })
+  // The share sheet ("Save to Files") is the reliable way out of a home-screen app on iPhone
+  const exportBackup = async () => {
+    const file = new File([JSON.stringify(state)], `crucible-backup-${todayKey()}.json`, { type: 'application/json' })
+    if (navigator.canShare?.({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: 'Crucible backup' })
+        return
+      } catch {
+        return
+      }
+    }
     const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = `crucible-backup-${todayKey()}.json`
+    a.href = URL.createObjectURL(file)
+    a.download = file.name
     a.click()
-    URL.revokeObjectURL(a.href)
+    setTimeout(() => URL.revokeObjectURL(a.href), 60_000)
   }
 
   const importBackup = async (f: File) => {
@@ -120,7 +129,8 @@ export function You() {
         <h2 className="title">New name and icon</h2>
         <p className="note" style={{ margin: '6px 0 14px' }}>iPhone keeps the old name on an app that's already installed. To switch without losing anything:</p>
         <ol className="steps">
-          <li><b>Export a backup</b> above and save it to Files.</li>
+          <li><b>Export a backup</b> and choose <b>Save to Files</b>.</li>
+          <li>Open the Files app and <b>check the backup file is there</b>. Don't go on until it is: deleting the app deletes its data.</li>
           <li>Delete the old app from your home screen, open the link in Safari, then Share → <b>Add to Home Screen</b>.</li>
           <li>Open the new app, go to You → <b>Import backup</b>, and pick the file.</li>
         </ol>

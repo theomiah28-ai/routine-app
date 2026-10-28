@@ -82,3 +82,20 @@ describe('migrate', () => {
     expect(s.transmutation.start).not.toBeNull()
   })
 })
+
+describe('srFromHabit', () => {
+  it('respects the habit schedule and finds the longest run', async () => {
+    const { srFromHabit } = await import('./migrate')
+    const { weekday } = await import('./dates')
+    // scheduled on every weekday except the one 3 days ago
+    const skip = weekday(ago(3))
+    const habit = { id: 'sr', name: 'Stay clean', kind: 'quit' as const, days: [0, 1, 2, 3, 4, 5, 6].filter((d) => d !== skip), createdAt: ago(40), timeOfDay: 'anytime' as const }
+    const checks: Record<string, string[]> = {}
+    for (const n of [0, 1, 2, 4, 5]) checks[ago(n)] = ['sr']
+    for (let n = 10; n < 30; n++) checks[ago(n)] = ['sr']
+    const r = srFromHabit(habit, checks, today)
+    expect(r.start).toBe(parseKey(ago(5)).getTime())
+    // 20 ticked days, 3 of them on the unscheduled weekday
+    expect(r.longestDays).toBe(17)
+  })
+})

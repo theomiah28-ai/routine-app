@@ -129,10 +129,13 @@ export function Sheet({ open, onClose, children }: { open: boolean; onClose: () 
 }
 
 export function Toast({ text, onDone }: { text: string; onDone: () => void }) {
+  // Parents re-render often (workout clock); keep the timer tied to the text, not the callback
+  const done = useRef(onDone)
+  done.current = onDone
   useEffect(() => {
-    const t = setTimeout(onDone, 2600)
+    const t = setTimeout(() => done.current(), 2600)
     return () => clearTimeout(t)
-  }, [text, onDone])
+  }, [text])
   return <div className="toast">{text}</div>
 }
 
