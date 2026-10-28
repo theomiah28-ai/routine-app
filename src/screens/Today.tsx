@@ -6,7 +6,6 @@ import { completion } from '../domain/completion'
 import { useStore } from '../store'
 import { useNav, type Route } from '../nav'
 import { Check, Moon, Ring, Screen, SortableList, Sun } from '../ui'
-import { sectionCards } from './sectionCards'
 import type { Habit } from '../types'
 
 type Group = { key: string; title: string; icon?: ReactNode; match: (h: Habit) => boolean }
@@ -120,24 +119,17 @@ export function Today() {
         )
       })}
 
-      {!visible.length && !editing && <div className="empty">No habits scheduled{day === 'today' ? ' today' : ''}.</div>}
+      {!state.habits.length && !editing ? (
+        <div className="empty-state">
+          <b>Your routine starts here</b>
+          <p className="note">Add the habits you want to build or quit. Link one to Transmutation, Stillness, Faith or Gym and every tick grows that section in Journey.</p>
+        </div>
+      ) : (
+        !visible.length && !editing && <div className="empty">No habits scheduled{day === 'today' ? ' today' : ''}.</div>
+      )}
       <button className="add-row" onClick={() => push({ name: 'habitEdit' })}>+ Add habit</button>
       {visible.length > 1 && <p className="hint">{editing ? 'Drag ⋮⋮ to reorder' : 'Press and hold a habit, then drag to reorder'}</p>}
 
-      {!editing && day === 'today' && (
-        <>
-          <div className="sec" style={{ marginTop: 30 }}>Your sections</div>
-          <div className="tiles">
-            {sectionCards(state).map((t) => (
-              <button key={t.label} className={'tile' + (t.lit ? ' lit' : '')} onClick={() => push(t.route)}>
-                <span className="label">{t.label}</span>
-                <b>{t.value}</b>
-                <small>{t.sub}</small>
-              </button>
-            ))}
-          </div>
-        </>
-      )}
     </Screen>
   )
 }

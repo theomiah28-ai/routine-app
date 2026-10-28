@@ -42,7 +42,12 @@ export function Reader({ chapter: chapterRef, planDay }: { chapter: string; plan
             <button
               className="btn"
               onClick={() => {
-                update((s) => void (s.faith = completeReading(s.faith, today)))
+                update((s) => {
+                  s.faith = completeReading(s.faith, today)
+                  // Reading counts for a faith-linked habit too
+                  const h = s.habits.find((x) => x.link === 'faith')
+                  if (h && !(s.checks[today] ?? []).includes(h.id)) s.checks[today] = [...(s.checks[today] ?? []), h.id]
+                })
                 pop()
               }}
             >
