@@ -3,6 +3,7 @@ import { elapsed, stageIndex } from '../domain/transmutation'
 import { useStore } from '../store'
 import { Back } from '../nav'
 import { Screen } from '../ui'
+import { WhyLink } from './WhyLink'
 
 export function StageDetail({ index }: { index: number }) {
   const { state } = useStore()
@@ -30,6 +31,7 @@ export function StageDetail({ index }: { index: number }) {
             <div><b className="acc">What you gain</b>{s.gains}</div>
             <div><b className="quit-c">What wasting it costs</b>{s.costs}</div>
           </div>
+          <WhyLink insightId={s.insightId} label="Go deeper" />
         </>
       ) : (
         <div className="locked">

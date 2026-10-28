@@ -43,6 +43,7 @@ export const ASCENT: AscentStage[] = [
     subtitle: 'People notice',
     teaching: '[Theo to write] A month changes how you carry yourself. Presence, eye contact, calm confidence. Others feel it before you name it.',
     gains: 'Presence, calm confidence, people drawn to you.',
+    insightId: 'energy-is-currency',
     costs: 'Fog, low drive, starting from zero.',
   },
   {
