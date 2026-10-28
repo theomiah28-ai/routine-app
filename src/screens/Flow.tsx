@@ -61,6 +61,7 @@ export function Flow({ kind }: { kind: 'morning' | 'evening' }) {
     },
     {
       id: 'verse',
+      skip: !state.settings.faith,
       render: () => (
         <>
           <div className="label gold">Verse of the day · {THEMES[verse.theme]}</div>

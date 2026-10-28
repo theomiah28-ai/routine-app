@@ -98,6 +98,10 @@ export function You() {
         <span>Work targets</span><span className="chev">›</span>
       </button>
       <div className="setting">
+        <span>Faith<div className="sub" style={{ fontSize: 12 }}>Christian faith section: verse, plans, prayer</div></span>
+        <Toggle on={set.faith} onChange={(v) => update((s) => void (s.settings.faith = v))} />
+      </div>
+      <div className="setting">
         <span>Show esoteric teachings<div className="sub" style={{ fontSize: 12 }}>Deeper material in Learn, off unless you want it</div></span>
         <Toggle on={set.showEsoteric} onChange={(v) => update((s) => void (s.settings.showEsoteric = v))} />
       </div>

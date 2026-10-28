@@ -174,12 +174,12 @@ export function App() {
       <Sheet open={!!state.settings.whatsNew} onClose={() => update((s) => void (s.settings.whatsNew = false))}>
         <div className="label gold">What's new</div>
         <h2 className="title" style={{ marginTop: 6 }}>Welcome to {APP_NAME}</h2>
-        <p className="note" style={{ margin: '8px 0 12px' }}>Everything you logged is here. Your NoFap streak now lives in Transmutation.</p>
+        <p className="note" style={{ margin: '8px 0 12px' }}>Everything you logged is here. Keep ticking your habits on Today: each one now grows a section in Journey.</p>
         <ul className="steps">
-          <li><b>Transmutation:</b> the Ascent, seven stages to 365 days.</li>
-          <li><b>Stillness:</b> the Morning Sit, breathwork and visualisation.</li>
-          <li><b>Faith</b>, <b>Work</b> and a <b>Screen Time</b> preview.</li>
-          <li><b>Journey</b> shows every symbol. <b>Learn</b> holds the teachings.</li>
+          <li><b>No PMO</b> climbs the Ascent, seven stages to 365 days.</li>
+          <li><b>Meditate</b> opens the Eye. Fully awake at 365 hours.</li>
+          <li><b>Gym</b> carves your statue. Every PB carves deeper.</li>
+          <li><b>Faith</b>, <b>Work</b> and your <b>Screen Time</b> brain are in Journey too. <b>Learn</b> holds the teachings.</li>
         </ul>
         <button className="btn" onClick={() => update((s) => void (s.settings.whatsNew = false))}>Let's go</button>
       </Sheet>
