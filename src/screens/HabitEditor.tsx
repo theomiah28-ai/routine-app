@@ -3,8 +3,8 @@ import { todayKey } from '../dates'
 import { uid } from '../seed'
 import { useStore } from '../store'
 import { Back, useNav } from '../nav'
-import { Toggle } from '../ui'
-import type { HabitKind } from '../types'
+import { Moon, Screen, Sun } from '../ui'
+import type { Habit, HabitKind, TimeOfDay } from '../types'
 
 // Mon-first display, stored as JS weekday numbers
 const WEEK = [
@@ -18,16 +18,18 @@ export function HabitEditor({ id }: { id?: string }) {
   const [name, setName] = useState(existing?.name ?? '')
   const [kind, setKind] = useState<HabitKind>(existing?.kind ?? 'build')
   const [days, setDays] = useState<number[]>(existing?.days.length ? existing.days : [0, 1, 2, 3, 4, 5, 6])
-  const [isGym, setIsGym] = useState(existing?.link === 'gym')
+  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(existing?.timeOfDay ?? 'anytime')
+  const [link, setLink] = useState<Habit['link']>(existing?.link)
 
   const save = () => {
-    if (!name.trim()) return
-    const fields = { name: name.trim(), kind, days: days.length === 7 ? [] : days, link: isGym ? ('gym' as const) : existing?.link === 'gym' ? undefined : existing?.link }
+    if (!name.trim() || !days.length) return
+    const fields = { name: name.trim(), kind, days: days.length === 7 ? [] : days, timeOfDay, link: kind === 'build' ? link : undefined }
     update((s) => {
-      if (isGym) s.habits.forEach((h) => h.link === 'gym' && (h.link = undefined))
+      // Only one habit can be linked to each section
+      if (fields.link) s.habits.forEach((h) => h.link === fields.link && h.id !== id && (h.link = undefined))
       const h = s.habits.find((h) => h.id === id)
       if (h) Object.assign(h, fields)
-      else s.habits.push({ id: uid(), createdAt: todayKey(), timeOfDay: 'anytime', ...fields })
+      else s.habits.push({ id: uid(), createdAt: todayKey(), ...fields })
     })
     pop()
   }
@@ -44,12 +46,12 @@ export function HabitEditor({ id }: { id?: string }) {
   const toggleDay = (d: number) => setDays((cur) => (cur.includes(d) ? cur.filter((x) => x !== d) : [...cur, d]))
 
   return (
-    <div className="screen full">
+    <Screen full>
       <div className="topbar">
         <Back label="Cancel" />
-        <button className="link" onClick={save} style={{ opacity: name.trim() && days.length ? 1 : 0.4 }}>Save</button>
+        <button className="link gold" onClick={save} style={{ opacity: name.trim() && days.length ? 1 : 0.4 }}>Save</button>
       </div>
-      <h1 style={{ marginBottom: 22 }}>{existing ? 'Edit habit' : 'New habit'}</h1>
+      <h1 style={{ margin: '14px 0 22px' }}>{existing ? 'Edit habit' : 'New habit'}</h1>
 
       <div className="field">
         <label>Name</label>
@@ -65,6 +67,21 @@ export function HabitEditor({ id }: { id?: string }) {
         {kind === 'quit' && <p className="note" style={{ marginTop: 10 }}>Tick it each day you stayed clean.</p>}
       </div>
 
+      {kind === 'build' && (
+        <div className="field">
+          <label>Time of day</label>
+          <div className="seg">
+            <button className={timeOfDay === 'morning' ? 'on' : ''} onClick={() => setTimeOfDay('morning')}>
+              <span style={{ display: 'inline-flex', gap: 5, alignItems: 'center' }}><Sun size={13} />Morning</span>
+            </button>
+            <button className={timeOfDay === 'anytime' ? 'on' : ''} onClick={() => setTimeOfDay('anytime')}>Anytime</button>
+            <button className={timeOfDay === 'evening' ? 'on' : ''} onClick={() => setTimeOfDay('evening')}>
+              <span style={{ display: 'inline-flex', gap: 5, alignItems: 'center' }}><Moon size={13} />Evening</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="field">
         <label>Days</label>
         <div className="days">
@@ -75,12 +92,18 @@ export function HabitEditor({ id }: { id?: string }) {
         <p className="note" style={{ marginTop: 10 }}>Streaks only count the days you pick, so rest days never break them.</p>
       </div>
 
-      <div className="field row" style={{ background: 'var(--surface)', borderRadius: 12, padding: '12px 14px' }}>
-        <span style={{ fontSize: 15 }}>Tick automatically when I finish a workout</span>
-        <Toggle on={isGym} onChange={setIsGym} />
-      </div>
+      {kind === 'build' && (
+        <div className="field">
+          <label>Tick automatically when I finish</label>
+          <div className="seg">
+            <button className={!link ? 'on' : ''} onClick={() => setLink(undefined)}>Nothing</button>
+            <button className={link === 'gym' ? 'on' : ''} onClick={() => setLink('gym')}>A workout</button>
+            <button className={link === 'stillness' ? 'on' : ''} onClick={() => setLink('stillness')}>A sit</button>
+          </div>
+        </div>
+      )}
 
       {existing && <button className="btn danger" onClick={remove} style={{ marginTop: 20 }}>Delete habit</button>}
-    </div>
+    </Screen>
   )
 }

@@ -1,13 +1,23 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { addDays, formatLong, todayKey } from '../dates'
 import { currentStreak, isChecked, isScheduled } from '../domain/streaks'
+import { completion } from '../domain/completion'
 import { useStore } from '../store'
-import { useNav } from '../nav'
-import { Check, SortableList } from '../ui'
-import type { Habit, HabitKind } from '../types'
+import { useNav, type Route } from '../nav'
+import { Check, Moon, Ring, Screen, SortableList, Sun } from '../ui'
+import { sectionCards } from './sectionCards'
+import type { Habit } from '../types'
 
-function greeting() {
-  const h = new Date().getHours()
+type Group = { key: string; title: string; icon?: ReactNode; match: (h: Habit) => boolean }
+
+const GROUPS: Group[] = [
+  { key: 'morning', title: 'Morning', icon: <Sun />, match: (h) => h.kind === 'build' && h.timeOfDay === 'morning' },
+  { key: 'anytime', title: 'Anytime', match: (h) => h.kind === 'build' && h.timeOfDay === 'anytime' },
+  { key: 'evening', title: 'Evening', icon: <Moon />, match: (h) => h.kind === 'build' && h.timeOfDay === 'evening' },
+  { key: 'quit', title: 'Quit', match: (h) => h.kind === 'quit' },
+]
+
+function greeting(h: number) {
   if (h < 12) return 'Good morning'
   if (h < 18) return 'Good afternoon'
   return 'Good evening'
@@ -20,10 +30,10 @@ export function Today() {
   const [editing, setEditing] = useState(false)
   const today = todayKey()
   const key = day === 'today' ? today : addDays(today, -1)
+  const hour = new Date().getHours()
+  const c = completion(state, key)
 
   const visible = editing ? state.habits : state.habits.filter((h) => isScheduled(h, key) && key >= h.createdAt)
-  const doneCount = visible.filter((h) => isChecked(state.checks, h.id, key)).length
-  const pct = visible.length ? (doneCount / visible.length) * 100 : 0
 
   const toggle = (id: string) =>
     update((s) => {
@@ -32,18 +42,15 @@ export function Today() {
     })
 
   // `items` may be only the habits shown today; hidden ones keep their slots
-  const reorder = (kind: HabitKind, items: Habit[]) =>
+  const reorder = (g: Group, items: Habit[]) =>
     update((s) => {
-      const ofKind = s.habits.filter((h) => h.kind === kind)
       const shown = new Set(items.map((h) => h.id))
       let i = 0
-      const merged = ofKind.map((h) => {
-        if (!shown.has(h.id)) return h
+      s.habits = s.habits.map((h) => {
+        if (!g.match(h) || !shown.has(h.id)) return h
         const id = items[i++].id
         return s.habits.find((x) => x.id === id)!
       })
-      const others = s.habits.filter((h) => h.kind !== kind)
-      s.habits = kind === 'build' ? [...merged, ...others] : [...others, ...merged]
     })
 
   const row = (h: Habit) => {
@@ -52,7 +59,7 @@ export function Today() {
     return (
       <div key={h.id} className={'item' + (done ? ' done' : '') + (h.kind === 'quit' ? ' quit' : '')}>
         {!editing && <Check on={done} onClick={() => toggle(h.id)} />}
-        <button className="name" style={{ textAlign: 'left' }} onClick={() => push(editing ? { name: 'habitEdit', id: h.id } : { name: 'habit', id: h.id })}>
+        <button className="name" onClick={() => push(editing ? { name: 'habitEdit', id: h.id } : { name: 'habit', id: h.id })}>
           {h.name}
         </button>
         {editing ? <span className="chev">›</span> : <span className={'streak' + (streak ? '' : ' zero')}>{streak}d</span>}
@@ -60,58 +67,74 @@ export function Today() {
     )
   }
 
-  const section = (kind: HabitKind, title: string) => {
-    const items = visible.filter((h) => h.kind === kind)
-    if (!items.length && !editing) return null
-    return (
-      <>
-        <div className="sec">{title}</div>
-        <SortableList items={items} onReorder={(i) => reorder(kind, i)} render={row} handle={editing} />
-      </>
-    )
-  }
+  const flow: { label: string; route: Route } | null =
+    day !== 'today' || editing ? null : hour < 12 ? { label: 'Start morning', route: { name: 'morning' } } : hour >= 18 ? { label: 'Wind down', route: { name: 'evening' } } : null
 
   return (
-    <div className="screen">
+    <Screen>
       <div className="topbar">
         <span className="date">{formatLong(key)}</span>
-        <div className="row" style={{ gap: 16 }}>
-          {!editing && (
-            <button className="icon-btn" onClick={() => push({ name: 'you' })} aria-label="Settings">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <path d="M4 7h10M18 7h2M4 17h4M12 17h8" />
-                <circle cx="16" cy="7" r="2" />
-                <circle cx="10" cy="17" r="2" />
-              </svg>
-            </button>
-          )}
-          <button className="link" onClick={() => setEditing(!editing)}>{editing ? 'Done' : 'Edit'}</button>
-        </div>
+        <button className="link" onClick={() => setEditing(!editing)}>{editing ? 'Done' : 'Edit'}</button>
       </div>
-      <h1>{editing ? 'Edit routine' : `${greeting()}, ${state.settings.name}`}</h1>
 
-      {!editing && (
+      {editing ? (
+        <h1>Edit routine</h1>
+      ) : (
         <>
-          <div className="row" style={{ marginTop: 14 }}>
-            <span className="sub">{doneCount} of {visible.length} done</span>
-            <div className="seg">
-              <button className={day === 'yesterday' ? 'on' : ''} onClick={() => setDay('yesterday')}>Yesterday</button>
-              <button className={day === 'today' ? 'on' : ''} onClick={() => setDay('today')}>Today</button>
+          <h1 style={{ marginBottom: 16 }}>
+            {greeting(hour)}
+            {state.settings.name ? `, ${state.settings.name}` : ''}
+          </h1>
+          <div className="row" style={{ alignItems: 'center', gap: 18 }}>
+            <Ring pct={c.pct} size={92} stroke={8}>
+              <div style={{ fontSize: 22, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{Math.round(c.pct * 100)}%</div>
+            </Ring>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 17, fontWeight: 650 }}>{c.done === c.total && c.total ? 'Day complete' : `${c.done} of ${c.total} done`}</div>
+              <div className="sub" style={{ marginTop: 2 }}>{day === 'today' ? 'Every tick fills the ring' : 'Fixing yesterday'}</div>
+              <div className="seg" style={{ marginTop: 10 }}>
+                <button className={day === 'yesterday' ? 'on' : ''} onClick={() => setDay('yesterday')}>Yesterday</button>
+                <button className={day === 'today' ? 'on' : ''} onClick={() => setDay('today')}>Today</button>
+              </div>
             </div>
           </div>
-          <div className="progress"><i style={{ width: `${pct}%` }} /></div>
+          {flow && (
+            <button className="btn" style={{ marginTop: 18 }} onClick={() => push(flow.route)}>
+              {flow.label}
+            </button>
+          )}
         </>
       )}
 
-      {section('build', 'Build')}
-      {section('quit', 'Quit')}
+      {GROUPS.map((g) => {
+        const items = visible.filter(g.match)
+        if (!items.length) return null
+        return (
+          <div key={g.key}>
+            <div className="sec">{g.icon}{g.title}</div>
+            <SortableList items={items} onReorder={(i) => reorder(g, i)} render={row} handle={editing} />
+          </div>
+        )
+      })}
 
-      {!visible.length && !editing && <div className="empty">Nothing scheduled{day === 'today' ? ' today' : ''}.</div>}
-
+      {!visible.length && !editing && <div className="empty">No habits scheduled{day === 'today' ? ' today' : ''}.</div>}
       <button className="add-row" onClick={() => push({ name: 'habitEdit' })}>+ Add habit</button>
-      {visible.length > 1 && (
-        <p className="hint">{editing ? 'Drag ⋮⋮ to reorder' : 'Press and hold a habit, then drag to put it in your order'}</p>
+      {visible.length > 1 && <p className="hint">{editing ? 'Drag ⋮⋮ to reorder' : 'Press and hold a habit, then drag to reorder'}</p>}
+
+      {!editing && day === 'today' && (
+        <>
+          <div className="sec" style={{ marginTop: 30 }}>Your sections</div>
+          <div className="tiles">
+            {sectionCards(state).map((t) => (
+              <button key={t.label} className={'tile' + (t.lit ? ' lit' : '')} onClick={() => push(t.route)}>
+                <span className="label">{t.label}</span>
+                <b>{t.value}</b>
+                <small>{t.sub}</small>
+              </button>
+            ))}
+          </div>
+        </>
       )}
-    </div>
+    </Screen>
   )
 }
