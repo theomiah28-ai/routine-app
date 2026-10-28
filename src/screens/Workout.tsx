@@ -15,6 +15,7 @@ export function startWorkout(s: State, dayId: string) {
     dayId,
     start: Date.now(),
     entries: day.exercises.map((e) => ({ exerciseId: e.exerciseId, sets: Array.from({ length: e.sets }, blank) })),
+    restEndsAt: null,
   }
 }
 
@@ -65,7 +66,7 @@ export function Workout() {
     update((s) => {
       s.sessions.push({ id: uid(), dayId: active.dayId, dayName: day?.name ?? 'Workout', start: active.start, end: Date.now(), entries })
       s.active = null
-      const gym = s.habits.find((h) => h.isGym)
+      const gym = s.habits.find((h) => h.link === 'gym')
       const key = todayKey()
       if (gym && !(s.checks[key] ?? []).includes(gym.id)) s.checks[key] = [...(s.checks[key] ?? []), gym.id]
     })

@@ -1,5 +1,5 @@
 import { addDays, todayKey, weekStart } from '../dates'
-import { bestStreak, currentStreak, isChecked, isScheduled } from '../streaks'
+import { bestStreak, currentStreak, isChecked, isScheduled } from '../domain/streaks'
 import { useStore } from '../store'
 import { Back, useNav } from '../nav'
 

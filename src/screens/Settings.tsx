@@ -20,7 +20,7 @@ export function Settings() {
   const importBackup = async (f: File) => {
     try {
       const data = JSON.parse(await f.text()) as State
-      if (data.version !== 1 || !Array.isArray(data.habits) || !Array.isArray(data.sessions)) throw new Error()
+      if ( !Array.isArray(data.habits) || !Array.isArray(data.sessions)) throw new Error()
       if (!confirm('Replace everything in the app with this backup?')) return
       replace(data)
       alert('Backup restored.')
@@ -36,7 +36,7 @@ export function Settings() {
 
       <div className="field">
         <label>Your name</label>
-        <input className="input" value={state.name} onChange={(e) => update((s) => void (s.name = e.target.value))} />
+        <input className="input" value={state.settings.name} onChange={(e) => update((s) => void (s.settings.name = e.target.value))} />
       </div>
 
       <div className="sec">Backup</div>

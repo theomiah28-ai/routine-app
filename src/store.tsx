@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { get, set } from 'idb-keyval'
 import { seedState } from './seed'
+import { migrate, V1_BACKUP_KEY } from './migrate'
 import type { State } from './types'
 
 type Update = (fn: (s: State) => void) => void
@@ -14,7 +15,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     navigator.storage?.persist?.()
-    get<State>('state').then((saved) => setState(saved ?? seedState()))
+    get('state').then(async (saved) => {
+      if (!saved) return setState(seedState())
+      if (saved.version !== 2) await set(V1_BACKUP_KEY, saved)
+      setState(migrate(saved, Date.now()))
+    })
   }, [])
 
   useEffect(() => {

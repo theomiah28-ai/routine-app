@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { bestStreak, currentStreak } from './streaks'
-import type { Habit } from './types'
+import type { Habit } from '../types'
 
-const daily: Habit = { id: 'h', name: 'Read', kind: 'build', days: [], createdAt: '2026-10-01' }
+const daily: Habit = { id: 'h', name: 'Read', kind: 'build', days: [], createdAt: '2026-10-01', timeOfDay: 'anytime' }
 // 2026-10-26 is a Monday
 const monWedFri: Habit = { ...daily, days: [1, 3, 5] }
 const checks = (...keys: string[]) => Object.fromEntries(keys.map((k) => [k, ['h']]))

@@ -1,4 +1,6 @@
 export type HabitKind = 'build' | 'quit'
+export type TimeOfDay = 'morning' | 'anytime' | 'evening'
+export type Section = 'routine' | 'gym' | 'transmutation' | 'stillness' | 'faith' | 'work' | 'screentime'
 
 export interface Habit {
   id: string
@@ -6,10 +8,12 @@ export interface Habit {
   kind: HabitKind
   /** Weekdays it's scheduled (0 = Sun … 6 = Sat). Empty = every day. */
   days: number[]
-  /** Auto-ticked when a workout is finished. */
-  isGym?: boolean
   /** YYYY-MM-DD — streaks never look further back than this. */
   createdAt: string
+  timeOfDay: TimeOfDay
+  /** Auto-ticked when a workout (gym) or a Morning Sit (stillness) is finished. */
+  link?: 'gym' | 'stillness'
+  insightId?: string
 }
 
 export interface Exercise {
@@ -57,11 +61,93 @@ export interface ActiveWorkout {
   dayId: string
   start: number
   entries: { exerciseId: string; sets: ActiveSet[] }[]
+  restEndsAt: number | null
+}
+
+export interface TransmutationState {
+  /** ms epoch the current streak began; null = not tracking yet */
+  start: number | null
+  longestDays: number
+  relapses: number[]
+  /** V1 had no recognisable SR habit — ask once which one it was */
+  needsPick?: boolean
+}
+
+export type PracticeKind = 'sit' | 'box' | 'power' | 'calm' | 'visualise'
+
+export interface PracticeLog {
+  id: string
+  kind: PracticeKind
+  start: number
+  minutes: number
+  completed: boolean
+}
+
+export interface StillnessState {
+  sitMinutes: number
+  logs: PracticeLog[]
+}
+
+export interface FaithDay {
+  prayer?: boolean
+  reading?: boolean
+  gratitude?: boolean
+  note?: string
+}
+
+export interface FaithState {
+  createdAt: string
+  days: Record<string, FaithDay>
+  planId: string | null
+  /** planId → days completed */
+  planProgress: Record<string, number>
+}
+
+export interface WorkInputs {
+  videos: number
+  products: number
+  hoursWorked: number
+  deepMinutes: number
+}
+
+export interface WorkState {
+  createdAt: string
+  targets: WorkInputs
+  /** Scheduled weekdays; empty = every day */
+  days: number[]
+  log: Record<string, WorkInputs>
+  focusStart: number | null
+}
+
+export interface ScreenTimeState {
+  limit: number
+  foggy: number
+  rotting: number
+  /** dateKey → minutes entered by hand */
+  manual: Record<string, number>
+}
+
+export interface Milestone {
+  id: string
+  section: Section
+  title: string
+  value: string
+  at: number
+  seen: boolean
+}
+
+export interface Settings {
+  name: string
+  showEsoteric: boolean
+  onboarded: boolean
+  restSeconds: number
+  /** Show the one-time "What's new in V2" sheet */
+  whatsNew?: boolean
 }
 
 export interface State {
-  version: 1
-  name: string
+  version: 2
+  settings: Settings
   habits: Habit[]
   /** dateKey → ids of habits ticked that day */
   checks: Record<string, string[]>
@@ -70,4 +156,10 @@ export interface State {
   exercises: Record<string, Exercise>
   sessions: Session[]
   active: ActiveWorkout | null
+  transmutation: TransmutationState
+  stillness: StillnessState
+  faith: FaithState
+  work: WorkState
+  screenTime: ScreenTimeState
+  milestones: Milestone[]
 }

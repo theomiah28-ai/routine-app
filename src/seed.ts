@@ -1,5 +1,5 @@
 import { todayKey } from './dates'
-import type { Exercise, SplitDay, State } from './types'
+import type { Exercise, Habit, SplitDay, State, TimeOfDay } from './types'
 
 export const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4)
 
@@ -22,32 +22,50 @@ function split(): { days: SplitDay[]; exercises: Record<string, Exercise> } {
   return { days, exercises }
 }
 
+/** The V2-only sections, fresh. */
+export function defaultSections(today: string, now: number): Pick<State, 'transmutation' | 'stillness' | 'faith' | 'work' | 'screenTime' | 'milestones'> {
+  return {
+    transmutation: { start: now, longestDays: 0, relapses: [] },
+    stillness: { sitMinutes: 30, logs: [] },
+    faith: { createdAt: today, days: {}, planId: 'wisdom-wealth', planProgress: {} },
+    work: {
+      createdAt: today,
+      targets: { videos: 1, products: 1, hoursWorked: 6, deepMinutes: 180 },
+      days: [],
+      log: {},
+      focusStart: null,
+    },
+    screenTime: { limit: 120, foggy: 120, rotting: 240, manual: {} },
+    milestones: [],
+  }
+}
+
 export function seedState(): State {
   const createdAt = todayKey()
-  const h = (name: string, kind: 'build' | 'quit', extra: { days?: number[]; isGym?: boolean } = {}) => ({
+  const h = (name: string, kind: Habit['kind'], timeOfDay: TimeOfDay, extra: Partial<Habit> = {}): Habit => ({
     id: uid(),
     name,
     kind,
-    days: extra.days ?? [],
-    isGym: extra.isGym,
+    days: [],
     createdAt,
+    timeOfDay,
+    ...extra,
   })
   return {
-    version: 1,
-    name: 'Theo',
+    version: 2,
+    settings: { name: '', showEsoteric: false, onboarded: false, restSeconds: 120 },
     habits: [
-      h('Wake up by 6:30', 'build'),
-      h('Gym', 'build', { days: [1, 2, 4, 5], isGym: true }),
-      h('Read 20 min', 'build'),
-      h('Meditate', 'build'),
-      h('Asleep by 23:00', 'build'),
-      h('No vaping', 'quit'),
-      h('No PMO', 'quit'),
+      h('Wake up by 6:30', 'build', 'morning'),
+      h('Gym', 'build', 'anytime', { days: [1, 2, 4, 5], link: 'gym' }),
+      h('Read 20 min', 'build', 'anytime'),
+      h('Asleep by 23:00', 'build', 'evening'),
+      h('No vaping', 'quit', 'anytime'),
     ],
     checks: {},
     splitName: 'Upper / Lower',
     ...split(),
     sessions: [],
     active: null,
+    ...defaultSections(createdAt, Date.now()),
   }
 }

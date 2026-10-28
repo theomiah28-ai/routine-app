@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { addDays, formatLong, todayKey } from '../dates'
-import { currentStreak, isChecked, isScheduled } from '../streaks'
+import { currentStreak, isChecked, isScheduled } from '../domain/streaks'
 import { useStore } from '../store'
 import { useNav } from '../nav'
 import { Check, SortableList } from '../components'
@@ -88,7 +88,7 @@ export function Today() {
           <button className="link" onClick={() => setEditing(!editing)}>{editing ? 'Done' : 'Edit'}</button>
         </div>
       </div>
-      <h1>{editing ? 'Edit routine' : `${greeting()}, ${state.name}`}</h1>
+      <h1>{editing ? 'Edit routine' : `${greeting()}, ${state.settings.name}`}</h1>
 
       {!editing && (
         <>

@@ -18,16 +18,16 @@ export function HabitEditor({ id }: { id?: string }) {
   const [name, setName] = useState(existing?.name ?? '')
   const [kind, setKind] = useState<HabitKind>(existing?.kind ?? 'build')
   const [days, setDays] = useState<number[]>(existing?.days.length ? existing.days : [0, 1, 2, 3, 4, 5, 6])
-  const [isGym, setIsGym] = useState(existing?.isGym ?? false)
+  const [isGym, setIsGym] = useState(existing?.link === 'gym')
 
   const save = () => {
     if (!name.trim()) return
-    const fields = { name: name.trim(), kind, days: days.length === 7 ? [] : days, isGym: isGym || undefined }
+    const fields = { name: name.trim(), kind, days: days.length === 7 ? [] : days, link: isGym ? ('gym' as const) : existing?.link === 'gym' ? undefined : existing?.link }
     update((s) => {
-      if (isGym) s.habits.forEach((h) => (h.isGym = undefined))
+      if (isGym) s.habits.forEach((h) => h.link === 'gym' && (h.link = undefined))
       const h = s.habits.find((h) => h.id === id)
       if (h) Object.assign(h, fields)
-      else s.habits.push({ id: uid(), createdAt: todayKey(), ...fields })
+      else s.habits.push({ id: uid(), createdAt: todayKey(), timeOfDay: 'anytime', ...fields })
     })
     pop()
   }
