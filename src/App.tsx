@@ -27,6 +27,7 @@ import { Progress } from './screens/Progress'
 import { Learn } from './screens/Learn'
 import { Article } from './screens/Article'
 import { MilestoneModal } from './screens/MilestoneModal'
+import { Flow } from './screens/Flow'
 import { celebrateOnly, detectMilestones } from './domain/milestones'
 
 function Soon({ title }: { title: string }) {
@@ -63,6 +64,8 @@ function screenFor(r: Route): ReactNode {
     case 'progress': return <Progress />
     case 'learn': return <Learn />
     case 'article': return <Article id={r.id} />
+    case 'morning': return <Flow kind="morning" />
+    case 'evening': return <Flow kind="evening" />
     case 'reader': return <Reader chapter={r.ref} planDay={r.planDay} />
     default: return <Soon title={r.name} />
   }
