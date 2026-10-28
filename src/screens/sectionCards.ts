@@ -5,6 +5,7 @@ import { sitDoneOn, sitStreak, totalMinutes, eyeStage } from '../domain/stillnes
 import { todayKey } from '../dates'
 import { faithDone, faithStreak } from '../domain/faith'
 import { workHit, workLog } from '../domain/work'
+import { brainState, todayMinutes } from '../domain/screentime'
 import type { Route } from '../nav'
 import type { State } from '../types'
 
@@ -29,6 +30,6 @@ export function sectionCards(s: State): SectionCard[] {
     { label: 'Faith', value: `${faithStreak(s.faith, today)}d`, sub: faithDone(s.faith, today, 'prayer') ? 'Prayed today' : 'Morning prayer', route: { name: 'faith' }, lit: faithDone(s.faith, today, 'prayer') },
     { label: 'Work', value: s.work.focusStart ? 'In focus' : `${Math.round(workLog(s.work, today).deepMinutes / 6) / 10}h deep`, sub: workHit(s.work, today) ? 'Targets hit' : `${workLog(s.work, today).videos} videos · ${workLog(s.work, today).products} products`, route: { name: 'work' }, lit: workHit(s.work, today) || !!s.work.focusStart },
     { label: 'Gym', value: next?.name ?? 'Set up', sub: s.active ? 'Workout in progress' : 'Next up', route: { name: 'gym' }, lit: !!s.active },
-    { label: 'Screen time', value: 'Preview', sub: 'Brain state', route: { name: 'screentime' } },
+    { label: 'Screen time', value: { sharp: 'Sharp', foggy: 'Foggy', rotting: 'Rotting' }[brainState(todayMinutes(s.screenTime, today), s.screenTime)], sub: 'Brain state · preview', route: { name: 'screentime' } },
   ]
 }

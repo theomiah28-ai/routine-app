@@ -21,6 +21,7 @@ import { Faith } from './screens/Faith'
 import { Plans } from './screens/Plans'
 import { Reader } from './screens/Reader'
 import { Work } from './screens/Work'
+import { ScreenTime } from './screens/ScreenTime'
 
 function Soon({ title }: { title: string }) {
   return (
@@ -51,6 +52,7 @@ function screenFor(r: Route): ReactNode {
     case 'faith': return <Faith />
     case 'plans': return <Plans />
     case 'work': return <Work startFocus={r.startFocus} />
+    case 'screentime': return <ScreenTime />
     case 'reader': return <Reader chapter={r.ref} planDay={r.planDay} />
     default: return <Soon title={r.name} />
   }
