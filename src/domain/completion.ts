@@ -34,13 +34,16 @@ const FAITH: { item: FaithItem; label: string }[] = [
 export function dayItems(s: State, key: string): DayItem[] {
   const items: DayItem[] = []
   for (const h of s.habits) {
-    // The Morning Sit item stands in for habits linked to Stillness
-    if (h.link === 'stillness' || key < h.createdAt || !isScheduled(h, key)) continue
-    items.push({ id: `habit:${h.id}`, label: h.name, section: h.link === 'gym' ? 'gym' : 'routine', done: isChecked(s.checks, h.id, key) })
+    if (key < h.createdAt || !isScheduled(h, key)) continue
+    const section = h.link === 'gym' ? 'gym' : h.link === 'stillness' ? 'stillness' : 'routine'
+    items.push({ id: `habit:${h.id}`, label: h.name, section, done: isChecked(s.checks, h.id, key) })
   }
   if (key < sectionsSince(s)) return items
 
-  items.push({ id: 'stillness:sit', label: 'Morning Sit', section: 'stillness', done: sitDoneOn(s.stillness, key) })
+  // A habit linked to Stillness (ticked automatically by a finished sit) stands in for the sit item
+  if (!items.some((i) => i.section === 'stillness')) {
+    items.push({ id: 'stillness:sit', label: 'Morning Sit', section: 'stillness', done: sitDoneOn(s.stillness, key) })
+  }
   if (key >= s.faith.createdAt) {
     for (const f of FAITH) items.push({ id: `faith:${f.item}`, label: f.label, section: 'faith', done: faithDone(s.faith, key, f.item) })
   }

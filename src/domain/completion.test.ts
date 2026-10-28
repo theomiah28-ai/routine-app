@@ -56,11 +56,19 @@ describe('dayItems', () => {
     expect(dayItems(base(), today).some((i) => i.section === 'screentime')).toBe(false)
   })
 
-  it('gym habit counted once and stillness-linked habit folded into the sit', () => {
-    const items = dayItems(base(), today)
+  it('gym habit counted once and a stillness-linked habit stands in for the sit', () => {
+    const s = base()
+    const items = dayItems(s, today)
     expect(items.filter((i) => i.section === 'gym' || i.id === 'habit:g')).toHaveLength(1)
-    expect(items.some((i) => i.id === 'habit:m')).toBe(false)
-    expect(items.filter((i) => i.section === 'stillness')).toHaveLength(1)
+    expect(items.filter((i) => i.section === 'stillness').map((i) => i.id)).toEqual(['habit:m'])
+    s.checks[today] = ['m']
+    expect(dayItems(s, today).find((i) => i.id === 'habit:m')?.done).toBe(true)
+  })
+
+  it('sit item used when no habit is linked to stillness', () => {
+    const s = base()
+    s.habits = s.habits.filter((h) => h.link !== 'stillness')
+    expect(dayItems(s, today).filter((i) => i.section === 'stillness').map((i) => i.id)).toEqual(['stillness:sit'])
   })
 
   it('nothing before sections existed', () => {
