@@ -20,6 +20,7 @@ import { Visualise } from './screens/Visualise'
 import { Faith } from './screens/Faith'
 import { Plans } from './screens/Plans'
 import { Reader } from './screens/Reader'
+import { Work } from './screens/Work'
 
 function Soon({ title }: { title: string }) {
   return (
@@ -49,6 +50,7 @@ function screenFor(r: Route): ReactNode {
     case 'visualise': return <Visualise id={r.id} />
     case 'faith': return <Faith />
     case 'plans': return <Plans />
+    case 'work': return <Work startFocus={r.startFocus} />
     case 'reader': return <Reader chapter={r.ref} planDay={r.planDay} />
     default: return <Soon title={r.name} />
   }
