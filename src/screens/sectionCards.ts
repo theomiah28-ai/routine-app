@@ -1,4 +1,4 @@
-import { nextDayId } from '../gym'
+import { nextDayId } from '../domain/gym'
 import { ASCENT } from '../content/ascent'
 import { elapsed, stageIndex } from '../domain/transmutation'
 import { sitDoneOn, sitStreak, totalMinutes, eyeStage } from '../domain/stillness'

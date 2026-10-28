@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { exerciseHistory, formatWeight, nextDayId, sessionsThisWeek, topWeight } from '../gym'
+import { exerciseHistory, formatWeight, nextDayId, sessionsThisWeek, topWeight } from '../domain/gym'
 import { uid } from '../seed'
 import { useStore } from '../store'
 import { useNav } from '../nav'
@@ -39,7 +39,7 @@ export function Gym() {
   )
 
   return (
-    <div className="screen" style={{ paddingBottom: 'calc(var(--tabbar) + var(--safe-bottom) + 100px)' }}>
+    <div className="screen full">
       <div className="topbar">
         <span className="date">Gym</span>
         <button className="link" onClick={() => setEditing(!editing)}>{editing ? 'Done' : 'Edit split'}</button>

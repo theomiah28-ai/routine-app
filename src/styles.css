@@ -287,3 +287,13 @@ textarea.input { resize: none; min-height: 90px; line-height: 1.45; }
 .wk-dots .today span { color: var(--text); }
 .wk-dots .today i { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px #5a5446; }
 .wk-dots .hit.today i { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--gold); }
+
+/* gym rest timer */
+.rest-bar { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; background: var(--surface-2); border-radius: 12px; padding: 10px 14px; margin-bottom: 8px; font-size: 14px; color: var(--soft); font-variant-numeric: tabular-nums; }
+.rest-bar b { color: var(--text); margin-left: 4px; }
+.rest-fill { position: absolute; left: 0; top: 0; bottom: 0; background: rgba(232, 196, 106, 0.1); transition: width 1s linear; }
+.rest-bar > span { position: relative; }
+.rest-actions { display: flex; gap: 16px; }
+.rest-actions button { color: var(--gold); font-weight: 600; font-size: 13.5px; }
+/* default warm glow behind every screen; Screen's own bg layer sits above it */
+.screen::before { content: ''; position: fixed; inset: 0; z-index: -2; pointer-events: none; background: radial-gradient(120% 50% at 50% 0%, #15110a 0%, var(--bg) 60%); }

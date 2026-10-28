@@ -45,7 +45,7 @@ export function HabitDetail({ id }: { id: string }) {
         {cells.map((c, i) => <i key={i} className={c} />)}
       </div>
       <div className="legend">
-        <span style={{ ['--c' as string]: quit ? 'var(--quit)' : 'var(--accent)' }}>Done</span>
+        <span style={{ ['--c' as string]: quit ? 'var(--ember)' : 'var(--gold)' }}>Done</span>
         <span style={{ ['--c' as string]: '#26262a' }}>Missed</span>
         <span style={{ ['--c' as string]: '#18181b' }}>Not scheduled</span>
       </div>

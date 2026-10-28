@@ -1,5 +1,5 @@
-import { dateKey, todayKey, weekStart } from './dates'
-import type { SetLog, Session, State } from './types'
+import { dateKey, todayKey, weekStart } from '../dates'
+import type { SetLog, Session, State } from '../types'
 
 /** Sessions (oldest first) that include this exercise, with only that exercise's sets. */
 export function exerciseHistory(state: State, exerciseId: string) {
@@ -37,3 +37,9 @@ export function sessionsThisWeek(sessions: Session[]): number {
 }
 
 export { fmt as formatWeight }
+
+/** Strictly heavier than every earlier session's top set for this exercise (and there is history). */
+export function isPersonalBest(state: State, exerciseId: string, weight: number): boolean {
+  const h = exerciseHistory(state, exerciseId)
+  return h.length > 0 && weight > Math.max(...h.map((x) => topWeight(x.sets)))
+}
