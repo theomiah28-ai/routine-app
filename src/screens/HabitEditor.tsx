@@ -3,7 +3,7 @@ import { todayKey } from '../dates'
 import { uid } from '../seed'
 import { useStore } from '../store'
 import { Back, useNav } from '../nav'
-import { Toggle } from '../components'
+import { Toggle } from '../ui'
 import type { HabitKind } from '../types'
 
 // Mon-first display, stored as JS weekday numbers

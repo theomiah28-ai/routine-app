@@ -4,7 +4,7 @@ import { todayKey } from '../dates'
 import { uid } from '../seed'
 import { useStore } from '../store'
 import { useNav } from '../nav'
-import { Check } from '../components'
+import { Check } from '../ui'
 import type { ActiveSet, State } from '../types'
 
 const blank = (): ActiveSet => ({ weight: '', reps: '', done: false })

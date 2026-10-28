@@ -3,7 +3,7 @@ import { addDays, formatLong, todayKey } from '../dates'
 import { currentStreak, isChecked, isScheduled } from '../domain/streaks'
 import { useStore } from '../store'
 import { useNav } from '../nav'
-import { Check, SortableList } from '../components'
+import { Check, SortableList } from '../ui'
 import type { Habit, HabitKind } from '../types'
 
 function greeting() {
@@ -77,7 +77,7 @@ export function Today() {
         <span className="date">{formatLong(key)}</span>
         <div className="row" style={{ gap: 16 }}>
           {!editing && (
-            <button className="icon-btn" onClick={() => push({ name: 'settings' })} aria-label="Settings">
+            <button className="icon-btn" onClick={() => push({ name: 'you' })} aria-label="Settings">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <path d="M4 7h10M18 7h2M4 17h4M12 17h8" />
                 <circle cx="16" cy="7" r="2" />

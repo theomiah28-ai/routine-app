@@ -3,7 +3,7 @@ import { exerciseHistory, formatWeight, nextDayId, sessionsThisWeek, topWeight }
 import { uid } from '../seed'
 import { useStore } from '../store'
 import { useNav } from '../nav'
-import { SortableList } from '../components'
+import { SortableList } from '../ui'
 import { startWorkout } from './Workout'
 import type { SplitDay } from '../types'
 

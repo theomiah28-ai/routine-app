@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
-import { NavCtx, type Route } from './nav'
+import { useEffect, useState, type ReactNode } from 'react'
+import { FULLSCREEN, NavCtx, type Route, type Tab } from './nav'
 import { useStore } from './store'
+import { Screen } from './ui'
 import { Today } from './screens/Today'
 import { HabitDetail } from './screens/HabitDetail'
 import { HabitEditor } from './screens/HabitEditor'
@@ -10,28 +11,75 @@ import { DayEditor } from './screens/DayEditor'
 import { Workout } from './screens/Workout'
 import { ExerciseProgress } from './screens/ExerciseProgress'
 
-type Tab = 'today' | 'gym'
+function Soon({ title }: { title: string }) {
+  return (
+    <Screen>
+      <div className="label" style={{ marginTop: 8 }}>{title}</div>
+      <h1>Coming in this build</h1>
+    </Screen>
+  )
+}
 
-function screenFor(r: Route) {
+function screenFor(r: Route): ReactNode {
   switch (r.name) {
     case 'today': return <Today />
     case 'habit': return <HabitDetail id={r.id} />
     case 'habitEdit': return <HabitEditor id={r.id} />
-    case 'settings': return <Settings />
     case 'gym': return <Gym />
     case 'dayEdit': return <DayEditor id={r.id} />
     case 'exercise': return <ExerciseProgress id={r.id} />
     case 'workout': return <Workout />
+    case 'you': return <Settings />
+    default: return <Soon title={r.name} />
   }
 }
 
+const ROOT: Record<Tab, Route> = {
+  today: { name: 'today' },
+  journey: { name: 'journey' },
+  learn: { name: 'learn' },
+  you: { name: 'you' },
+}
+
+const ICONS: Record<Tab, ReactNode> = {
+  today: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M8.5 12.3l2.4 2.4 4.8-5.2" />
+    </svg>
+  ),
+  journey: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 21c3-2.5-1-5 2-8s4-1.5 6-4.5S13 3 17 3" />
+      <circle cx="6" cy="21" r="0.6" fill="currentColor" />
+      <circle cx="17" cy="3" r="1.6" />
+    </svg>
+  ),
+  learn: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5z" />
+      <path d="M12 6.5v13" />
+    </svg>
+  ),
+  you: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="8.5" r="3.8" />
+      <path d="M4.5 20.5c1.2-3.8 4-5.5 7.5-5.5s6.3 1.7 7.5 5.5" />
+    </svg>
+  ),
+}
+
+const LABELS: Record<Tab, string> = { today: 'Today', journey: 'Journey', learn: 'Learn', you: 'You' }
+
 export function App() {
   const { state } = useStore()
-  const [tab, setTab] = useState<Tab>(state.active ? 'gym' : 'today')
-  const [stacks, setStacks] = useState<Record<Tab, Route[]>>({
-    today: [{ name: 'today' }],
-    gym: state.active ? [{ name: 'gym' }, { name: 'workout' }] : [{ name: 'gym' }],
-  })
+  const [tab, setTab] = useState<Tab>('today')
+  const [stacks, setStacks] = useState<Record<Tab, Route[]>>(() => ({
+    today: state.active ? [ROOT.today, { name: 'gym' }, { name: 'workout' }] : [ROOT.today],
+    journey: [ROOT.journey],
+    learn: [ROOT.learn],
+    you: [ROOT.you],
+  }))
   const stack = stacks[tab]
   const route = stack[stack.length - 1]
 
@@ -43,6 +91,7 @@ export function App() {
     push: (r: Route) => setStacks((s) => ({ ...s, [tab]: [...s[tab], r] })),
     pop: () => setStacks((s) => ({ ...s, [tab]: s[tab].length > 1 ? s[tab].slice(0, -1) : s[tab] })),
     reset: () => setStacks((s) => ({ ...s, [tab]: s[tab].slice(0, 1) })),
+    switchTab: (t: Tab) => setTab(t),
   }
 
   const selectTab = (t: Tab) => {
@@ -53,21 +102,14 @@ export function App() {
   return (
     <NavCtx.Provider value={nav}>
       <div key={tab + stack.length}>{screenFor(route)}</div>
-      {route.name !== 'workout' && (
+      {!FULLSCREEN.has(route.name) && (
         <nav className="tabbar">
-          <button className={tab === 'today' ? 'on' : ''} onClick={() => selectTab('today')}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="4" y="4" width="16" height="16" rx="4" />
-              <path d="M8.5 12.5l2.5 2.5 5-6" />
-            </svg>
-            Today
-          </button>
-          <button className={tab === 'gym' ? 'on' : ''} onClick={() => selectTab('gym')}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11" />
-            </svg>
-            Gym
-          </button>
+          {(Object.keys(LABELS) as Tab[]).map((t) => (
+            <button key={t} className={tab === t ? 'on' : ''} onClick={() => selectTab(t)}>
+              {ICONS[t]}
+              {LABELS[t]}
+            </button>
+          ))}
         </nav>
       )}
     </NavCtx.Provider>
