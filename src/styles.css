@@ -235,3 +235,21 @@ textarea.input { resize: none; min-height: 90px; line-height: 1.45; }
 .tile.lit { background: linear-gradient(155deg, #2a2110 0%, var(--surface) 70%); }
 .tile.lit b { color: var(--gold); }
 .tile.lit .label { color: var(--gold-dim); }
+
+/* ascent + stage */
+.asc-draw { transition: stroke-dasharray 1.2s var(--ease); }
+.asc-pulse { animation: pulse 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes pulse { 0%, 100% { opacity: 0.55; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1.15); } }
+.stage-hero { height: 220px; margin: 14px -20px 18px; position: relative; background: radial-gradient(70% 80% at 50% 100%, #2a2010 0%, var(--bg) 72%); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; }
+.stage-hero-glow { position: absolute; inset: 0; background: radial-gradient(35% 50% at 50% 55%, rgba(255, 214, 110, 0.5), transparent 70%); }
+.stage-roman { position: relative; font-family: Georgia, 'Times New Roman', serif; font-size: 64px; color: #fff3d6; text-shadow: 0 0 30px rgba(255, 214, 110, 0.8); letter-spacing: 0.04em; }
+.prose-p { font-size: 15.5px; line-height: 1.6; color: var(--soft); margin: 16px 0 0; }
+.gain-cost { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 18px; }
+.gain-cost > div { background: var(--surface); border-radius: 14px; padding: 12px 13px; font-size: 13px; color: var(--soft); line-height: 1.45; }
+.gain-cost b { display: block; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 5px; }
+.locked { margin-top: 22px; background: var(--surface); border-radius: 14px; padding: 18px; color: var(--muted); font-size: 15px; display: flex; gap: 10px; align-items: center; }
+.flow-dots { display: flex; gap: 6px; }
+.flow-dots i { width: 22px; height: 3px; border-radius: 2px; background: #2b2720; transition: background 0.3s; }
+.flow-dots i.on { background: var(--gold); }
+.has-tabs .dock { bottom: calc(var(--tabbar) + var(--safe-bottom)); padding-bottom: 12px; }
+.has-tabs .screen.full { padding-bottom: calc(var(--tabbar) + var(--safe-bottom) + 100px); }

@@ -1,4 +1,6 @@
 import { nextDayId } from '../gym'
+import { ASCENT } from '../content/ascent'
+import { elapsed, stageIndex } from '../domain/transmutation'
 import type { Route } from '../nav'
 import type { State } from '../types'
 
@@ -14,8 +16,9 @@ export interface SectionCard {
 /** One-line state for each section's tile on Today. */
 export function sectionCards(s: State): SectionCard[] {
   const next = s.days.find((d) => d.id === nextDayId(s))
+  const sr = elapsed(s.transmutation.start, Date.now())
   return [
-    { label: 'Transmutation', value: '—', sub: 'The Ascent', route: { name: 'transmutation' } },
+    { label: 'Transmutation', value: `${sr.days} days`, sub: ASCENT[stageIndex(sr.days)].name, route: { name: 'transmutation' }, lit: sr.days >= 1 },
     { label: 'Stillness', value: '—', sub: 'Morning Sit', route: { name: 'stillness' } },
     { label: 'Faith', value: '—', sub: 'Walk with God', route: { name: 'faith' } },
     { label: 'Work', value: '—', sub: 'Daily inputs', route: { name: 'work' } },

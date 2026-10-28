@@ -10,6 +10,9 @@ import { Gym } from './screens/Gym'
 import { DayEditor } from './screens/DayEditor'
 import { Workout } from './screens/Workout'
 import { ExerciseProgress } from './screens/ExerciseProgress'
+import { Transmutation } from './screens/Transmutation'
+import { StageDetail } from './screens/StageDetail'
+import { Urge } from './screens/Urge'
 
 function Soon({ title }: { title: string }) {
   return (
@@ -30,6 +33,9 @@ function screenFor(r: Route): ReactNode {
     case 'exercise': return <ExerciseProgress id={r.id} />
     case 'workout': return <Workout />
     case 'you': return <Settings />
+    case 'transmutation': return <Transmutation />
+    case 'stage': return <StageDetail index={r.index} />
+    case 'urge': return <Urge />
     default: return <Soon title={r.name} />
   }
 }
@@ -101,7 +107,7 @@ export function App() {
 
   return (
     <NavCtx.Provider value={nav}>
-      <div key={tab + stack.length}>{screenFor(route)}</div>
+      <div key={tab + stack.length} className={FULLSCREEN.has(route.name) ? '' : 'has-tabs'}>{screenFor(route)}</div>
       {!FULLSCREEN.has(route.name) && (
         <nav className="tabbar">
           {(Object.keys(LABELS) as Tab[]).map((t) => (
