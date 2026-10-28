@@ -5,7 +5,6 @@ import { Screen } from './ui'
 import { Today } from './screens/Today'
 import { HabitDetail } from './screens/HabitDetail'
 import { HabitEditor } from './screens/HabitEditor'
-import { Settings } from './screens/Settings'
 import { Gym } from './screens/Gym'
 import { DayEditor } from './screens/DayEditor'
 import { Workout } from './screens/Workout'
@@ -28,6 +27,10 @@ import { Learn } from './screens/Learn'
 import { Article } from './screens/Article'
 import { MilestoneModal } from './screens/MilestoneModal'
 import { Flow } from './screens/Flow'
+import { You } from './screens/You'
+import { Onboarding } from './screens/Onboarding'
+import { APP_NAME } from './config'
+import { Sheet } from './ui'
 import { celebrateOnly, detectMilestones } from './domain/milestones'
 
 function Soon({ title }: { title: string }) {
@@ -48,7 +51,7 @@ function screenFor(r: Route): ReactNode {
     case 'dayEdit': return <DayEditor id={r.id} />
     case 'exercise': return <ExerciseProgress id={r.id} />
     case 'workout': return <Workout />
-    case 'you': return <Settings />
+    case 'you': return <You />
     case 'transmutation': return <Transmutation />
     case 'stage': return <StageDetail index={r.index} />
     case 'urge': return <Urge />
@@ -149,6 +152,8 @@ export function App() {
     else setTab(t)
   }
 
+  if (!state.settings.onboarded) return <Onboarding />
+
   return (
     <NavCtx.Provider value={nav}>
       <div key={tab + stack.length} className={FULLSCREEN.has(route.name) ? '' : 'has-tabs'}>{screenFor(route)}</div>
@@ -162,7 +167,19 @@ export function App() {
           ))}
         </nav>
       )}
-      {celebrate && <MilestoneModal m={celebrate} onClose={() => update((s) => void (s.milestones.find((m) => m.id === celebrate.id)!.seen = true))} />}
+      <Sheet open={!!state.settings.whatsNew} onClose={() => update((s) => void (s.settings.whatsNew = false))}>
+        <div className="label gold">What's new</div>
+        <h2 className="title" style={{ marginTop: 6 }}>Welcome to {APP_NAME}</h2>
+        <p className="note" style={{ margin: '8px 0 12px' }}>Everything you logged is here. Your NoFap streak now lives in Transmutation.</p>
+        <ul className="steps">
+          <li><b>Transmutation:</b> the Ascent, seven stages to 365 days.</li>
+          <li><b>Stillness:</b> the Morning Sit, breathwork and visualisation.</li>
+          <li><b>Faith</b>, <b>Work</b> and a <b>Screen Time</b> preview.</li>
+          <li><b>Journey</b> shows every symbol. <b>Learn</b> holds the teachings.</li>
+        </ul>
+        <button className="btn" onClick={() => update((s) => void (s.settings.whatsNew = false))}>Let's go</button>
+      </Sheet>
+      {!state.settings.whatsNew && celebrate && <MilestoneModal m={celebrate} onClose={() => update((s) => void (s.milestones.find((m) => m.id === celebrate.id)!.seen = true))} />}
     </NavCtx.Provider>
   )
 }
