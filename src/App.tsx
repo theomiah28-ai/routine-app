@@ -26,6 +26,8 @@ import { Journey } from './screens/Journey'
 import { Progress } from './screens/Progress'
 import { Learn } from './screens/Learn'
 import { Article } from './screens/Article'
+import { MilestoneModal } from './screens/MilestoneModal'
+import { celebrateOnly, detectMilestones } from './domain/milestones'
 
 function Soon({ title }: { title: string }) {
   return (
@@ -104,7 +106,7 @@ const ICONS: Record<Tab, ReactNode> = {
 const LABELS: Record<Tab, string> = { today: 'Today', journey: 'Journey', learn: 'Learn', you: 'You' }
 
 export function App() {
-  const { state } = useStore()
+  const { state, update } = useStore()
   const [tab, setTab] = useState<Tab>('today')
   const [stacks, setStacks] = useState<Record<Tab, Route[]>>(() => ({
     today: state.active ? [ROOT.today, { name: 'gym' }, { name: 'workout' }] : [ROOT.today],
@@ -118,6 +120,19 @@ export function App() {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [route, tab])
+
+  // Record new milestones. On the first launch after migrating, earlier achievements go straight to the gallery.
+  useEffect(() => {
+    if (!detectMilestones(state, Date.now()).length) return
+    // Re-detect against the latest state so a repeated run can't add the same milestone twice
+    update((s) => {
+      const found = detectMilestones(s, Date.now())
+      const marked = s.settings.whatsNew ? found.map((m) => ({ ...m, seen: true })) : celebrateOnly(found)
+      s.milestones = [...s.milestones, ...marked]
+    })
+  }, [state, update])
+
+  const celebrate = FULLSCREEN.has(route.name) ? undefined : state.milestones.find((m) => !m.seen)
 
   const nav = {
     push: (r: Route) => setStacks((s) => ({ ...s, [tab]: [...s[tab], r] })),
@@ -144,6 +159,7 @@ export function App() {
           ))}
         </nav>
       )}
+      {celebrate && <MilestoneModal m={celebrate} onClose={() => update((s) => void (s.milestones.find((m) => m.id === celebrate.id)!.seen = true))} />}
     </NavCtx.Provider>
   )
 }

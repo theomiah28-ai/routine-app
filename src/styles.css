@@ -358,3 +358,12 @@ textarea.input { resize: none; min-height: 90px; line-height: 1.45; }
 .prose blockquote p { margin: 0; }
 .prose ul, .prose ol { padding-left: 20px; }
 .prose a { color: var(--gold); }
+
+/* milestones */
+.ms-wrap { position: fixed; inset: 0; z-index: 50; background: rgba(7, 7, 6, 0.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; padding: calc(var(--safe-top) + 20px) 28px calc(var(--safe-bottom) + 20px); animation: fade 0.3s; }
+.ms-inner { width: 100%; max-width: 380px; position: relative; animation: pop 0.5s var(--ease); }
+.ms-card { margin: 18px auto; width: 78%; border-radius: 18px; overflow: hidden; box-shadow: 0 0 60px rgba(232, 196, 106, 0.35); }
+.ms-card img { display: block; width: 100%; }
+.ms-burst { position: absolute; width: 140vmax; height: 140vmax; background: repeating-conic-gradient(rgba(232, 196, 106, 0.09) 0 6deg, transparent 6deg 18deg); border-radius: 50%; animation: burst 14s linear infinite; mask: radial-gradient(circle, #000 10%, transparent 60%); -webkit-mask: radial-gradient(circle, #000 10%, transparent 60%); }
+@keyframes burst { to { transform: rotate(360deg); } }
+@keyframes pop { from { transform: scale(0.88); opacity: 0; } }
