@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { todayKey } from '../dates'
 import { uid } from '../seed'
+import { linkChangeImpact } from '../domain/progression'
 import { useStore } from '../store'
 import { Back, useNav } from '../nav'
 import { Moon, Screen, Stepper, Sun } from '../ui'
@@ -32,6 +33,8 @@ export function HabitEditor({ id }: { id?: string }) {
 
   const save = () => {
     if (!name.trim() || !days.length) return
+    const warning = linkChangeImpact(state, id, link, link === 'stillness' || link === 'faith' ? minutes : undefined)
+    if (warning && !confirm(warning + '\n\nSave anyway?')) return
     const fields = { name: name.trim(), kind, days: days.length === 7 ? [] : days, timeOfDay, link, minutes: link === 'stillness' || link === 'faith' ? minutes : undefined }
     update((s) => {
       // Only one habit can be linked to each section

@@ -1,5 +1,6 @@
 import { addDays, todayKey, weekStart } from '../dates'
-import { bestStreak, currentStreak, isChecked, isScheduled } from '../domain/streaks'
+import { bestStreak, isChecked, isScheduled } from '../domain/streaks'
+import { habitStreak } from '../domain/progression'
 import { useStore } from '../store'
 import { Back, useNav } from '../nav'
 
@@ -33,10 +34,10 @@ export function HabitDetail({ id }: { id: string }) {
 
       <div className="stats" style={{ marginTop: 16 }}>
         <div className="stat">
-          <b className={quit ? 'quit-c' : 'acc'}>{currentStreak(habit, state.checks, today)}</b>
+          <b className={quit ? 'quit-c' : 'acc'}>{habitStreak(state, habit, today)}</b>
           <span>{quit ? 'days clean' : 'day streak'}</span>
         </div>
-        <div className="stat"><b>{bestStreak(habit, state.checks, today)}</b><span>best streak</span></div>
+        <div className="stat"><b>{habit.link === 'transmutation' ? Math.max(state.transmutation.longestDays, habitStreak(state, habit, today)) : bestStreak(habit, state.checks, today)}</b><span>best streak</span></div>
         <div className="stat"><b>{scheduled ? Math.round((done / scheduled) * 100) : 0}%</b><span>last 13 weeks</span></div>
       </div>
 

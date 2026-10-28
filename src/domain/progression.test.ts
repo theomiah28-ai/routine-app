@@ -83,3 +83,46 @@ describe('progression', () => {
     expect(sectionProgress(s, today).some((p) => p.section === 'faith')).toBe(true)
   })
 })
+
+describe('review fixes', () => {
+  it('a relapse day stays out of the streak on later days', async () => {
+    const s = base()
+    s.habits = [hab('sr', 'transmutation')]
+    const d2 = addDays(today, -2)
+    for (let i = 2; i < 10; i++) s.checks[addDays(today, -i)] = ['sr']
+    s.transmutation.relapses = [parseKey(d2).getTime() + 3600e3]
+    s.checks[addDays(today, -1)] = ['sr']
+    s.checks[today] = ['sr']
+    expect(ascentDays(s, today)).toBe(2)
+  })
+
+  it('habitStreak uses the Ascent for the transmutation habit', async () => {
+    const { habitStreak } = await import('./progression')
+    const s = base()
+    s.habits = [hab('sr', 'transmutation'), hab('r')]
+    for (let i = 0; i < 20; i++) s.checks[addDays(today, -i)] = ['sr', 'r']
+    const r = relapseToday(s, now)
+    r.checks[today] = ['sr', 'r']
+    expect(habitStreak(r, r.habits[0], today)).toBe(0)
+    expect(habitStreak(r, r.habits[1], today)).toBe(20)
+  })
+
+  it('cross brightness grows through every faith stage', async () => {
+    const { faithBrightness } = await import('./progression')
+    const vals = [0, 1, 7, 14, 30, 45, 60, 100, 200, 365].map(faithBrightness)
+    for (let i = 1; i < vals.length; i++) expect(vals[i]).toBeGreaterThan(vals[i - 1])
+    expect(faithBrightness(365)).toBe(1)
+    expect(faithBrightness(60)).toBeLessThan(1)
+  })
+
+  it('warns before a link move or minutes change rewrites progress', async () => {
+    const { linkChangeImpact } = await import('./progression')
+    const s = base()
+    s.habits = [hab('m', 'stillness', { minutes: 30, name: 'Meditate' }), hab('n')]
+    for (let i = 0; i < 4; i++) s.checks[addDays(today, -i)] = ['m']
+    expect(linkChangeImpact(s, 'n', 'stillness', 30)).toContain('Meditate')
+    expect(linkChangeImpact(s, 'm', 'stillness', 10)).toContain('2h')
+    expect(linkChangeImpact(s, 'm', 'stillness', 30)).toBeNull()
+    expect(linkChangeImpact(s, 'n', undefined, undefined)).toBeNull()
+  })
+})

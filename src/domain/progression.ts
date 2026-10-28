@@ -3,7 +3,7 @@ import { addDays, dateKey } from '../dates'
 import { currentStreak, isChecked } from './streaks'
 import { EYE_STAGES, eyeStage } from './stillness'
 import { workStreak } from './work'
-import type { HabitLink, Section, State } from '../types'
+import type { Habit, HabitLink, Section, State } from '../types'
 
 export const linked = (s: State, link: HabitLink) => s.habits.find((h) => h.link === link)
 
@@ -156,3 +156,38 @@ export function sectionProgress(s: State, today: string): SectionProgress[] {
   out.push({ section: 'work', title: 'Work', value: `${ws}-day streak`, stage: 'Inputs', pct: Math.min(1, ws / 30), next: ws < 30 ? '30-day streak' : null })
   return out
 }
+
+/** The streak shown next to a habit: the Ascent for the transmutation habit (relapse-aware), the plain streak otherwise. */
+export function habitStreak(s: State, h: Habit, today: string): number {
+  return h.link === 'transmutation' ? ascentDays(s, today) : currentStreak(h, s.checks, today)
+}
+
+/** Cross brightness, 0.2 → 1, rising through every faith stage to full glory at 365 days. */
+export function faithBrightness(days: number): number {
+  const f = faithStage(days)
+  const steps = FAITH_STAGES.length
+  return Math.min(1, 0.2 + 0.8 * Math.max(0, f.index + 1 + (f.next ? f.pct : 0)) / steps)
+}
+
+const LINK_NAMES: Record<HabitLink, string> = { transmutation: 'the Ascent', stillness: 'the Eye', faith: 'Faith', gym: 'the statue' }
+
+/**
+ * Saving a habit with this link/minutes would change past progress (moving a link away from a habit
+ * with history, or changing the minutes each past tick counts for). Returns a warning, or null.
+ */
+export function linkChangeImpact(s: State, habitId: string | undefined, link: HabitLink | undefined, minutes: number | undefined): string | null {
+  if (!link) return null
+  const holder = linked(s, link)
+  const ticks = (id: string) => Object.values(s.checks).filter((ids) => ids.includes(id)).length
+  if (holder && holder.id !== habitId && ticks(holder.id)) {
+    return `"${holder.name}" currently grows ${LINK_NAMES[link]}. Moving the link starts ${LINK_NAMES[link]} again from this habit's ticks.`
+  }
+  if (link === 'stillness' && holder && holder.id === habitId && holder.minutes !== undefined && minutes !== holder.minutes) {
+    const before = meditationMinutes(s)
+    const after = meditationMinutes({ ...s, habits: s.habits.map((h) => (h.id === habitId ? { ...h, minutes } : h)) })
+    if (Math.round(before) !== Math.round(after)) return `Past ticks will count as ${minutes} min each: the Eye goes from ${fmtH(before)} to ${fmtH(after)}.`
+  }
+  return null
+}
+
+const fmtH = (m: number) => `${Math.round((m / 60) * 10) / 10}h`

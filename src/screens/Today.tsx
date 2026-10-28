@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from 'react'
 import { addDays, dateKey, formatLong } from '../dates'
 import { useNow } from './Transmutation'
-import { currentStreak, isChecked, isScheduled } from '../domain/streaks'
+import { isChecked, isScheduled } from '../domain/streaks'
+import { habitStreak } from '../domain/progression'
 import { completion } from '../domain/completion'
 import { useStore } from '../store'
 import { useNav, type Route } from '../nav'
@@ -34,6 +35,7 @@ export function Today() {
   const key = day === 'today' ? today : addDays(today, -1)
   const hour = new Date(now).getHours()
   const c = completion(state, key)
+  const relapsed = state.transmutation.relapses.some((r) => dateKey(new Date(r)) === today)
 
   const visible = editing ? state.habits : state.habits.filter((h) => isScheduled(h, key) && key >= h.createdAt)
 
@@ -57,14 +59,16 @@ export function Today() {
 
   const row = (h: Habit) => {
     const done = !editing && isChecked(state.checks, h.id, key)
-    const streak = currentStreak(h, state.checks, today)
+    const streak = habitStreak(state, h, today)
+    // A logged relapse closes today for the SR habit
+    const reset = h.link === 'transmutation' && key === today && relapsed
     return (
       <div key={h.id} className={'item' + (done ? ' done' : '') + (h.kind === 'quit' ? ' quit' : '')}>
-        {!editing && <Check on={done} onClick={() => toggle(h.id)} />}
+        {!editing && (reset ? <span className="chk" style={{ opacity: 0.35 }} /> : <Check on={done} onClick={() => toggle(h.id)} />)}
         <button className="name" onClick={() => push(editing ? { name: 'habitEdit', id: h.id } : { name: 'habit', id: h.id })}>
           {h.name}
         </button>
-        {editing ? <span className="chev">›</span> : <span className={'streak' + (streak ? '' : ' zero')}>{streak}d</span>}
+        {editing ? <span className="chev">›</span> : reset ? <span className="streak zero">reset</span> : <span className={'streak' + (streak ? '' : ' zero')}>{streak}d</span>}
       </div>
     )
   }

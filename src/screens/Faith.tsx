@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { THEMES, verseText } from '../content/faith'
 import { faithDone, planToday, verseOfDay, type FaithItem } from '../domain/faith'
-import { faithDays, faithStage } from '../domain/progression'
+import { faithBrightness, faithDays, faithStage } from '../domain/progression'
 import { todayKey } from '../dates'
 import { useStore } from '../store'
 import { Back, useNav } from '../nav'
 import { Cross } from '../symbols/Cross'
 import { Check, Screen, Sheet } from '../ui'
 
-export const crossBrightness = (streak: number) => Math.min(1, 0.25 + streak / 60)
+export const crossBrightness = faithBrightness
 
 export function Faith() {
   const { state, update } = useStore()

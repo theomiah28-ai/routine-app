@@ -116,3 +116,14 @@ describe('srFromHabit', () => {
     expect(r.longestDays).toBe(17)
   })
 })
+
+describe('normalise edge', () => {
+  it('relapse on the start day is not counted after normalising', async () => {
+    const { ascentDays } = await import('./domain/progression')
+    const s = seedState() as unknown as Record<string, any>
+    const start = parseKey(ago(3)).getTime() + 3600e3
+    s.transmutation = { start, longestDays: 9, relapses: [start] }
+    const n = migrate(s, now)
+    expect(ascentDays(n, today)).toBe(3)
+  })
+})
