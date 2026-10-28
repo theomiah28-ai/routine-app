@@ -36,10 +36,29 @@ export function srFromHabit(h: Habit, checks: State['checks'], today: string): {
   return { start: runStart(h, checks, today), longestDays: bestStreak(h, checks, today) }
 }
 
+/**
+ * Fill fields added after V2 first shipped. Idempotent. A preview-era V2 state that tracked SR as a
+ * start time gets a "No PMO" habit linked to Transmutation, ticked from that start day to today.
+ */
+export function normaliseV2(s: State, now: number): State {
+  const out = structuredClone(s)
+  out.settings = { ...out.settings, faith: out.settings.faith ?? true, goals: out.settings.goals ?? [] }
+  const today = dateKey(new Date(now))
+  if (out.transmutation.start !== null && !out.habits.some((h) => h.link === 'transmutation')) {
+    const startKey = dateKey(new Date(out.transmutation.start))
+    const id = `sr-${out.transmutation.start}`
+    out.habits.push({ id, name: 'No PMO', kind: 'quit', days: [], createdAt: startKey, timeOfDay: 'anytime', link: 'transmutation' })
+    for (let k = startKey; k <= today; k = addDays(k, 1)) out.checks[k] = [...(out.checks[k] ?? []), id]
+  }
+  out.transmutation = { ...out.transmutation, start: null, needsPick: undefined }
+  for (const h of out.habits) if (h.link === 'stillness' && h.minutes === undefined) h.minutes = 30
+  return out
+}
+
 /** Bring any saved state (V1 or V2) up to the current V2 shape. */
 export function migrate(raw: unknown, now: number): State {
   const s = raw as { version?: number }
-  if (s.version === 2) return raw as State
+  if (s.version === 2) return normaliseV2(raw as State, now)
   const v1 = raw as {
     name?: string
     habits: V1Habit[]
@@ -52,32 +71,31 @@ export function migrate(raw: unknown, now: number): State {
   }
   const today = dateKey(new Date(now))
 
+  let stillnessLinked = false
   const habits: Habit[] = v1.habits.map(({ isGym, ...h }) => {
     const habit: Habit = { ...h, timeOfDay: timeOfDay(h.name) }
     if (isGym) habit.link = 'gym'
-    else if (/meditat/i.test(h.name)) habit.link = 'stillness'
+    else if (/meditat/i.test(h.name) && !stillnessLinked) {
+      stillnessLinked = true
+      habit.link = 'stillness'
+      habit.minutes = 30
+    }
     return habit
   })
 
+  // SR stays a daily habit; its ticks now climb the Ascent
   const sr = habits.find((h) => h.kind === 'quit' && SR.test(h.name))
   const sections = defaultSections(today, now)
   if (sr) {
-    sections.transmutation = { ...srFromHabit(sr, v1.checks, today), relapses: [] }
-  } else {
-    sections.transmutation = { start: null, longestDays: 0, relapses: [], needsPick: true }
-  }
-
-  const checks: State['checks'] = {}
-  for (const [k, ids] of Object.entries(v1.checks)) {
-    const kept = sr ? ids.filter((id) => id !== sr.id) : ids
-    if (kept.length) checks[k] = kept
+    sr.link = 'transmutation'
+    sections.transmutation = { start: null, longestDays: srFromHabit(sr, v1.checks, today).longestDays, relapses: [] }
   }
 
   return {
     version: 2,
-    settings: { name: v1.name ?? '', showEsoteric: false, onboarded: true, restSeconds: 120, whatsNew: true },
-    habits: sr ? habits.filter((h) => h.id !== sr.id) : habits,
-    checks,
+    settings: { name: v1.name ?? '', showEsoteric: false, onboarded: true, restSeconds: 120, whatsNew: true, faith: true, goals: [] },
+    habits,
+    checks: structuredClone(v1.checks),
     splitName: v1.splitName,
     days: v1.days,
     exercises: v1.exercises,

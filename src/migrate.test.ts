@@ -44,25 +44,42 @@ describe('migrate', () => {
     expect(s.days[0].name).toBe('Upper A')
   })
 
-  it('converts No PMO', () => {
+  it('v1 keeps No PMO as a transmutation habit', () => {
     const checks: Record<string, string[]> = {}
     const tick = (n: number) => (checks[ago(n)] = [...(checks[ago(n)] ?? []), 'sr'])
     for (let i = 0; i <= 9; i++) tick(i)
     for (let i = 11; i <= 25; i++) tick(i)
-    checks[ago(3)].push('a')
     const s = migrate(v1([h('a', 'Read'), h('sr', 'No PMO', { kind: 'quit' })], checks), now)
-    expect(s.habits.map((x) => x.id)).toEqual(['a'])
-    expect(Object.values(s.checks).some((l) => l.includes('sr'))).toBe(false)
-    expect(s.checks[ago(3)]).toEqual(['a'])
-    expect(s.transmutation.start).toBe(parseKey(ago(9)).getTime())
+    const sr = s.habits.find((x) => x.id === 'sr')!
+    expect(sr.link).toBe('transmutation')
+    expect(s.checks[ago(0)]).toContain('sr')
     expect(s.transmutation.longestDays).toBe(15)
-    expect(s.transmutation.needsPick).toBeFalsy()
+    expect(s.transmutation.start).toBeNull()
   })
 
   it('migrates without SR habit', () => {
     const s = migrate(v1([h('a', 'Read')]), now)
-    expect(s.transmutation.start).toBeNull()
-    expect(s.transmutation.needsPick).toBe(true)
+    expect(s.habits.some((x) => x.link === 'transmutation')).toBe(false)
+    expect(s.settings.faith).toBe(true)
+    expect(s.settings.goals).toEqual([])
+  })
+
+  it('normalises v2 preview state', () => {
+    const s = seedState() as unknown as Record<string, any>
+    delete s.settings.faith
+    delete s.settings.goals
+    s.transmutation = { start: parseKey(ago(5)).getTime(), longestDays: 3, relapses: [] }
+    s.habits = [{ id: 'm', name: 'Meditate', kind: 'build', days: [], createdAt: ago(20), timeOfDay: 'morning', link: 'stillness' }]
+    const n = migrate(s, now)
+    expect(n.settings.faith).toBe(true)
+    expect(n.settings.goals).toEqual([])
+    const sr = n.habits.find((x) => x.link === 'transmutation')!
+    expect(sr.name).toBe('No PMO')
+    for (let i = 0; i <= 5; i++) expect(n.checks[ago(i)]).toContain(sr.id)
+    expect(n.transmutation.start).toBeNull()
+    expect(n.habits.find((x) => x.id === 'm')!.minutes).toBe(30)
+    // idempotent
+    expect(migrate(structuredClone(n), now)).toEqual(n)
   })
 
   it('import v1 backup', () => {
@@ -75,11 +92,11 @@ describe('migrate', () => {
     expect(migrate(structuredClone(s), now)).toEqual(s)
   })
 
-  it('seed is v2', () => {
+  it('seed has no habits', () => {
     const s = seedState()
     expect(s.version).toBe(2)
-    expect(s.habits.some((x) => /pmo/i.test(x.name))).toBe(false)
-    expect(s.transmutation.start).not.toBeNull()
+    expect(s.habits).toEqual([])
+    expect(s.settings.faith).toBe(true)
   })
 })
 

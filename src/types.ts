@@ -1,5 +1,6 @@
 export type HabitKind = 'build' | 'quit'
 export type TimeOfDay = 'morning' | 'anytime' | 'evening'
+export type HabitLink = 'transmutation' | 'stillness' | 'faith' | 'gym'
 export type Section = 'routine' | 'gym' | 'transmutation' | 'stillness' | 'faith' | 'work' | 'screentime'
 
 export interface Habit {
@@ -11,8 +12,10 @@ export interface Habit {
   /** YYYY-MM-DD — streaks never look further back than this. */
   createdAt: string
   timeOfDay: TimeOfDay
-  /** Auto-ticked when a workout (gym) or a Morning Sit (stillness) is finished. */
-  link?: 'gym' | 'stillness'
+  /** Feeds that section's progression; auto-ticked when a workout, sit or reading is finished. */
+  link?: HabitLink
+  /** Minutes a tick counts for (meditation, scripture) */
+  minutes?: number
   insightId?: string
 }
 
@@ -152,6 +155,10 @@ export interface Settings {
   restSeconds: number
   /** Show the one-time "What's new in V2" sheet */
   whatsNew?: boolean
+  /** Christian Faith section on */
+  faith: boolean
+  /** Goals picked in onboarding */
+  goals: string[]
 }
 
 export interface State {
