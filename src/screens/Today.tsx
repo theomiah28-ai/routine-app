@@ -31,10 +31,19 @@ export function Today() {
       s.checks[key] = list.includes(id) ? list.filter((x) => x !== id) : [...list, id]
     })
 
+  // `items` may be only the habits shown today; hidden ones keep their slots
   const reorder = (kind: HabitKind, items: Habit[]) =>
     update((s) => {
+      const ofKind = s.habits.filter((h) => h.kind === kind)
+      const shown = new Set(items.map((h) => h.id))
+      let i = 0
+      const merged = ofKind.map((h) => {
+        if (!shown.has(h.id)) return h
+        const id = items[i++].id
+        return s.habits.find((x) => x.id === id)!
+      })
       const others = s.habits.filter((h) => h.kind !== kind)
-      s.habits = kind === 'build' ? [...items, ...others] : [...others, ...items]
+      s.habits = kind === 'build' ? [...merged, ...others] : [...others, ...merged]
     })
 
   const row = (h: Habit) => {
@@ -57,7 +66,7 @@ export function Today() {
     return (
       <>
         <div className="sec">{title}</div>
-        {editing ? <SortableList items={items} onReorder={(i) => reorder(kind, i)} render={row} /> : items.map(row)}
+        <SortableList items={items} onReorder={(i) => reorder(kind, i)} render={row} handle={editing} />
       </>
     )
   }
@@ -100,6 +109,9 @@ export function Today() {
       {!visible.length && !editing && <div className="empty">Nothing scheduled{day === 'today' ? ' today' : ''}.</div>}
 
       <button className="add-row" onClick={() => push({ name: 'habitEdit' })}>+ Add habit</button>
+      {visible.length > 1 && (
+        <p className="hint">{editing ? 'Drag ⋮⋮ to reorder' : 'Press and hold a habit, then drag to put it in your order'}</p>
+      )}
     </div>
   )
 }
