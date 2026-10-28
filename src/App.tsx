@@ -17,6 +17,9 @@ import { Stillness } from './screens/Stillness'
 import { Sit } from './screens/Sit'
 import { Breath } from './screens/Breath'
 import { Visualise } from './screens/Visualise'
+import { Faith } from './screens/Faith'
+import { Plans } from './screens/Plans'
+import { Reader } from './screens/Reader'
 
 function Soon({ title }: { title: string }) {
   return (
@@ -44,6 +47,9 @@ function screenFor(r: Route): ReactNode {
     case 'sit': return <Sit />
     case 'breath': return <Breath id={r.id} />
     case 'visualise': return <Visualise id={r.id} />
+    case 'faith': return <Faith />
+    case 'plans': return <Plans />
+    case 'reader': return <Reader chapter={r.ref} planDay={r.planDay} />
     default: return <Soon title={r.name} />
   }
 }
