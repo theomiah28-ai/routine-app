@@ -5,7 +5,8 @@ import { todayKey } from '../dates'
 import { uid } from '../seed'
 import { useStore } from '../store'
 import { useNav } from '../nav'
-import { Screen, Sheet } from '../ui'
+import { AddHabitButton, Screen, Sheet } from '../ui'
+import { GROUPS } from './groups'
 
 const GROWS: Record<string, string> = { transmutation: 'Grows the Ascent', stillness: 'Opens the Eye', gym: 'Carves the statue', health: 'Heals the lungs' }
 
@@ -13,7 +14,6 @@ const GROWS: Record<string, string> = { transmutation: 'Grows the Ascent', still
 export function BuildRoutine() {
   const { state, update } = useStore()
   const { push } = useNav()
-  const [draft, setDraft] = useState('')
   const [why, setWhy] = useState<string | null>(null)
   const [confirm, setConfirm] = useState(false)
   const have = new Set(state.habits.map((h) => h.name.toLowerCase()))
@@ -27,12 +27,6 @@ export function BuildRoutine() {
       const link = x.link && (x.link === 'health' || !s.habits.some((h) => h.link === x.link)) ? x.link : undefined
       s.habits.push({ id: uid(), name: x.name, kind: x.kind, timeOfDay: x.timeOfDay, days: x.days ?? [], createdAt: todayKey(), link, minutes: link === 'stillness' ? x.minutes : undefined, insightId: x.insightId })
     })
-  const addOwn = () => {
-    const n = draft.trim()
-    if (!n) return
-    update((s) => void s.habits.push({ id: uid(), name: n, kind: 'build', timeOfDay: 'anytime', days: [], createdAt: todayKey() }))
-    setDraft('')
-  }
   const remove = (id: string) => update((s) => void (s.habits = s.habits.filter((h) => h.id !== id)))
 
   return (
@@ -41,23 +35,24 @@ export function BuildRoutine() {
       <h1>Build your routine</h1>
       <p className="note">Add every habit you want to build or quit. Nothing is tracked yet. When your routine is ready, begin your journey and the tracking starts.</p>
 
-      <div className="sec">Your habits · {state.habits.length}</div>
-      {state.habits.length === 0 && <p className="note" style={{ padding: '10px 0' }}>No habits yet. Add ideas below or write your own.</p>}
-      {state.habits.map((h) => (
-        <div key={h.id} className="item">
-          <button className="name" onClick={() => push({ name: 'habitEdit', id: h.id })}>
-            {h.name}
-            {h.link && <small className="sub" style={{ display: 'block', fontSize: 11.5, color: 'var(--gold-dim)' }}>{GROWS[h.link]}</small>}
-          </button>
-          <button className="del" onClick={() => remove(h.id)} aria-label={`Remove ${h.name}`}>×</button>
-        </div>
-      ))}
-
-      <div className="row" style={{ marginTop: 12 }}>
-        <input className="input" value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addOwn()} placeholder="Add your own habit" />
-        <button className="link gold" onClick={addOwn} style={{ opacity: draft.trim() ? 1 : 0.4 }}>Add</button>
-      </div>
-      <button className="add-row" onClick={() => push({ name: 'habitEdit' })}>+ Add with details (days, time, section)</button>
+      {GROUPS.map((g) => {
+        const items = state.habits.filter(g.match)
+        return (
+          <div key={g.key}>
+            <div className="sec">{g.icon}{g.title}</div>
+            {items.map((h) => (
+              <div key={h.id} className="item">
+                <button className="name" onClick={() => push({ name: 'habitEdit', id: h.id })}>
+                  {h.name}
+                  {h.link && <small className="sub" style={{ display: 'block', fontSize: 11.5, color: 'var(--gold-dim)' }}>{GROWS[h.link]}</small>}
+                </button>
+                <button className="del" onClick={() => remove(h.id)} aria-label={`Remove ${h.name}`}>×</button>
+              </div>
+            ))}
+            <AddHabitButton label={g.add} onClick={() => push({ name: 'habitEdit', ...g.preset })} />
+          </div>
+        )
+      })}
 
       {ideas.length > 0 && (
         <>

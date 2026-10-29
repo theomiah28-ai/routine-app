@@ -5,7 +5,7 @@ export type Tab = 'today' | 'journey' | 'learn' | 'you'
 export type Route =
   | { name: 'today' }
   | { name: 'habit'; id: string }
-  | { name: 'habitEdit'; id?: string }
+  | { name: 'habitEdit'; id?: string; timeOfDay?: 'morning' | 'anytime' | 'evening'; kind?: 'build' | 'quit' }
   | { name: 'gym' }
   | { name: 'dayEdit'; id: string }
   | { name: 'exercise'; id: string }

@@ -220,3 +220,13 @@ export function SortableList<T extends { id: string }>({
     </DndContext>
   )
 }
+
+/** The add-habit button shown under each routine group. Gold and dashed so it never looks like a habit. */
+export function AddHabitButton({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button className="add-habit" onClick={onClick}>
+      <span className="add-habit-plus">+</span>
+      {label}
+    </button>
+  )
+}

@@ -5,10 +5,10 @@ import { V1_BACKUP_KEY } from './migrate'
 /** Saves everything stored on the phone, straight from IndexedDB, without needing the app to work. */
 export async function exportRaw() {
   const data = { state: await get('state'), v1Backup: await get(V1_BACKUP_KEY), exportedAt: new Date().toISOString() }
-  const file = new File([JSON.stringify(data)], `crucible-rescue-${Date.now()}.json`, { type: 'application/json' })
+  const file = new File([JSON.stringify(data)], `mastery-rescue-${Date.now()}.json`, { type: 'application/json' })
   if (navigator.canShare?.({ files: [file] })) {
     try {
-      await navigator.share({ files: [file], title: 'Crucible data' })
+      await navigator.share({ files: [file], title: 'Mastery data' })
       return
     } catch {
       /* cancelled: fall through to download */
