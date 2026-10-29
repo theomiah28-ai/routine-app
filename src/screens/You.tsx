@@ -16,6 +16,7 @@ const ICON: Record<Milestone['section'], string> = {
   gym: '⟛',
   routine: '✓',
   screentime: '◌',
+  health: '❦',
 }
 
 export function You() {

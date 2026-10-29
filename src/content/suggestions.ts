@@ -40,7 +40,9 @@ export const SUGGESTIONS: Suggestion[] = [
   { name: 'Asleep by 23:00', kind: 'build', timeOfDay: 'evening', goals: ['sleep', 'energy'], why: 'Tomorrow’s discipline is decided by tonight’s sleep.' },
   { name: 'No screens after 22:00', kind: 'build', timeOfDay: 'evening', goals: ['sleep', 'focus'], why: 'Let your brain wind down before bed.' },
   { name: 'No PMO', kind: 'quit', timeOfDay: 'anytime', goals: ['quit', 'focus', 'energy'], link: 'transmutation', insightId: 'energy-is-currency', why: 'Keep your energy and transmute it. Every clean day climbs the Ascent in Journey.' },
-  { name: 'No vaping', kind: 'quit', timeOfDay: 'anytime', goals: ['quit', 'energy'], insightId: 'rewiring-66-days', why: 'Every craving you ride out weakens the habit loop.' },
+  { name: 'No vaping', kind: 'quit', timeOfDay: 'anytime', goals: ['quit', 'energy', 'physique'], link: 'health', insightId: 'rewiring-66-days', why: 'Every craving you ride out weakens the habit loop. Every clean day heals the lungs in Journey.' },
+  { name: 'No weed', kind: 'quit', timeOfDay: 'anytime', goals: ['quit', 'focus', 'energy'], link: 'health', why: 'A clearer head and better sleep. Every clean day heals the lungs in Journey.' },
+  { name: 'No smoking', kind: 'quit', timeOfDay: 'anytime', goals: ['quit', 'physique'], link: 'health', why: 'Your lungs start repairing within days. Watch them heal in Journey.' },
   { name: 'No junk food', kind: 'quit', timeOfDay: 'anytime', goals: ['quit', 'physique'], why: 'Cheap food, like cheap dopamine, costs more than it gives.' },
 ]
 

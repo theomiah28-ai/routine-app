@@ -1,7 +1,7 @@
 export type HabitKind = 'build' | 'quit'
 export type TimeOfDay = 'morning' | 'anytime' | 'evening'
-export type HabitLink = 'transmutation' | 'stillness' | 'gym'
-export type Section = 'routine' | 'gym' | 'transmutation' | 'stillness' | 'faith' | 'work' | 'screentime'
+export type HabitLink = 'transmutation' | 'stillness' | 'gym' | 'health'
+export type Section = 'routine' | 'gym' | 'transmutation' | 'stillness' | 'health' | 'faith' | 'work' | 'screentime'
 
 export interface Habit {
   id: string

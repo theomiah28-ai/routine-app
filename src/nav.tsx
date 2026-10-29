@@ -18,6 +18,7 @@ export type Route =
   | { name: 'breath'; id: 'box' | 'power' | 'calm' }
   | { name: 'visualise'; id: string }
   | { name: 'screentime' }
+  | { name: 'health' }
   | { name: 'journey' }
   | { name: 'progress' }
   | { name: 'learn' }

@@ -10,12 +10,15 @@ import { Ascent } from '../symbols/Ascent'
 import { Eye } from '../symbols/Eye'
 import { Brain } from '../symbols/Brain'
 import { Statue } from '../symbols/Statue'
+import { Lungs } from '../symbols/Lungs'
+import { lungScore, lungState } from '../domain/health'
 import { Ring, Screen } from '../ui'
 
 const ROUTE: Record<string, Route> = {
   transmutation: { name: 'transmutation' },
   stillness: { name: 'stillness' },
   gym: { name: 'gym' },
+  health: { name: 'health' },
 }
 
 function Row({ p, symbol, onClick }: { p: SectionProgress; symbol: ReactNode; onClick: () => void }) {
@@ -56,6 +59,7 @@ export function Journey() {
     ),
     stillness: <Eye openness={eyeStage(meditationMinutes(state)).openness} width={70} />,
     gym: <Statue stage={statueStage(statuePoints(state)).index} size={58} />,
+    health: <Lungs state={lungState(lungScore(state, today) ?? 1)} width={70} />,
   }
 
   return (

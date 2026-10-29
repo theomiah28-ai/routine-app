@@ -12,6 +12,7 @@ const LINKS: { id: Habit['link']; label: string; hint: string }[] = [
   { id: 'transmutation', label: 'Transmutation', hint: 'NoFap: climbs the Ascent' },
   { id: 'stillness', label: 'Stillness', hint: 'Meditation: opens the Eye' },
   { id: 'gym', label: 'Gym', hint: 'Ticked when you finish a workout' },
+  { id: 'health', label: 'Health', hint: 'No vaping, weed, smoking: heals the lungs' },
 ]
 
 // Mon-first display, stored as JS weekday numbers
@@ -37,7 +38,7 @@ export function HabitEditor({ id }: { id?: string }) {
     const fields = { name: name.trim(), kind, days: days.length === 7 ? [] : days, timeOfDay, link, minutes: link === 'stillness' ? minutes : undefined }
     update((s) => {
       // Only one habit can be linked to each section
-      if (fields.link) s.habits.forEach((h) => h.link === fields.link && h.id !== id && (h.link = undefined))
+      if (fields.link && fields.link !== 'health') s.habits.forEach((h) => h.link === fields.link && h.id !== id && (h.link = undefined))
       const h = s.habits.find((h) => h.id === id)
       if (h) Object.assign(h, fields)
       else s.habits.push({ id: uid(), createdAt: todayKey(), ...fields })
