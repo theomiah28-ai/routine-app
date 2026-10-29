@@ -1,5 +1,5 @@
-import { addDays, weekday } from './dates'
-import type { Habit, State } from './types'
+import { addDays, weekday } from '../dates'
+import type { Habit, State } from '../types'
 
 export function isScheduled(habit: Habit, key: string): boolean {
   return habit.days.length === 0 || habit.days.includes(weekday(key))

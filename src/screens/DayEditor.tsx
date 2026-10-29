@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { uid } from '../seed'
 import { useStore } from '../store'
 import { Back, useNav } from '../nav'
-import { SortableList } from '../components'
+import { SortableList } from '../ui'
 import { startWorkout } from './Workout'
 import type { SplitDay } from '../types'
 

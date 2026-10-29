@@ -22,32 +22,37 @@ function split(): { days: SplitDay[]; exercises: Record<string, Exercise> } {
   return { days, exercises }
 }
 
+/** The V2-only sections, fresh. */
+export function defaultSections(today: string, now: number): Pick<State, 'transmutation' | 'stillness' | 'faith' | 'work' | 'screenTime' | 'milestones' | 'journal'> {
+  return {
+    transmutation: { start: null, longestDays: 0, relapses: [] },
+    stillness: { sitMinutes: 30, logs: [] },
+    faith: { createdAt: today, days: {}, planId: 'wisdom-wealth', planProgress: {} },
+    work: {
+      createdAt: today,
+      targets: { videos: 1, products: 1, hoursWorked: 6, deepMinutes: 180 },
+      days: [],
+      log: {},
+      focusStart: null,
+    },
+    screenTime: { limit: 120, foggy: 120, rotting: 240, manual: {} },
+    milestones: [],
+    journal: {},
+  }
+}
+
 export function seedState(): State {
   const createdAt = todayKey()
-  const h = (name: string, kind: 'build' | 'quit', extra: { days?: number[]; isGym?: boolean } = {}) => ({
-    id: uid(),
-    name,
-    kind,
-    days: extra.days ?? [],
-    isGym: extra.isGym,
-    createdAt,
-  })
   return {
-    version: 1,
-    name: 'Theo',
-    habits: [
-      h('Wake up by 6:30', 'build'),
-      h('Gym', 'build', { days: [1, 2, 4, 5], isGym: true }),
-      h('Read 20 min', 'build'),
-      h('Meditate', 'build'),
-      h('Asleep by 23:00', 'build'),
-      h('No vaping', 'quit'),
-      h('No PMO', 'quit'),
-    ],
+    version: 2,
+    settings: { name: '', showEsoteric: false, onboarded: false, restSeconds: 120, faith: true, goals: [] },
+    // Nothing forced: onboarding suggests, the user picks
+    habits: [],
     checks: {},
     splitName: 'Upper / Lower',
     ...split(),
     sessions: [],
     active: null,
+    ...defaultSections(createdAt, Date.now()),
   }
 }

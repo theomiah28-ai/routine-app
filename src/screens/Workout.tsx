@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
-import { formatWeight, lastSets, summarise } from '../gym'
+import { useEffect, useRef, useState } from 'react'
+import { formatWeight, isPersonalBest, lastSets, summarise } from '../domain/gym'
+import { bell, unlockAudio } from '../audio'
+import { Screen, Toast } from '../ui'
 import { todayKey } from '../dates'
 import { uid } from '../seed'
 import { useStore } from '../store'
 import { useNav } from '../nav'
-import { Check } from '../components'
+import { Check } from '../ui'
 import type { ActiveSet, State } from '../types'
 
 const blank = (): ActiveSet => ({ weight: '', reps: '', done: false })
@@ -15,6 +17,7 @@ export function startWorkout(s: State, dayId: string) {
     dayId,
     start: Date.now(),
     entries: day.exercises.map((e) => ({ exerciseId: e.exerciseId, sets: Array.from({ length: e.sets }, blank) })),
+    restEndsAt: null,
   }
 }
 
@@ -35,8 +38,20 @@ export function Workout() {
     return () => clearInterval(t)
   }, [])
 
+  const [toast, setToast] = useState<string | null>(null)
+  const rang = useRef<number | null>(null)
+  const restLeft = state.active?.restEndsAt ? Math.max(0, Math.ceil((state.active.restEndsAt - now) / 1000)) : 0
+
+  useEffect(() => {
+    const ends = state.active?.restEndsAt
+    if (ends && restLeft === 0 && rang.current !== ends) {
+      rang.current = ends
+      bell()
+    }
+  }, [restLeft, state.active?.restEndsAt])
+
   const active = state.active
-  if (!active) return <div className="screen full"><button className="link" onClick={reset}>‹ Gym</button></div>
+  if (!active) return <Screen full><button className="link" onClick={pop}>‹ Gym</button></Screen>
   const day = state.days.find((d) => d.id === active.dayId)
 
   const setField = (ei: number, si: number, patch: Partial<ActiveSet>) =>
@@ -48,7 +63,20 @@ export function Workout() {
     const weight = set.weight || ghost.weight
     const reps = set.reps || ghost.reps
     if (!reps) return
-    setField(ei, si, { weight: weight || '0', reps, done: true })
+    unlockAudio()
+    const exerciseId = active.entries[ei].exerciseId
+    const w = parseFloat(weight) || 0
+    const pb = isPersonalBest(state, exerciseId, w)
+    const pbId = `pb:${active.start}:${exerciseId}`
+    update((s) => {
+      Object.assign(s.active!.entries[ei].sets[si], { weight: weight || '0', reps, done: true })
+      s.active!.restEndsAt = Date.now() + s.settings.restSeconds * 1000
+      if (pb && !s.milestones.some((m) => m.id === pbId && m.value === `${formatWeight(w)}kg`)) {
+        const name = s.exercises[exerciseId]?.name ?? 'Lift'
+        s.milestones = [...s.milestones.filter((m) => m.id !== pbId), { id: pbId, section: 'gym', title: `New PB · ${name}`, value: `${formatWeight(w)}kg`, at: Date.now(), seen: false }]
+      }
+    })
+    if (pb) setToast(`New PB · ${state.exercises[exerciseId]?.name} ${formatWeight(w)}kg`)
   }
 
   const finish = () => {
@@ -65,23 +93,28 @@ export function Workout() {
     update((s) => {
       s.sessions.push({ id: uid(), dayId: active.dayId, dayName: day?.name ?? 'Workout', start: active.start, end: Date.now(), entries })
       s.active = null
-      const gym = s.habits.find((h) => h.isGym)
+      const gym = s.habits.find((h) => h.link === 'gym')
       const key = todayKey()
       if (gym && !(s.checks[key] ?? []).includes(gym.id)) s.checks[key] = [...(s.checks[key] ?? []), gym.id]
     })
-    reset()
+    pop()
   }
 
   const discard = (skipConfirm = false) => {
     if (!skipConfirm && !confirm('Discard this workout? Nothing will be saved.')) return
-    update((s) => void (s.active = null))
-    reset()
+    update((s) => {
+      // PBs from a discarded workout don't count
+      s.milestones = s.milestones.filter((m) => !m.id.startsWith(`pb:${active.start}:`))
+      s.active = null
+    })
+    pop()
   }
 
   const doneSets = active.entries.reduce((n, e) => n + e.sets.filter((x) => x.done).length, 0)
 
   return (
-    <div className="screen full">
+    <Screen full>
+      {toast && <Toast text={toast} onDone={() => setToast(null)} />}
       <div className="topbar">
         <button className="link muted" onClick={pop}>‹ Gym</button>
         <span className="date" style={{ fontVariantNumeric: 'tabular-nums' }}>{elapsed(now - active.start)}</span>
@@ -138,8 +171,18 @@ export function Workout() {
       <button className="btn danger" onClick={() => discard()} style={{ marginTop: 24 }}>Discard workout</button>
 
       <div className="dock">
+        {restLeft > 0 && (
+          <div className="rest-bar">
+            <div className="rest-fill" style={{ width: `${(restLeft / state.settings.restSeconds) * 100}%` }} />
+            <span>Rest <b>{Math.floor(restLeft / 60)}:{String(restLeft % 60).padStart(2, '0')}</b></span>
+            <span className="rest-actions">
+              <button onClick={() => update((s) => void (s.active!.restEndsAt = (s.active!.restEndsAt ?? Date.now()) + 30_000))}>+30s</button>
+              <button onClick={() => update((s) => void (s.active!.restEndsAt = null))}>Skip</button>
+            </span>
+          </div>
+        )}
         <button className="btn" onClick={finish}>Finish workout</button>
       </div>
-    </div>
+    </Screen>
   )
 }

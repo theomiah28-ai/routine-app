@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { exerciseHistory, formatWeight, summarise, topWeight } from '../gym'
+import { exerciseHistory, formatWeight, summarise, topWeight } from '../domain/gym'
 import { useStore } from '../store'
 import { Back } from '../nav'
 
@@ -21,14 +21,14 @@ function Chart({ points }: { points: { t: number; w: number }[] }) {
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block', marginTop: 8 }}>
       <defs>
         <linearGradient id="fill" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor="#c6f432" stopOpacity="0.18" />
-          <stop offset="1" stopColor="#c6f432" stopOpacity="0" />
+          <stop offset="0" stopColor="#e8c46a" stopOpacity="0.18" />
+          <stop offset="1" stopColor="#e8c46a" stopOpacity="0" />
         </linearGradient>
       </defs>
       <line x1="0" y1={H - 1} x2={W} y2={H - 1} stroke="#1f1f22" />
       {points.length > 1 && <polygon points={area} fill="url(#fill)" />}
-      <polyline fill="none" stroke="#c6f432" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" points={line} />
-      <circle cx={x(last.t)} cy={y(last.w)} r="4.5" fill="#c6f432" />
+      <polyline fill="none" stroke="#e8c46a" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" points={line} />
+      <circle cx={x(last.t)} cy={y(last.w)} r="4.5" fill="#e8c46a" />
       <text x={Math.min(x(last.t), W - 60)} y={y(last.w) - 12} fill="#f2f2f2" fontSize="13" fontWeight="700" textAnchor={points.length > 1 ? 'middle' : 'start'}>
         {formatWeight(last.w)}kg
       </text>

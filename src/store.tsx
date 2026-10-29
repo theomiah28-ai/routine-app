@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { get, set } from 'idb-keyval'
-import { seedState } from './seed'
+import { V1_BACKUP_KEY } from './migrate'
+import { loadState } from './load'
+import { Recovery } from './Recovery'
 import type { State } from './types'
 
 type Update = (fn: (s: State) => void) => void
@@ -9,12 +11,23 @@ const Ctx = createContext<{ state: State; update: Update; replace: (s: State) =>
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<State | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const latest = useRef<State | null>(null)
   latest.current = state
 
   useEffect(() => {
     navigator.storage?.persist?.()
-    get<State>('state').then((saved) => setState(saved ?? seedState()))
+    ;(async () => {
+      try {
+        const saved = await get('state')
+        if (saved && saved.version !== 2) await set(V1_BACKUP_KEY, saved)
+        const r = loadState(saved, Date.now())
+        if ('error' in r) setError(r.error)
+        else setState(r.state)
+      } catch (e) {
+        setError(e instanceof Error ? e.message : String(e))
+      }
+    })()
   }, [])
 
   useEffect(() => {
@@ -31,6 +44,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return () => document.removeEventListener('visibilitychange', flush)
   }, [])
 
+  // Never save over the stored data when it couldn't be loaded
+  if (error) return <Recovery error={error} />
   if (!state) return null
 
   const update: Update = (fn) =>
