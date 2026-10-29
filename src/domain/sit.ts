@@ -18,3 +18,6 @@ export function finishSit(s: StillnessState, completed: boolean, now: number): {
   const stillness = minutes > 0 ? logPractice(cleared, { id: `sit-${a.start}`, kind: 'sit', start: a.start, minutes, completed }) : cleared
   return { stillness, dayKey: dateKey(new Date(a.start)) }
 }
+
+/** A timed sit ticks the meditation habit only when it lasted at least the habit's minutes. */
+export const sitTicksHabit = (sitMinutes: number, habitMinutes: number | undefined) => habitMinutes === undefined || sitMinutes >= habitMinutes

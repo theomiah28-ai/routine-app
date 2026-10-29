@@ -44,13 +44,18 @@ export function normaliseV2(s: State, now: number): State {
   const out = structuredClone(s)
   out.settings = { ...out.settings, faith: out.settings.faith ?? true, goals: out.settings.goals ?? [] }
   const today = dateKey(new Date(now))
+  // Reuse an existing NoFap-style quit habit rather than adding a second one
+  const own = !out.habits.some((h) => h.link === 'transmutation') ? out.habits.find((h) => h.kind === 'quit' && !h.link && SR.test(h.name)) : undefined
+  if (own) own.link = 'transmutation'
   if (out.transmutation.start !== null && !out.habits.some((h) => h.link === 'transmutation')) {
     const startKey = dateKey(new Date(out.transmutation.start))
     const id = `sr-${out.transmutation.start}`
     out.habits.push({ id, name: 'No PMO', kind: 'quit', days: [], createdAt: startKey, timeOfDay: 'anytime', link: 'transmutation' })
     for (let k = startKey; k <= today; k = addDays(k, 1)) out.checks[k] = [...(out.checks[k] ?? []), id]
   }
-  out.transmutation = { ...out.transmutation, start: null, needsPick: undefined }
+  // Drop the preview-era start time and its pick prompt flag
+  const { needsPick: _legacy, ...t } = out.transmutation as State['transmutation'] & { needsPick?: boolean }
+  out.transmutation = { ...t, start: null }
   for (const h of out.habits) if (h.link === 'stillness' && h.minutes === undefined) h.minutes = 30
   return out
 }

@@ -20,12 +20,12 @@ export function brainState(minutes: number, st: ScreenTimeState): BrainState {
 
 export const todayMinutes = (st: ScreenTimeState, key: string) => st.manual[key] ?? SAMPLE_TOTAL
 
-/** Average daily minutes over the last `days` days, using only days with an entry (sample when none). */
-export function avgMinutes(st: ScreenTimeState, today: string, days: number): number {
+/** Average daily minutes over the last `days` days, using only days with an entry; null when nothing was entered. */
+export function avgMinutes(st: ScreenTimeState, today: string, days: number): number | null {
   const vals: number[] = []
   for (let i = 0; i < days; i++) {
     const k = addDays(today, -i)
     if (st.manual[k] !== undefined) vals.push(st.manual[k])
   }
-  return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : SAMPLE_TOTAL
+  return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : null
 }

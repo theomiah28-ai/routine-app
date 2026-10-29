@@ -63,8 +63,7 @@ describe('progression', () => {
     expect(statueStage(250).index).toBe(7)
     const s = base()
     s.sessions = Array.from({ length: 5 }, (_, i) => ({ id: 's' + i, dayId: 'd', dayName: 'A', start: i, end: i, entries: [] }))
-    s.milestones = [{ id: 'pb:1:x', section: 'gym', title: 'PB', value: '1', at: 0, seen: true }]
-    expect(statuePoints(s)).toBe(6)
+    expect(statuePoints(s)).toBe(5)
   })
 
   it('faith days counts habit or prayer', () => {
@@ -124,5 +123,23 @@ describe('review fixes', () => {
     expect(linkChangeImpact(s, 'm', 'stillness', 10)).toContain('2h')
     expect(linkChangeImpact(s, 'm', 'stillness', 30)).toBeNull()
     expect(linkChangeImpact(s, 'n', undefined, undefined)).toBeNull()
+  })
+})
+
+describe('minor fixes', () => {
+  it('statue counts PBs found in workout history, not just recorded milestones', () => {
+    const s = base()
+    const sess = (i: number, w: number) => ({ id: 's' + i, dayId: 'd', dayName: 'A', start: i, end: i, entries: [{ exerciseId: 'sq', sets: [{ weight: w, reps: 5 }] }] })
+    s.sessions = [sess(0, 100), sess(1, 105), sess(2, 105), sess(3, 110)]
+    // 4 workouts + 2 heavier-than-ever sessions (the first session sets the baseline)
+    expect(statuePoints(s)).toBe(6)
+  })
+
+  it('faith streak skips the faith habit’s unscheduled days', () => {
+    const s = base()
+    const wd = parseKey(addDays(today, -2)).getDay()
+    s.habits = [hab('b', 'faith', { days: [0, 1, 2, 3, 4, 5, 6].filter((d) => d !== wd) })]
+    for (const n of [1, 3, 4]) s.checks[addDays(today, -n)] = ['b']
+    expect(faithDays(s, today)).toBe(3)
   })
 })

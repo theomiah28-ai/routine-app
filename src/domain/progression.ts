@@ -1,6 +1,6 @@
 import { ASCENT } from '../content/ascent'
 import { addDays, dateKey } from '../dates'
-import { currentStreak, isChecked } from './streaks'
+import { currentStreak, isChecked, isScheduled } from './streaks'
 import { EYE_STAGES, eyeStage } from './stillness'
 import { workStreak } from './work'
 import type { Habit, HabitLink, Section, State } from '../types'
@@ -53,12 +53,19 @@ const faithDone = (s: State, key: string) => {
   return !!s.faith.days[key]?.prayer || (!!h && isChecked(s.checks, h.id, key))
 }
 
-/** Consecutive days with the faith habit ticked or morning prayer done; today not done yet doesn't break it. */
+/**
+ * Consecutive days with the faith habit ticked or morning prayer done; today not done yet doesn't break it.
+ * Days the faith habit isn't scheduled are skipped rather than breaking the run.
+ */
 export function faithDays(s: State, today: string): number {
+  const h = linked(s, 'faith')
+  // Without a habit there's no schedule, so the run simply ends at the first day without prayer
+  const since = h?.createdAt ?? ''
   let key = faithDone(s, today) ? today : addDays(today, -1)
   let n = 0
-  while (faithDone(s, key)) {
-    n++
+  for (let guard = 0; guard < 4000 && key >= since; guard++) {
+    if (faithDone(s, key)) n++
+    else if (!h || isScheduled(h, key)) break
     key = addDays(key, -1)
   }
   return n
@@ -95,8 +102,21 @@ export const STATUE = [
   { points: 250, name: 'Masterpiece' },
 ]
 
-/** Consistency (workouts) plus progressive overload (personal bests). */
-export const statuePoints = (s: State) => s.sessions.length + s.milestones.filter((m) => m.id.startsWith('pb:')).length
+/** Consistency (each workout) plus progressive overload (each lift that beat its best), read from the whole history. */
+export function statuePoints(s: State): number {
+  const best = new Map<string, number>()
+  let pbs = 0
+  for (const sess of [...s.sessions].sort((a, b) => a.end - b.end)) {
+    for (const e of sess.entries) {
+      if (!e.sets.length) continue
+      const top = Math.max(...e.sets.map((x) => x.weight))
+      const prev = best.get(e.exerciseId)
+      if (prev !== undefined && top > prev) pbs++
+      if (prev === undefined || top > prev) best.set(e.exerciseId, top)
+    }
+  }
+  return s.sessions.length + pbs
+}
 
 export function statueStage(points: number) {
   let index = 0

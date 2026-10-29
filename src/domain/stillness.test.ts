@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { eyeStage, logPractice, sitDoneOn, sitStreak, totalMinutes } from './stillness'
+import { eyeStage, logPractice, sitDoneOn, sitStreak } from './stillness'
 import { addDays, parseKey, todayKey } from '../dates'
 import type { PracticeLog, StillnessState } from '../types'
 
@@ -23,7 +23,6 @@ describe('stillness', () => {
 
   it('partial sit counts minutes not streak', () => {
     const s = st([sit(today, 12, false)])
-    expect(totalMinutes(s)).toBe(12)
     expect(sitDoneOn(s, today)).toBe(false)
     expect(sitStreak(s, today)).toBe(0)
   })

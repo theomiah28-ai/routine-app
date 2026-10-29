@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { completeReading, faithDone, faithStreak, planToday, verseOfDay } from './faith'
+import { completeReading, faithDone, planToday, verseOfDay } from './faith'
 import { VERSES } from '../content/faith'
 import { addDays, todayKey } from '../dates'
 import type { FaithState } from '../types'
@@ -18,13 +18,6 @@ describe('faith', () => {
     const s = f({ days: { [today]: { prayer: true } } })
     expect(faithDone(s, today, 'prayer')).toBe(true)
     expect(faithDone(s, today, 'gratitude')).toBe(false)
-  })
-
-  it('streak counts prayer days', () => {
-    const s = f({ days: { [addDays(today, -1)]: { prayer: true }, [addDays(today, -2)]: { prayer: true }, [addDays(today, -4)]: { prayer: true } } })
-    expect(faithStreak(s, today)).toBe(2)
-    s.days[today] = { prayer: true }
-    expect(faithStreak(s, today)).toBe(3)
   })
 
   it('completeReading advances once per day', () => {

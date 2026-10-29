@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { bell, unlockAudio } from '../audio'
-import { finishSit, sitLeft } from '../domain/sit'
+import { finishSit, sitLeft, sitTicksHabit } from '../domain/sit'
 import { useStore } from '../store'
 import { useNav } from '../nav'
 import { Screen } from '../ui'
@@ -94,9 +94,11 @@ export function Sit() {
 
   const close = (completed: boolean) =>
     update((s) => {
+      const sat = s.stillness.activeSit?.minutes ?? 0
       const r = finishSit(s.stillness, completed, Date.now())
       s.stillness = r.stillness
-      if (completed) tickStillnessHabit(s, r.dayKey)
+      const h = s.habits.find((x) => x.link === 'stillness')
+      if (completed && sitTicksHabit(sat, h?.minutes)) tickStillnessHabit(s, r.dayKey)
     })
 
   useEffect(() => {

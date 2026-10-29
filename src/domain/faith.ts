@@ -15,17 +15,6 @@ export function faithDone(f: FaithState, key: string, item: FaithItem): boolean 
   return !!f.days[key]?.[item]
 }
 
-/** Consecutive days with morning prayer, ending today; today not done yet doesn't break it. */
-export function faithStreak(f: FaithState, today: string): number {
-  let key = faithDone(f, today, 'prayer') ? today : addDays(today, -1)
-  let n = 0
-  while (faithDone(f, key, 'prayer')) {
-    n++
-    key = addDays(key, -1)
-  }
-  return n
-}
-
 /** Today's chapter in the active plan. Stays on the chapter just read until tomorrow. */
 export function planToday(f: FaithState, key: string): { plan: Plan; dayIndex: number; ref: string } | null {
   const plan = PLANS.find((p) => p.id === f.planId)

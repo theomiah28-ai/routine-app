@@ -58,7 +58,7 @@ export function You() {
     }
   }
 
-  const earned = [...state.milestones].sort((a, b) => b.at - a.at)
+  const earned = [...state.milestones].filter((m) => m.section !== 'faith' || set.faith).sort((a, b) => b.at - a.at)
 
   return (
     <Screen>

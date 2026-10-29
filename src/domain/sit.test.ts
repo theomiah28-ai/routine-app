@@ -27,3 +27,13 @@ describe('sit sessions', () => {
     expect(finishSit(base(), false, start).stillness.logs).toEqual([])
   })
 })
+
+describe('short sits', () => {
+  it('only ticks the meditation habit when the sit covers its minutes', async () => {
+    const { sitTicksHabit } = await import('./sit')
+    expect(sitTicksHabit(30, 30)).toBe(true)
+    expect(sitTicksHabit(45, 30)).toBe(true)
+    expect(sitTicksHabit(10, 30)).toBe(false)
+    expect(sitTicksHabit(10, undefined)).toBe(true)
+  })
+})

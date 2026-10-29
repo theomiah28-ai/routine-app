@@ -52,7 +52,8 @@ export function Onboarding() {
     if (n && !custom.includes(n)) setCustom([...custom, n])
     setDraft('')
   }
-  const count = picked.size + custom.length
+  // Only count picks still on the list (changing goals can drop some)
+  const count = suggestions.filter((x) => picked.has(x.name)).length + custom.length
 
   const canNext = [!!name.trim(), true, faith !== null, true, true][step]
   const label = step === 3 ? (count ? `Continue · ${count} added` : 'Skip for now') : step === STEPS - 1 ? 'Start' : 'Continue'

@@ -68,12 +68,10 @@ export interface ActiveWorkout {
 }
 
 export interface TransmutationState {
-  /** ms epoch the current streak began; null = not tracking yet */
+  /** Legacy (V2 preview): ms epoch an SR streak began. Normalised to null; the Ascent now comes from the linked habit */
   start: number | null
   longestDays: number
   relapses: number[]
-  /** V1 had no recognisable SR habit — ask once which one it was */
-  needsPick?: boolean
 }
 
 export type PracticeKind = 'sit' | 'box' | 'power' | 'calm' | 'visualise'

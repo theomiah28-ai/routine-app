@@ -5,8 +5,6 @@ import type { PracticeLog, StillnessState } from '../types'
 export const EYE_STAGES = [0, 1, 10, 25, 50, 100, 200, 365].map((h) => h * 60)
 export const EYE_NAMES = ['Closed', 'Stirring', 'Waking', 'Clarity', 'Presence', 'Insight', 'Vision', 'Awake']
 
-export const totalMinutes = (s: StillnessState) => s.logs.reduce((n, l) => n + l.minutes, 0)
-
 /** Stage reached plus how open the eye is (0.08 at the start → 1 when Awake), rising smoothly within each stage. */
 export function eyeStage(minutes: number): { index: number; name: string; openness: number; nextAt: number | null } {
   let index = 0

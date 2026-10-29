@@ -142,7 +142,7 @@ export function App() {
     })
   }, [state, update])
 
-  const celebrate = FULLSCREEN.has(route.name) ? undefined : state.milestones.find((m) => !m.seen)
+  const celebrate = FULLSCREEN.has(route.name) ? undefined : state.milestones.find((m) => !m.seen && (m.section !== 'faith' || state.settings.faith))
 
   const nav = {
     push: (r: Route) => setStacks((s) => ({ ...s, [tab]: [...s[tab], r] })),

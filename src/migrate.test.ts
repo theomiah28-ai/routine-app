@@ -127,3 +127,14 @@ describe('normalise edge', () => {
     expect(ascentDays(n, today)).toBe(3)
   })
 })
+
+describe('normalise reuse', () => {
+  it('links an existing NoFap-style habit instead of adding a second one', () => {
+    const s = seedState() as unknown as Record<string, any>
+    s.transmutation = { start: parseKey(ago(5)).getTime(), longestDays: 0, relapses: [] }
+    s.habits = [{ id: 'mine', name: 'NoFap', kind: 'quit', days: [], createdAt: ago(20), timeOfDay: 'anytime' }]
+    const n = migrate(s, now)
+    expect(n.habits.filter((h) => h.kind === 'quit')).toHaveLength(1)
+    expect(n.habits[0].link).toBe('transmutation')
+  })
+})

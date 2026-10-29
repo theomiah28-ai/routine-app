@@ -45,7 +45,7 @@ export function Flow({ kind }: { kind: 'morning' | 'evening' }) {
   const verse = verseOfDay(today)
   const prayed = faithDone(state.faith, today, 'prayer')
   const c = completion(state, today)
-  const left = dayItems(state, today).filter((i) => !i.done && i.id !== 'faith:gratitude')
+  const left = dayItems(state, today).filter((i) => !i.done)
 
   const morning: Step[] = [
     {

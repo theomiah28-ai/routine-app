@@ -42,11 +42,14 @@ function Carving({ stage, size }: { stage: number; size: number }) {
 }
 
 export function Statue({ stage, size = 150 }: { stage: number; size?: number }) {
-  const [img, setImg] = useState(true)
+  // Remember which stage's image failed, so a later stage still tries its own image
+  const [failed, setFailed] = useState<number | null>(null)
+  const img = failed !== stage
+  const setImg = (_: boolean) => setFailed(stage)
   if (img)
     return (
       <img
-        src={`/routine-app/statue/stage-${stage}.png`}
+        src={`${import.meta.env.BASE_URL}statue/stage-${stage}.png`}
         alt=""
         width={size}
         style={{ display: 'block', margin: '0 auto', borderRadius: 14 }}

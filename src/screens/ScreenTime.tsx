@@ -44,10 +44,10 @@ export function ScreenTime() {
       <div style={{ margin: '30px 0 10px' }}><Brain state={b} /></div>
       <div className="brains" style={{ margin: '4px 0 14px' }}>
         {[{ label: '7 days', mins: avgMinutes(st, today, 7) }, { label: '30 days', mins: avgMinutes(st, today, 30) }].map((x) => (
-          <div key={x.label}>
-            <Brain state={brainState(x.mins, st)} width={70} />
+          <div key={x.label} style={{ opacity: x.mins === null ? 0.35 : 1 }}>
+            <Brain state={brainState(x.mins ?? 0, st)} width={70} />
             <b>{x.label}</b>
-            <small>{hm(x.mins)} / day</small>
+            <small>{x.mins === null ? 'Enter totals to see' : `${hm(x.mins)} / day`}</small>
           </div>
         ))}
       </div>
