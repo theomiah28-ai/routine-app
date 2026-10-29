@@ -28,10 +28,10 @@ export function You() {
 
   // The share sheet ("Save to Files") is the reliable way out of a home-screen app on iPhone
   const exportBackup = async () => {
-    const file = new File([JSON.stringify(state)], `crucible-backup-${todayKey()}.json`, { type: 'application/json' })
+    const file = new File([JSON.stringify(state)], `mastery-backup-${todayKey()}.json`, { type: 'application/json' })
     if (navigator.canShare?.({ files: [file] })) {
       try {
-        await navigator.share({ files: [file], title: 'Crucible backup' })
+        await navigator.share({ files: [file], title: 'Mastery backup' })
         return
       } catch {
         return

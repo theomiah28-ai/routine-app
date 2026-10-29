@@ -20,14 +20,14 @@ const WEEK = [
   { d: 1, l: 'M' }, { d: 2, l: 'T' }, { d: 3, l: 'W' }, { d: 4, l: 'T' }, { d: 5, l: 'F' }, { d: 6, l: 'S' }, { d: 0, l: 'S' },
 ]
 
-export function HabitEditor({ id }: { id?: string }) {
+export function HabitEditor({ id, timeOfDay: presetTime, kind: presetKind }: { id?: string; timeOfDay?: TimeOfDay; kind?: HabitKind }) {
   const { state, update } = useStore()
   const { pop, reset } = useNav()
   const existing = state.habits.find((h) => h.id === id)
   const [name, setName] = useState(existing?.name ?? '')
-  const [kind, setKind] = useState<HabitKind>(existing?.kind ?? 'build')
+  const [kind, setKind] = useState<HabitKind>(existing?.kind ?? presetKind ?? 'build')
   const [days, setDays] = useState<number[]>(existing?.days.length ? existing.days : [0, 1, 2, 3, 4, 5, 6])
-  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(existing?.timeOfDay ?? 'anytime')
+  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(existing?.timeOfDay ?? presetTime ?? 'anytime')
   const [link, setLink] = useState<Habit['link']>(existing?.link)
   const [minutes, setMinutes] = useState(existing?.minutes ?? 30)
 

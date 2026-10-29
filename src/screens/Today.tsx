@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import { addDays, dateKey, formatLong } from '../dates'
 import { useNow } from './Transmutation'
 import { isChecked, isScheduled } from '../domain/streaks'
@@ -8,17 +8,10 @@ import { BuildRoutine } from './BuildRoutine'
 import { completion } from '../domain/completion'
 import { useStore } from '../store'
 import { useNav, type Route } from '../nav'
-import { Check, Moon, Ring, Screen, SortableList, Sun } from '../ui'
+import { AddHabitButton, Check, Ring, Screen, SortableList } from '../ui'
+import { GROUPS, type Group } from './groups'
 import type { Habit } from '../types'
 
-type Group = { key: string; title: string; icon?: ReactNode; match: (h: Habit) => boolean }
-
-const GROUPS: Group[] = [
-  { key: 'morning', title: 'Morning', icon: <Sun />, match: (h) => h.kind === 'build' && h.timeOfDay === 'morning' },
-  { key: 'anytime', title: 'Anytime', match: (h) => h.kind === 'build' && h.timeOfDay === 'anytime' },
-  { key: 'evening', title: 'Evening', icon: <Moon />, match: (h) => h.kind === 'build' && h.timeOfDay === 'evening' },
-  { key: 'quit', title: 'Quit', match: (h) => h.kind === 'quit' },
-]
 
 function greeting(h: number) {
   if (h < 12) return 'Good morning'
@@ -121,24 +114,19 @@ function Tracking() {
 
       {GROUPS.map((g) => {
         const items = visible.filter(g.match)
-        if (!items.length) return null
         return (
           <div key={g.key}>
             <div className="sec">{g.icon}{g.title}</div>
-            <SortableList items={items} onReorder={(i) => reorder(g, i)} render={row} handle={editing} />
+            {items.length > 0 ? (
+              <SortableList items={items} onReorder={(i) => reorder(g, i)} render={row} handle={editing} />
+            ) : (
+              <div className="group-empty">{g.key === 'quit' ? 'Nothing to quit yet.' : `No ${g.title.toLowerCase()} habits${day === 'today' ? ' today' : ''}.`}</div>
+            )}
+            {!editing && <AddHabitButton label={g.add} onClick={() => push({ name: 'habitEdit', ...g.preset })} />}
           </div>
         )
       })}
 
-      {!state.habits.length && !editing ? (
-        <div className="empty-state">
-          <b>Your routine starts here</b>
-          <p className="note">Add the habits you want to build or quit. Link one to Transmutation, Stillness or Gym and every tick grows that section in Journey.</p>
-        </div>
-      ) : (
-        !visible.length && !editing && <div className="empty">No habits scheduled{day === 'today' ? ' today' : ''}.</div>
-      )}
-      <button className="add-row" onClick={() => push({ name: 'habitEdit' })}>+ Add habit</button>
       {visible.length > 1 && <p className="hint">{editing ? 'Drag ⋮⋮ to reorder' : 'Press and hold a habit, then drag to reorder'}</p>}
 
     </Screen>

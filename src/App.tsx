@@ -43,7 +43,7 @@ function screenFor(r: Route): ReactNode {
   switch (r.name) {
     case 'today': return <Today />
     case 'habit': return <HabitDetail id={r.id} />
-    case 'habitEdit': return <HabitEditor id={r.id} />
+    case 'habitEdit': return <HabitEditor id={r.id} timeOfDay={r.timeOfDay} kind={r.kind} />
     case 'gym': return <Gym />
     case 'dayEdit': return <DayEditor id={r.id} />
     case 'exercise': return <ExerciseProgress id={r.id} />
