@@ -1,8 +1,7 @@
 import { ASCENT } from '../content/ascent'
 import { dateKey } from '../dates'
 import { EYE_NAMES, eyeStage, sitStreak } from './stillness'
-import { workStreak } from './work'
-import { FAITH_STAGES, STATUE, ascentDays, faithDays, meditationMinutes, statuePoints, statueStage } from './progression'
+import { STATUE, ascentDays, meditationMinutes, statuePoints, statueStage } from './progression'
 import { currentStreak } from './streaks'
 import type { Milestone, Section, State } from '../types'
 
@@ -26,16 +25,8 @@ export function detectMilestones(s: State, now: number): Milestone[] {
   const sit = sitStreak(s.stillness, today)
   for (const n of STREAKS) if (sit >= n) add(`sit-streak:${n}`, 'stillness', `${n}-day sit streak`, `${n} days`)
 
-  if (s.settings.faith) {
-    const fd = faithDays(s, today)
-    FAITH_STAGES.forEach((st, i) => i > 0 && fd >= st.day && add(`faith:${st.day}`, 'faith', `Faith · ${st.name}`, `${st.day} days`))
-  }
-
   const statue = statueStage(statuePoints(s)).index
   for (let i = 2; i <= statue; i++) add(`statue:${i}`, 'gym', `The statue · ${STATUE[i].name}`, `${s.sessions.length} sessions`)
-
-  const work = workStreak(s.work, today)
-  for (const n of [7, 30, 100]) if (work >= n) add(`work-streak:${n}`, 'work', `${n} days hitting every target`, `${n} days`)
 
   // Linked habits celebrate through their section's symbol instead
   for (const h of s.habits) {

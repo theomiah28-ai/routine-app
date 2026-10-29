@@ -11,7 +11,6 @@ const LINKS: { id: Habit['link']; label: string; hint: string }[] = [
   { id: undefined, label: 'None', hint: 'Just a habit' },
   { id: 'transmutation', label: 'Transmutation', hint: 'NoFap: climbs the Ascent' },
   { id: 'stillness', label: 'Stillness', hint: 'Meditation: opens the Eye' },
-  { id: 'faith', label: 'Faith', hint: 'Prayer or scripture' },
   { id: 'gym', label: 'Gym', hint: 'Ticked when you finish a workout' },
 ]
 
@@ -29,13 +28,13 @@ export function HabitEditor({ id }: { id?: string }) {
   const [days, setDays] = useState<number[]>(existing?.days.length ? existing.days : [0, 1, 2, 3, 4, 5, 6])
   const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(existing?.timeOfDay ?? 'anytime')
   const [link, setLink] = useState<Habit['link']>(existing?.link)
-  const [minutes, setMinutes] = useState(existing?.minutes ?? (existing?.link === 'faith' ? 20 : 30))
+  const [minutes, setMinutes] = useState(existing?.minutes ?? 30)
 
   const save = () => {
     if (!name.trim() || !days.length) return
-    const warning = linkChangeImpact(state, id, link, link === 'stillness' || link === 'faith' ? minutes : undefined)
+    const warning = linkChangeImpact(state, id, link, link === 'stillness' ? minutes : undefined)
     if (warning && !confirm(warning + '\n\nSave anyway?')) return
-    const fields = { name: name.trim(), kind, days: days.length === 7 ? [] : days, timeOfDay, link, minutes: link === 'stillness' || link === 'faith' ? minutes : undefined }
+    const fields = { name: name.trim(), kind, days: days.length === 7 ? [] : days, timeOfDay, link, minutes: link === 'stillness' ? minutes : undefined }
     update((s) => {
       // Only one habit can be linked to each section
       if (fields.link) s.habits.forEach((h) => h.link === fields.link && h.id !== id && (h.link = undefined))
@@ -107,7 +106,7 @@ export function HabitEditor({ id }: { id?: string }) {
       <div className="field">
         <label>Grows a section in Journey</label>
         <div className="link-grid">
-          {LINKS.filter((l) => l.id !== 'faith' || state.settings.faith).map((l) => (
+          {LINKS.map((l) => (
             <button key={l.id ?? 'none'} className={'link-opt' + (link === l.id ? ' on' : '')} onClick={() => setLink(l.id)}>
               <b>{l.label}</b>
               <small>{l.hint}</small>
@@ -116,9 +115,9 @@ export function HabitEditor({ id }: { id?: string }) {
         </div>
       </div>
 
-      {(link === 'stillness' || link === 'faith') && (
+      {link === 'stillness' && (
         <div className="field row" style={{ background: 'var(--surface)', borderRadius: 12, padding: '10px 14px' }}>
-          <span style={{ fontSize: 15 }}>Minutes each time<div className="sub" style={{ fontSize: 12 }}>{link === 'stillness' ? 'More minutes open the Eye faster' : 'Time with God each day'}</div></span>
+          <span style={{ fontSize: 15 }}>Minutes each time<div className="sub" style={{ fontSize: 12 }}>More minutes open the Eye faster</div></span>
           <Stepper value={minutes} step={5} min={5} onChange={setMinutes} />
         </div>
       )}

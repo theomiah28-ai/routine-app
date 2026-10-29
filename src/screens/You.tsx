@@ -58,7 +58,7 @@ export function You() {
     }
   }
 
-  const earned = [...state.milestones].filter((m) => m.section !== 'faith' || set.faith).sort((a, b) => b.at - a.at)
+  const earned = [...state.milestones].filter((m) => m.section !== 'faith' && m.section !== 'work').sort((a, b) => b.at - a.at)
 
   return (
     <Screen>
@@ -93,13 +93,6 @@ export function You() {
       <div className="setting">
         <span>Gym rest timer<div className="sub" style={{ fontSize: 12 }}>{Math.floor(set.restSeconds / 60)}:{String(set.restSeconds % 60).padStart(2, '0')}</div></span>
         <Stepper value={set.restSeconds} step={15} min={15} onChange={(v) => update((s) => void (s.settings.restSeconds = v))} />
-      </div>
-      <button className="setting" style={{ width: '100%', textAlign: 'left' }} onClick={() => push({ name: 'work' })}>
-        <span>Work targets</span><span className="chev">›</span>
-      </button>
-      <div className="setting">
-        <span>Faith<div className="sub" style={{ fontSize: 12 }}>Christian faith section: verse, plans, prayer</div></span>
-        <Toggle on={set.faith} onChange={(v) => update((s) => void (s.settings.faith = v))} />
       </div>
       <div className="setting">
         <span>Show esoteric teachings<div className="sub" style={{ fontSize: 12 }}>Deeper material in Learn, off unless you want it</div></span>

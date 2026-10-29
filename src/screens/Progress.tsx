@@ -10,7 +10,6 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: 'routine', label: 'Routine' },
   { id: 'gym', label: 'Gym' },
   { id: 'stillness', label: 'Stillness' },
-  { id: 'faith', label: 'Faith' },
   { id: 'transmutation', label: 'SR' },
 ]
 
@@ -48,7 +47,7 @@ export function Progress() {
       </div>
 
       <div className="pills" style={{ marginTop: 14 }}>
-        {FILTERS.filter((f) => f.id !== 'faith' || state.settings.faith).map((f) => (
+        {FILTERS.map((f) => (
           <button key={f.id} className={'pill-btn' + (filter === f.id ? ' on' : '')} onClick={() => setFilter(f.id)}>{f.label}</button>
         ))}
       </div>

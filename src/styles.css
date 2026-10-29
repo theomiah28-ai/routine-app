@@ -403,3 +403,5 @@ textarea.input { resize: none; min-height: 90px; line-height: 1.45; }
 .brains small { font-size: 11px; color: var(--muted); }
 .statue-head { display: flex; gap: 14px; align-items: center; background: radial-gradient(90% 80% at 20% 50%, #1f1a12, var(--surface) 75%); border-radius: 18px; padding: 12px 14px; margin-top: 12px; }
 .statue-head > div:last-child { flex: 1; }
+.sug .add { width: 30px; height: 30px; border-radius: 50%; background: var(--gold-grad); color: var(--on-gold); font-size: 18px; font-weight: 700; flex: none; display: flex; align-items: center; justify-content: center; }
+.journey-cta { background: linear-gradient(160deg, #261e0e, var(--surface) 75%); border-radius: 18px; padding: 16px; margin-top: 14px; box-shadow: inset 0 0 0 1px #3a2f17; width: 100%; text-align: left; }

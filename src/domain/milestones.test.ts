@@ -40,13 +40,6 @@ describe('milestones', () => {
     expect(ids(s)).not.toContain('statue:3')
   })
 
-  it('faith milestones skipped when faith is off', () => {
-    const s = base()
-    s.faith.days = Object.fromEntries(Array.from({ length: 8 }, (_, i) => [addDays(today, -i), { prayer: true }]))
-    expect(ids(s)).toContain('faith:7')
-    s.settings.faith = false
-    expect(ids(s).some((i) => i.startsWith('faith'))).toBe(false)
-  })
 
   it('habit streak 7', () => {
     const s = base()

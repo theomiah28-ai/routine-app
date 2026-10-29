@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ascentDays, faithDays, meditationMinutes, relapseToday, sectionProgress, statuePoints, statueStage } from './progression'
+import { ascentDays, meditationMinutes, relapseToday, sectionProgress, statuePoints, statueStage } from './progression'
 import { eyeStage } from './stillness'
 import { seedState } from '../seed'
 import { addDays, parseKey, todayKey } from '../dates'
@@ -15,7 +15,6 @@ describe('progression', () => {
     const s = base()
     expect(ascentDays(s, today)).toBe(0)
     expect(meditationMinutes(s)).toBe(0)
-    expect(faithDays(s, today)).toBe(0)
     expect(statuePoints(s)).toBe(0)
     expect(() => sectionProgress(s, today)).not.toThrow()
   })
@@ -66,21 +65,6 @@ describe('progression', () => {
     expect(statuePoints(s)).toBe(5)
   })
 
-  it('faith days counts habit or prayer', () => {
-    const s = base()
-    s.habits = [hab('b', 'faith', { minutes: 20 })]
-    s.checks[addDays(today, -1)] = ['b']
-    s.faith.days[addDays(today, -2)] = { prayer: true }
-    expect(faithDays(s, today)).toBe(2)
-  })
-
-  it('faith hidden when off', () => {
-    const s = base()
-    s.settings.faith = false
-    expect(sectionProgress(s, today).some((p) => p.section === 'faith')).toBe(false)
-    s.settings.faith = true
-    expect(sectionProgress(s, today).some((p) => p.section === 'faith')).toBe(true)
-  })
 })
 
 describe('review fixes', () => {
@@ -106,13 +90,6 @@ describe('review fixes', () => {
     expect(habitStreak(r, r.habits[1], today)).toBe(20)
   })
 
-  it('cross brightness grows through every faith stage', async () => {
-    const { faithBrightness } = await import('./progression')
-    const vals = [0, 1, 7, 14, 30, 45, 60, 100, 200, 365].map(faithBrightness)
-    for (let i = 1; i < vals.length; i++) expect(vals[i]).toBeGreaterThan(vals[i - 1])
-    expect(faithBrightness(365)).toBe(1)
-    expect(faithBrightness(60)).toBeLessThan(1)
-  })
 
   it('warns before a link move or minutes change rewrites progress', async () => {
     const { linkChangeImpact } = await import('./progression')
@@ -135,11 +112,4 @@ describe('minor fixes', () => {
     expect(statuePoints(s)).toBe(6)
   })
 
-  it('faith streak skips the faith habit’s unscheduled days', () => {
-    const s = base()
-    const wd = parseKey(addDays(today, -2)).getDay()
-    s.habits = [hab('b', 'faith', { days: [0, 1, 2, 3, 4, 5, 6].filter((d) => d !== wd) })]
-    for (const n of [1, 3, 4]) s.checks[addDays(today, -n)] = ['b']
-    expect(faithDays(s, today)).toBe(3)
-  })
 })

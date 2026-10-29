@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
-import { sectionProgress, ascentDays, meditationMinutes, faithDays, statuePoints, statueStage, type SectionProgress } from '../domain/progression'
+import { sectionProgress, ascentDays, meditationMinutes, statuePoints, statueStage, type SectionProgress } from '../domain/progression'
 import { eyeStage } from '../domain/stillness'
-import { workLog } from '../domain/work'
 import { avgMinutes, brainState, todayMinutes } from '../domain/screentime'
 import { consistency } from '../domain/progress'
 import { addDays, todayKey } from '../dates'
@@ -9,18 +8,14 @@ import { useStore } from '../store'
 import { useNav, type Route } from '../nav'
 import { Ascent } from '../symbols/Ascent'
 import { Eye } from '../symbols/Eye'
-import { Cross } from '../symbols/Cross'
 import { Brain } from '../symbols/Brain'
 import { Statue } from '../symbols/Statue'
 import { Ring, Screen } from '../ui'
-import { crossBrightness } from './Faith'
 
 const ROUTE: Record<string, Route> = {
   transmutation: { name: 'transmutation' },
   stillness: { name: 'stillness' },
-  faith: { name: 'faith' },
   gym: { name: 'gym' },
-  work: { name: 'work' },
 }
 
 function Row({ p, symbol, onClick }: { p: SectionProgress; symbol: ReactNode; onClick: () => void }) {
@@ -42,7 +37,7 @@ function Row({ p, symbol, onClick }: { p: SectionProgress; symbol: ReactNode; on
 
 export function Journey() {
   const { state } = useStore()
-  const { push } = useNav()
+  const { push, switchTab } = useNav()
   const today = todayKey()
   const progress = sectionProgress(state, today)
   const month = consistency(state, addDays(today, -29), today, 'all')
@@ -52,7 +47,6 @@ export function Journey() {
     { label: '7 days', mins: avgMinutes(st, today, 7) },
     { label: '30 days', mins: avgMinutes(st, today, 30) },
   ]
-  const deep = workLog(state.work, today).deepMinutes
 
   const symbols: Record<string, ReactNode> = {
     transmutation: (
@@ -61,13 +55,7 @@ export function Journey() {
       </div>
     ),
     stillness: <Eye openness={eyeStage(meditationMinutes(state)).openness} width={70} />,
-    faith: <Cross brightness={crossBrightness(faithDays(state, today))} height={60} />,
     gym: <Statue stage={statueStage(statuePoints(state)).index} size={58} />,
-    work: (
-      <Ring pct={state.work.targets.deepMinutes ? deep / state.work.targets.deepMinutes : 0} size={56} stroke={6}>
-        <span style={{ fontSize: 11, fontWeight: 700 }}>{Math.round(deep / 6) / 10}h</span>
-      </Ring>
-    ),
   }
 
   return (
@@ -75,6 +63,13 @@ export function Journey() {
       <div className="date" style={{ marginTop: 8 }}>Journey</div>
       <h1>Who you're becoming</h1>
       <p className="sub" style={{ marginTop: 0 }}>Every tick on Today grows these.</p>
+      {!state.settings.journeyStart && (
+        <button className="journey-cta" onClick={() => switchTab('today')}>
+          <span className="label gold">Not started</span>
+          <div style={{ fontSize: 17, fontWeight: 700, marginTop: 4 }}>Build your routine, then begin your journey</div>
+          <div className="sub" style={{ marginTop: 2 }}>Tracking starts the moment you begin. Go to Today ›</div>
+        </button>
+      )}
 
       <button className="jr-tile wide" onClick={() => push({ name: 'progress' })}>
         <div>

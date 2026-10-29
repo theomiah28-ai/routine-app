@@ -17,10 +17,6 @@ export type Route =
   | { name: 'sit' }
   | { name: 'breath'; id: 'box' | 'power' | 'calm' }
   | { name: 'visualise'; id: string }
-  | { name: 'faith' }
-  | { name: 'plans' }
-  | { name: 'reader'; ref: string; planDay?: boolean }
-  | { name: 'work'; startFocus?: boolean }
   | { name: 'screentime' }
   | { name: 'journey' }
   | { name: 'progress' }

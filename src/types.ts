@@ -1,6 +1,6 @@
 export type HabitKind = 'build' | 'quit'
 export type TimeOfDay = 'morning' | 'anytime' | 'evening'
-export type HabitLink = 'transmutation' | 'stillness' | 'faith' | 'gym'
+export type HabitLink = 'transmutation' | 'stillness' | 'gym'
 export type Section = 'routine' | 'gym' | 'transmutation' | 'stillness' | 'faith' | 'work' | 'screentime'
 
 export interface Habit {
@@ -157,6 +157,8 @@ export interface Settings {
   faith: boolean
   /** Goals picked in onboarding */
   goals: string[]
+  /** Day "Begin your journey" was pressed; tracking counts from here. Unset while building the routine */
+  journeyStart?: string
 }
 
 export interface State {
@@ -176,4 +178,6 @@ export interface State {
   work: WorkState
   screenTime: ScreenTimeState
   milestones: Milestone[]
+  /** dateKey → evening gratitude note */
+  journal: Record<string, string>
 }

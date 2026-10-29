@@ -60,7 +60,6 @@ describe('migrate', () => {
   it('migrates without SR habit', () => {
     const s = migrate(v1([h('a', 'Read')]), now)
     expect(s.habits.some((x) => x.link === 'transmutation')).toBe(false)
-    expect(s.settings.faith).toBe(true)
     expect(s.settings.goals).toEqual([])
   })
 
@@ -136,5 +135,28 @@ describe('normalise reuse', () => {
     const n = migrate(s, now)
     expect(n.habits.filter((h) => h.kind === 'quit')).toHaveLength(1)
     expect(n.habits[0].link).toBe('transmutation')
+  })
+})
+
+describe('v3 sections', () => {
+  it('v1 users have already begun their journey, from their first habit', () => {
+    const s = migrate(v1([h('a', 'Read'), h('b', 'Walk', { createdAt: ago(45) })]), now)
+    expect(s.settings.journeyStart).toBe(ago(45))
+  })
+
+  it('normalising unlinks faith habits and marks onboarded users as begun', () => {
+    const s = seedState() as unknown as Record<string, any>
+    s.settings.onboarded = true
+    s.habits = [{ id: 'f', name: 'Read the Bible 20 min', kind: 'build', days: [], createdAt: ago(9), timeOfDay: 'anytime', link: 'faith', minutes: 20 }]
+    s.faith.days = { [ago(1)]: { gratitude: true, note: 'family' } }
+    const n = migrate(s, now)
+    expect(n.habits[0].link).toBeUndefined()
+    expect(n.settings.journeyStart).toBe(ago(9))
+    expect(n.journal[ago(1)]).toBe('family')
+  })
+
+  it('a fresh, not-yet-onboarded state stays not begun', () => {
+    const n = migrate(seedState(), now)
+    expect(n.settings.journeyStart).toBeUndefined()
   })
 })

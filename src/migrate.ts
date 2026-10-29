@@ -57,8 +57,20 @@ export function normaliseV2(s: State, now: number): State {
   const { needsPick: _legacy, ...t } = out.transmutation as State['transmutation'] & { needsPick?: boolean }
   out.transmutation = { ...t, start: null }
   for (const h of out.habits) if (h.link === 'stillness' && h.minutes === undefined) h.minutes = 30
+  // Faith and Work left the app: unlink faith habits (their ticks stay), keep gratitude notes in the journal
+  for (const h of out.habits) {
+    if ((h.link as string) === 'faith') {
+      delete h.link
+      delete h.minutes
+    }
+  }
+  out.journal = { ...out.journal }
+  for (const [k, d] of Object.entries(out.faith?.days ?? {})) if (d.note && out.journal[k] === undefined) out.journal[k] = d.note
+  if (!out.settings.journeyStart && out.settings.onboarded) out.settings.journeyStart = firstDay(out.habits, today)
   return out
 }
+
+const firstDay = (habits: { createdAt: string }[], today: string) => habits.reduce((m, h) => (h.createdAt < m ? h.createdAt : m), today)
 
 /** Bring any saved state (V1 or V2) up to the current V2 shape. */
 export function migrate(raw: unknown, now: number): State {
@@ -98,7 +110,7 @@ export function migrate(raw: unknown, now: number): State {
 
   return {
     version: 2,
-    settings: { name: v1.name ?? '', showEsoteric: false, onboarded: true, restSeconds: 120, whatsNew: true, faith: true, goals: [] },
+    settings: { name: v1.name ?? '', showEsoteric: false, onboarded: true, restSeconds: 120, whatsNew: true, faith: false, goals: [], journeyStart: firstDay(habits, today) },
     habits,
     checks: structuredClone(v1.checks),
     splitName: v1.splitName,

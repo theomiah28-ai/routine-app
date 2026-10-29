@@ -3,6 +3,8 @@ import { addDays, dateKey, formatLong } from '../dates'
 import { useNow } from './Transmutation'
 import { isChecked, isScheduled } from '../domain/streaks'
 import { habitStreak } from '../domain/progression'
+import { journeyStarted } from '../domain/journey'
+import { BuildRoutine } from './BuildRoutine'
 import { completion } from '../domain/completion'
 import { useStore } from '../store'
 import { useNav, type Route } from '../nav'
@@ -25,6 +27,11 @@ function greeting(h: number) {
 }
 
 export function Today() {
+  const { state } = useStore()
+  return journeyStarted(state) ? <Tracking /> : <BuildRoutine />
+}
+
+function Tracking() {
   const { state, update } = useStore()
   const { push } = useNav()
   const [day, setDay] = useState<'today' | 'yesterday'>('today')
@@ -126,7 +133,7 @@ export function Today() {
       {!state.habits.length && !editing ? (
         <div className="empty-state">
           <b>Your routine starts here</b>
-          <p className="note">Add the habits you want to build or quit. Link one to Transmutation, Stillness, Faith or Gym and every tick grows that section in Journey.</p>
+          <p className="note">Add the habits you want to build or quit. Link one to Transmutation, Stillness or Gym and every tick grows that section in Journey.</p>
         </div>
       ) : (
         !visible.length && !editing && <div className="empty">No habits scheduled{day === 'today' ? ' today' : ''}.</div>

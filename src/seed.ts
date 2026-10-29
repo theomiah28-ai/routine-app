@@ -23,7 +23,7 @@ function split(): { days: SplitDay[]; exercises: Record<string, Exercise> } {
 }
 
 /** The V2-only sections, fresh. */
-export function defaultSections(today: string, now: number): Pick<State, 'transmutation' | 'stillness' | 'faith' | 'work' | 'screenTime' | 'milestones'> {
+export function defaultSections(today: string, now: number): Pick<State, 'transmutation' | 'stillness' | 'faith' | 'work' | 'screenTime' | 'milestones' | 'journal'> {
   return {
     transmutation: { start: null, longestDays: 0, relapses: [] },
     stillness: { sitMinutes: 30, logs: [] },
@@ -37,6 +37,7 @@ export function defaultSections(today: string, now: number): Pick<State, 'transm
     },
     screenTime: { limit: 120, foggy: 120, rotting: 240, manual: {} },
     milestones: [],
+    journal: {},
   }
 }
 

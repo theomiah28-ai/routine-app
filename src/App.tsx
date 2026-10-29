@@ -16,10 +16,6 @@ import { Stillness } from './screens/Stillness'
 import { Sit } from './screens/Sit'
 import { Breath } from './screens/Breath'
 import { Visualise } from './screens/Visualise'
-import { Faith } from './screens/Faith'
-import { Plans } from './screens/Plans'
-import { Reader } from './screens/Reader'
-import { Work } from './screens/Work'
 import { ScreenTime } from './screens/ScreenTime'
 import { Journey } from './screens/Journey'
 import { Progress } from './screens/Progress'
@@ -59,9 +55,6 @@ function screenFor(r: Route): ReactNode {
     case 'sit': return <Sit />
     case 'breath': return <Breath id={r.id} />
     case 'visualise': return <Visualise id={r.id} />
-    case 'faith': return <Faith />
-    case 'plans': return <Plans />
-    case 'work': return <Work startFocus={r.startFocus} />
     case 'screentime': return <ScreenTime />
     case 'journey': return <Journey />
     case 'progress': return <Progress />
@@ -69,7 +62,6 @@ function screenFor(r: Route): ReactNode {
     case 'article': return <Article id={r.id} />
     case 'morning': return <Flow kind="morning" />
     case 'evening': return <Flow kind="evening" />
-    case 'reader': return <Reader chapter={r.ref} planDay={r.planDay} />
     default: return <Soon title={r.name} />
   }
 }
@@ -142,7 +134,7 @@ export function App() {
     })
   }, [state, update])
 
-  const celebrate = FULLSCREEN.has(route.name) ? undefined : state.milestones.find((m) => !m.seen && (m.section !== 'faith' || state.settings.faith))
+  const celebrate = FULLSCREEN.has(route.name) ? undefined : state.milestones.find((m) => !m.seen && m.section !== 'faith' && m.section !== 'work')
 
   const nav = {
     push: (r: Route) => setStacks((s) => ({ ...s, [tab]: [...s[tab], r] })),
@@ -179,7 +171,7 @@ export function App() {
           <li><b>No PMO</b> climbs the Ascent, seven stages to 365 days.</li>
           <li><b>Meditate</b> opens the Eye. Fully awake at 365 hours.</li>
           <li><b>Gym</b> carves your statue. Every PB carves deeper.</li>
-          <li><b>Faith</b>, <b>Work</b> and your <b>Screen Time</b> brain are in Journey too. <b>Learn</b> holds the teachings.</li>
+          <li>Your <b>Screen Time</b> brain is in Journey too. <b>Learn</b> holds the teachings.</li>
         </ul>
         <button className="btn" onClick={() => update((s) => void (s.settings.whatsNew = false))}>Let's go</button>
       </Sheet>

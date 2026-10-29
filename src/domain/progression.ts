@@ -1,8 +1,7 @@
 import { ASCENT } from '../content/ascent'
-import { addDays, dateKey } from '../dates'
-import { currentStreak, isChecked, isScheduled } from './streaks'
+import { dateKey } from '../dates'
+import { currentStreak } from './streaks'
 import { EYE_STAGES, eyeStage } from './stillness'
-import { workStreak } from './work'
 import type { Habit, HabitLink, Section, State } from '../types'
 
 export const linked = (s: State, link: HabitLink) => s.habits.find((h) => h.link === link)
@@ -47,49 +46,6 @@ export function meditationMinutes(s: State): number {
   for (const m of byDay.values()) total += m
   return total
 }
-
-const faithDone = (s: State, key: string) => {
-  const h = linked(s, 'faith')
-  return !!s.faith.days[key]?.prayer || (!!h && isChecked(s.checks, h.id, key))
-}
-
-/**
- * Consecutive days with the faith habit ticked or morning prayer done; today not done yet doesn't break it.
- * Days the faith habit isn't scheduled are skipped rather than breaking the run.
- */
-export function faithDays(s: State, today: string): number {
-  const h = linked(s, 'faith')
-  // Without a habit there's no schedule, so the run simply ends at the first day without prayer
-  const since = h?.createdAt ?? ''
-  let key = faithDone(s, today) ? today : addDays(today, -1)
-  let n = 0
-  for (let guard = 0; guard < 4000 && key >= since; guard++) {
-    if (faithDone(s, key)) n++
-    else if (!h || isScheduled(h, key)) break
-    key = addDays(key, -1)
-  }
-  return n
-}
-
-export const FAITH_STAGES = [
-  { day: 1, name: 'Seed' },
-  { day: 7, name: 'Root' },
-  { day: 14, name: 'Light' },
-  { day: 30, name: 'Lamp' },
-  { day: 60, name: 'Fire' },
-  { day: 100, name: 'Radiance' },
-  { day: 365, name: 'Glory' },
-]
-
-function dayStage(stages: { day: number; name: string }[], days: number) {
-  let i = -1
-  stages.forEach((st, idx) => days >= st.day && (i = idx))
-  const next = stages[i + 1]
-  const from = i < 0 ? 0 : stages[i].day
-  return { index: i, name: i < 0 ? 'Not started' : stages[i].name, next, pct: next ? (days - from) / (next.day - from) : 1 }
-}
-
-export const faithStage = (days: number) => dayStage(FAITH_STAGES, days)
 
 export const STATUE = [
   { points: 0, name: 'Raw stone' },
@@ -162,18 +118,11 @@ export function sectionProgress(s: State, today: string): SectionProgress[] {
     next: eye.nextAt ? `${eye.nextAt / 60}h` : null,
   })
 
-  if (s.settings.faith) {
-    const fd = faithDays(s, today)
-    const f = faithStage(fd)
-    out.push({ section: 'faith', title: 'Faith', value: `${fd} ${fd === 1 ? 'day' : 'days'}`, stage: f.name, pct: f.pct, next: f.next ? `Day ${f.next.day} · ${f.next.name}` : null })
-  }
 
   const pts = statuePoints(s)
   const st = statueStage(pts)
   out.push({ section: 'gym', title: 'Gym', value: `${s.sessions.length} sessions`, stage: st.name, pct: st.pct, next: st.next?.name ?? null })
 
-  const ws = workStreak(s.work, today)
-  out.push({ section: 'work', title: 'Work', value: `${ws}-day streak`, stage: 'Inputs', pct: Math.min(1, ws / 30), next: ws < 30 ? '30-day streak' : null })
   return out
 }
 
@@ -182,14 +131,8 @@ export function habitStreak(s: State, h: Habit, today: string): number {
   return h.link === 'transmutation' ? ascentDays(s, today) : currentStreak(h, s.checks, today)
 }
 
-/** Cross brightness, 0.2 → 1, rising through every faith stage to full glory at 365 days. */
-export function faithBrightness(days: number): number {
-  const f = faithStage(days)
-  const steps = FAITH_STAGES.length
-  return Math.min(1, 0.2 + 0.8 * Math.max(0, f.index + 1 + (f.next ? f.pct : 0)) / steps)
-}
 
-const LINK_NAMES: Record<HabitLink, string> = { transmutation: 'the Ascent', stillness: 'the Eye', faith: 'Faith', gym: 'the statue' }
+const LINK_NAMES: Record<HabitLink, string> = { transmutation: 'the Ascent', stillness: 'the Eye', gym: 'the statue' }
 
 /**
  * Saving a habit with this link/minutes would change past progress (moving a link away from a habit

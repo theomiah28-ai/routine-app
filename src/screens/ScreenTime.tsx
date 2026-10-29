@@ -5,7 +5,7 @@ import { useStore } from '../store'
 import { Back } from '../nav'
 import { Brain } from '../symbols/Brain'
 import { Screen, Sheet, Stepper } from '../ui'
-import { hm } from './Work'
+const hm = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h ${Math.round(m % 60)}m` : `${Math.round(m)}m`)
 
 const COPY = {
   sharp: { chip: 'Sharp', line: 'Clear head. Keep it that way.' },

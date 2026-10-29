@@ -1,17 +1,12 @@
 import { useState, type ReactNode } from 'react'
-import { verseText, THEMES } from '../content/faith'
-import { verseOfDay, faithDone } from '../domain/faith'
 import { sitDoneOn } from '../domain/stillness'
 import { completion, dayItems } from '../domain/completion'
 import { isChecked, isScheduled } from '../domain/streaks'
-import { FIELDS } from '../domain/work'
 import { addDays, todayKey } from '../dates'
 import { useStore } from '../store'
 import { useNav } from '../nav'
-import { Check, Moon, Ring, Screen, Stepper, Sun } from '../ui'
+import { Check, Moon, Ring, Screen, Sun } from '../ui'
 import type { Habit } from '../types'
-
-const WORK_LABEL = { videos: 'Videos to post', products: 'Products to test', hoursWorked: 'Hours to work', deepMinutes: 'Deep work (min)' } as const
 
 interface Step {
   id: string
@@ -24,7 +19,7 @@ export function Flow({ kind }: { kind: 'morning' | 'evening' }) {
   const { state, update } = useStore()
   const { pop, push } = useNav()
   const today = todayKey()
-  const [note, setNote] = useState(state.faith.days[today]?.note ?? '')
+  const [note, setNote] = useState(state.journal[today] ?? '')
 
   const toggle = (id: string) =>
     update((s) => {
@@ -42,8 +37,6 @@ export function Flow({ kind }: { kind: 'morning' | 'evening' }) {
   }
   const scheduled = (key: string, t: Habit['timeOfDay']) => state.habits.filter((h) => h.kind === 'build' && h.timeOfDay === t && isScheduled(h, key) && key >= h.createdAt)
 
-  const verse = verseOfDay(today)
-  const prayed = faithDone(state.faith, today, 'prayer')
   const c = completion(state, today)
   const left = dayItems(state, today).filter((i) => !i.done)
 
@@ -56,38 +49,6 @@ export function Flow({ kind }: { kind: 'morning' | 'evening' }) {
           <div className="label gold">Step one</div>
           <h1>The Morning Sit</h1>
           <p className="prose-p">{state.stillness.sitMinutes} minutes of pure awareness before anything else. No phone, no plan. Just watch.</p>
-        </>
-      ),
-    },
-    {
-      id: 'verse',
-      skip: !state.settings.faith,
-      render: () => (
-        <>
-          <div className="label gold">Verse of the day · {THEMES[verse.theme]}</div>
-          <p className="vis-line" style={{ textAlign: 'left', fontSize: 23, marginTop: 18 }}>“{verseText(verse.ref)}”</p>
-          <div className="sub" style={{ marginTop: 12, color: 'var(--gold-dim)' }}>{verse.ref}</div>
-          <button className={'card' + (prayed ? ' glow' : '')} style={{ marginTop: 26 }} onClick={() => update((s) => void (s.faith.days[today] = { ...s.faith.days[today], prayer: !prayed }))}>
-            <Check on={prayed} />
-            <span className="grow">I've prayed this morning</span>
-          </button>
-        </>
-      ),
-    },
-    {
-      id: 'work',
-      render: () => (
-        <>
-          <div className="label gold">Set the day</div>
-          <h1>Today's work targets</h1>
-          <div style={{ marginTop: 14 }}>
-            {FIELDS.map((f) => (
-              <div key={f} className="input-row">
-                <span style={{ fontSize: 15.5 }}>{WORK_LABEL[f]}</span>
-                <Stepper value={state.work.targets[f]} step={f === 'hoursWorked' ? 0.5 : f === 'deepMinutes' ? 15 : 1} onChange={(v) => update((s) => void (s.work.targets[f] = v))} />
-              </div>
-            ))}
-          </div>
         </>
       ),
     },
@@ -124,13 +85,8 @@ export function Flow({ kind }: { kind: 'morning' | 'evening' }) {
           <h1>Still open today</h1>
           <div style={{ marginTop: 10 }}>
             {left.map((i) => {
-              const h = i.id.startsWith('habit:') ? state.habits.find((x) => `habit:${x.id}` === i.id) : undefined
-              return h ? habitRow(h) : (
-                <div key={i.id} className="item">
-                  <span className="chk" />
-                  <span className="name" style={{ color: 'var(--muted)' }}>{i.label}</span>
-                </div>
-              )
+              const h = state.habits.find((x) => `habit:${x.id}` === i.id)
+              return h ? habitRow(h) : null
             })}
           </div>
         </>
@@ -145,7 +101,7 @@ export function Flow({ kind }: { kind: 'morning' | 'evening' }) {
           <textarea className="input" style={{ marginTop: 16 }} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Today I'm grateful for…" />
         </>
       ),
-      next: 'Give thanks',
+      next: 'Save',
     },
     {
       id: 'ring',
@@ -192,7 +148,11 @@ export function Flow({ kind }: { kind: 'morning' | 'evening' }) {
   const last = i >= steps.length - 1
 
   const advance = () => {
-    if (step.id === 'gratitude') update((s) => void (s.faith.days[today] = { ...s.faith.days[today], gratitude: true, note: note.trim() || undefined }))
+    if (step.id === 'gratitude')
+      update((s) => {
+        if (note.trim()) s.journal[today] = note.trim()
+        else delete s.journal[today]
+      })
     if (last) pop()
     else setI(i + 1)
   }
