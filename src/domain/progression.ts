@@ -120,6 +120,11 @@ export function sectionProgress(s: State, today: string): SectionProgress[] {
   })
 
 
+  const pts = statuePoints(s)
+  const st = statueStage(pts)
+  out.push({ section: 'gym', title: 'Gym', value: `${s.sessions.length} sessions`, stage: st.name, pct: st.pct, next: st.next?.name ?? null })
+
+
   const lungs = lungScore(s, today)
   if (lungs !== null) {
     const hs = healthStreak(s, today)
@@ -127,11 +132,6 @@ export function sectionProgress(s: State, today: string): SectionProgress[] {
   } else {
     out.push({ section: 'health', title: 'Health', value: 'Not started', stage: '—', pct: 0, next: 'Link a quit habit like no vaping' })
   }
-
-  const pts = statuePoints(s)
-  const st = statueStage(pts)
-  out.push({ section: 'gym', title: 'Gym', value: `${s.sessions.length} sessions`, stage: st.name, pct: st.pct, next: st.next?.name ?? null })
-
   return out
 }
 
