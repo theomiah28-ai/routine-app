@@ -4,6 +4,7 @@ import { registerSW } from 'virtual:pwa-register'
 import { StoreProvider } from './store'
 import { App } from './App'
 import { ErrorBoundary } from './Recovery'
+import { InstallPrompt } from './InstallPrompt'
 import './styles.css'
 
 registerSW({ immediate: true })
@@ -14,6 +15,7 @@ createRoot(document.getElementById('root')!).render(
       <StoreProvider>
         <App />
       </StoreProvider>
+      <InstallPrompt />
     </ErrorBoundary>
   </StrictMode>,
 )

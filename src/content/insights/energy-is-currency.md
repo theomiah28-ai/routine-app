@@ -4,7 +4,6 @@ category: transmutation
 minutes: 6
 ---
 
-> [Theo to replace] Placeholder article. Swap this text for your own material.
 
 Every day you wake up with a fixed amount of energy. Where it goes decides what you build.
 

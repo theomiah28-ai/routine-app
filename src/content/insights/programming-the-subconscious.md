@@ -4,7 +4,6 @@ category: subconscious
 minutes: 5
 ---
 
-> [Theo to replace] Placeholder article.
 
 Most of what you do runs below conscious thought. The subconscious learns from repetition and emotion.
 
