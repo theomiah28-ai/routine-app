@@ -4,7 +4,6 @@ category: neuroplasticity
 minutes: 5
 ---
 
-> [Theo to replace] Placeholder article.
 
 Your brain changes with what you repeat. Each time you act, the pathway behind that action gets a little stronger.
 

@@ -4,7 +4,6 @@ category: mindset
 minutes: 3
 ---
 
-> [Theo to replace] Placeholder article.
 
 Thirty minutes of doing nothing is one of the hardest things you can do. That's exactly why it works.
 

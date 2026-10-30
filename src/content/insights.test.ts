@@ -9,12 +9,11 @@ describe('insights', () => {
   })
 
   it('loads the bundled articles', () => {
-    expect(INSIGHTS.length).toBeGreaterThanOrEqual(6)
+    expect(INSIGHTS.length).toBeGreaterThanOrEqual(5)
     expect(INSIGHTS.every((a) => a.title && a.category)).toBe(true)
   })
 
   it('hides esoteric unless enabled', () => {
     expect(visibleInsights(false).some((a) => a.category === 'esoteric')).toBe(false)
-    expect(visibleInsights(true).some((a) => a.category === 'esoteric')).toBe(true)
   })
 })

@@ -4,7 +4,6 @@ category: identity
 minutes: 4
 ---
 
-> [Theo to replace] Placeholder article.
 
 Most people try to change what they do. Lasting change starts with who you believe you are.
 
