@@ -2,6 +2,9 @@ import { useRef, useState } from 'react'
 import { APP_NAME, APP_VERSION } from '../config'
 import { renderCard, shareCard } from '../cards'
 import { migrate } from '../migrate'
+import { del } from 'idb-keyval'
+import { pushRemote, signOut } from '../cloud'
+import { useAccount } from '../account'
 import { todayKey } from '../dates'
 import { useStore } from '../store'
 import { useNav } from '../nav'
@@ -21,6 +24,20 @@ const ICON: Record<Milestone['section'], string> = {
 
 export function You() {
   const { state, update, replace } = useStore()
+  const account = useAccount()
+
+  // Save to the account first, then clear this phone so the next person starts clean
+  const signOutNow = async () => {
+    if (!account.userId) return
+    try {
+      await pushRemote(account.userId, state)
+    } catch {
+      if (!confirm('You look offline, so your latest changes haven’t saved to your account yet. Sign out anyway and lose them?')) return
+    }
+    await del('state')
+    await signOut()
+    location.reload()
+  }
   const { push } = useNav()
   const file = useRef<HTMLInputElement>(null)
   const [guide, setGuide] = useState(false)
@@ -103,6 +120,17 @@ export function You() {
         <span>Reminders<div className="sub" style={{ fontSize: 12 }}>Morning, wind-down and nudges</div></span>
         <span className="placeholder-tag">coming soon</span>
       </div>
+
+      {account.userId && (
+        <>
+          <div className="sec">Account</div>
+          <div className="setting">
+            <span>Signed in<div className="sub" style={{ fontSize: 12 }}>{account.email}</div></span>
+            <button className="link muted" onClick={signOutNow}>Sign out</button>
+          </div>
+          <p className="note">Your progress saves to your account automatically, so you can sign in on any phone.</p>
+        </>
+      )}
 
       <div className="sec">Backup</div>
       <p className="note">Everything is stored on this phone only. Export a backup now and then so nothing's ever lost.</p>

@@ -5,6 +5,8 @@ import { StoreProvider } from './store'
 import { App } from './App'
 import { ErrorBoundary } from './Recovery'
 import { InstallPrompt } from './InstallPrompt'
+import { AuthGate } from './AuthGate'
+import { AccountCtx } from './account'
 import './styles.css'
 
 registerSW({ immediate: true })
@@ -12,9 +14,15 @@ registerSW({ immediate: true })
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
-      <StoreProvider>
-        <App />
-      </StoreProvider>
+      <AuthGate>
+        {(userId, email) => (
+          <AccountCtx.Provider value={{ userId, email }}>
+            <StoreProvider userId={userId}>
+              <App />
+            </StoreProvider>
+          </AccountCtx.Provider>
+        )}
+      </AuthGate>
       <InstallPrompt />
     </ErrorBoundary>
   </StrictMode>,

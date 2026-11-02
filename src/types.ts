@@ -180,4 +180,6 @@ export interface State {
   milestones: Milestone[]
   /** dateKey → evening gratitude note */
   journal: Record<string, string>
+  /** Sync bookkeeping: whose data this is and when it last changed */
+  meta?: { updatedAt: number; ownerId?: string }
 }
