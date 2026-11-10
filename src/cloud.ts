@@ -4,7 +4,8 @@ import type { RemoteRow } from './sync'
 import type { State } from './types'
 
 /** Accounts switch on once the publishable key is set; until then the app runs local-only. */
-export const accountsEnabled = !!SUPABASE_KEY
+// The local draft (npm run dev) skips sign-in so it can be tested without an email code
+export const accountsEnabled = !!SUPABASE_KEY && !import.meta.env.DEV
 
 let client: SupabaseClient | null = null
 export function cloud(): SupabaseClient {
