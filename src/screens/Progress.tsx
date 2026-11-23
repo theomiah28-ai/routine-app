@@ -12,6 +12,7 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: 'stillness', label: 'Stillness' },
   { id: 'transmutation', label: 'SR' },
   { id: 'health', label: 'Health' },
+  { id: 'sleep', label: 'Sleep' },
 ]
 
 /** Faint → gold by completion. */

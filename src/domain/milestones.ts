@@ -4,6 +4,7 @@ import { EYE_NAMES, eyeStage, sitStreak } from './stillness'
 import { STATUE, ascentDays, meditationMinutes, statuePoints, statueStage } from './progression'
 import { currentStreak } from './streaks'
 import { healthStreak } from './health'
+import { sleepStreak } from './sleep'
 import type { Milestone, Section, State } from '../types'
 
 const STREAKS = [7, 30, 100, 365]
@@ -28,6 +29,9 @@ export function detectMilestones(s: State, now: number): Milestone[] {
 
   const hs = healthStreak(s, today)
   for (const n of STREAKS) if (hs >= n) add(`health-streak:${n}`, 'health', `${n} clean days · lungs healing`, `${n} days`)
+
+  const ss = sleepStreak(s, today)
+  for (const n of STREAKS) if (ss >= n) add(`sleep-streak:${n}`, 'sleep', `${n} nights on time · moon full`, `${n} nights`)
 
   const statue = statueStage(statuePoints(s)).index
   for (let i = 2; i <= statue; i++) add(`statue:${i}`, 'gym', `The statue · ${STATUE[i].name}`, `${s.sessions.length} sessions`)

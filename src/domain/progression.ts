@@ -3,6 +3,7 @@ import { dateKey } from '../dates'
 import { currentStreak } from './streaks'
 import { EYE_STAGES, eyeStage } from './stillness'
 import { LUNG_NAMES, healthStreak, lungScore, lungState } from './health'
+import { MOON_NAMES, moonState, sleepScore, sleepStreak } from './sleep'
 import type { Habit, HabitLink, Section, State } from '../types'
 
 export const linked = (s: State, link: HabitLink) => s.habits.find((h) => h.link === link)
@@ -132,6 +133,14 @@ export function sectionProgress(s: State, today: string): SectionProgress[] {
   } else {
     out.push({ section: 'health', title: 'Health', value: 'Not started', stage: '—', pct: 0, next: 'Link a quit habit like no vaping' })
   }
+
+  const moon = sleepScore(s, today)
+  if (moon !== null) {
+    const ss = sleepStreak(s, today)
+    out.push({ section: 'sleep', title: 'Sleep', value: `${ss} ${ss === 1 ? 'night' : 'nights'} on time`, stage: MOON_NAMES[moonState(moon)], pct: moon, next: moon >= 1 ? null : 'On-time nights fill the moon' })
+  } else {
+    out.push({ section: 'sleep', title: 'Sleep', value: 'Not started', stage: '—', pct: 0, next: 'Set your wake-up and bedtime' })
+  }
   return out
 }
 
@@ -141,15 +150,15 @@ export function habitStreak(s: State, h: Habit, today: string): number {
 }
 
 
-const LINK_NAMES: Record<HabitLink, string> = { transmutation: 'the Ascent', stillness: 'the Eye', gym: 'the statue', health: 'the lungs' }
+const LINK_NAMES: Record<HabitLink, string> = { transmutation: 'the Ascent', stillness: 'the Eye', gym: 'the statue', health: 'the lungs', sleep: 'the moon' }
 
 /**
  * Saving a habit with this link/minutes would change past progress (moving a link away from a habit
  * with history, or changing the minutes each past tick counts for). Returns a warning, or null.
  */
 export function linkChangeImpact(s: State, habitId: string | undefined, link: HabitLink | undefined, minutes: number | undefined): string | null {
-  // Health takes any number of habits, so linking one never moves another
-  if (!link || link === 'health') return null
+  // Health and Sleep take any number of habits, so linking one never moves another
+  if (!link || link === 'health' || link === 'sleep') return null
   const holder = linked(s, link)
   const ticks = (id: string) => Object.values(s.checks).filter((ids) => ids.includes(id)).length
   if (holder && holder.id !== habitId && ticks(holder.id)) {

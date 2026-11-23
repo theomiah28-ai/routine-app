@@ -7,8 +7,9 @@ import { useStore } from '../store'
 import { useNav } from '../nav'
 import { AddHabitButton, Screen, Sheet } from '../ui'
 import { GROUPS } from './groups'
+import { timeIn } from '../domain/sleep'
 
-const GROWS: Record<string, string> = { transmutation: 'Grows the Ascent', stillness: 'Opens the Eye', gym: 'Carves the statue', health: 'Heals the lungs' }
+const GROWS: Record<string, string> = { transmutation: 'Grows the Ascent', stillness: 'Opens the Eye', gym: 'Carves the statue', health: 'Heals the lungs', sleep: 'Fills the moon' }
 
 /** Before tracking: build the routine, then "Begin your journey". */
 export function BuildRoutine() {
@@ -24,8 +25,8 @@ export function BuildRoutine() {
       const x = ideas.find((i) => i.name === name)
       if (!x) return
       // One habit per section link; a second one comes in unlinked
-      const link = x.link && (x.link === 'health' || !s.habits.some((h) => h.link === x.link)) ? x.link : undefined
-      s.habits.push({ id: uid(), name: x.name, kind: x.kind, timeOfDay: x.timeOfDay, days: x.days ?? [], createdAt: todayKey(), link, minutes: link === 'stillness' ? x.minutes : undefined, insightId: x.insightId })
+      const link = x.link && (x.link === 'health' || x.link === 'sleep' || !s.habits.some((h) => h.link === x.link)) ? x.link : undefined
+      s.habits.push({ id: uid(), name: x.name, kind: x.kind, timeOfDay: x.timeOfDay, days: x.days ?? [], createdAt: todayKey(), link, minutes: link === 'stillness' ? x.minutes : undefined, time: link === 'sleep' ? timeIn(x.name) : undefined, insightId: x.insightId })
     })
   const remove = (id: string) => update((s) => void (s.habits = s.habits.filter((h) => h.id !== id)))
 

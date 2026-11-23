@@ -19,6 +19,7 @@ export type Route =
   | { name: 'visualise'; id: string }
   | { name: 'screentime' }
   | { name: 'health' }
+  | { name: 'sleep' }
   | { name: 'journey' }
   | { name: 'progress' }
   | { name: 'learn' }

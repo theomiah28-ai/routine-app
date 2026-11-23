@@ -18,6 +18,7 @@ import { Breath } from './screens/Breath'
 import { Visualise } from './screens/Visualise'
 import { ScreenTime } from './screens/ScreenTime'
 import { Health } from './screens/Health'
+import { Sleep } from './screens/Sleep'
 import { Journey } from './screens/Journey'
 import { Progress } from './screens/Progress'
 import { Learn } from './screens/Learn'
@@ -58,6 +59,7 @@ function screenFor(r: Route): ReactNode {
     case 'visualise': return <Visualise id={r.id} />
     case 'screentime': return <ScreenTime />
     case 'health': return <Health />
+    case 'sleep': return <Sleep />
     case 'journey': return <Journey />
     case 'progress': return <Progress />
     case 'learn': return <Learn />

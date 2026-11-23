@@ -1,7 +1,7 @@
 export type HabitKind = 'build' | 'quit'
 export type TimeOfDay = 'morning' | 'anytime' | 'evening'
-export type HabitLink = 'transmutation' | 'stillness' | 'gym' | 'health'
-export type Section = 'routine' | 'gym' | 'transmutation' | 'stillness' | 'health' | 'faith' | 'work' | 'screentime'
+export type HabitLink = 'transmutation' | 'stillness' | 'gym' | 'health' | 'sleep'
+export type Section = 'routine' | 'gym' | 'transmutation' | 'stillness' | 'health' | 'sleep' | 'faith' | 'work' | 'screentime'
 
 export interface Habit {
   id: string
@@ -16,6 +16,8 @@ export interface Habit {
   link?: HabitLink
   /** Minutes a tick counts for (meditation, scripture) */
   minutes?: number
+  /** Target time ("06:30") for a sleep habit: wake by it, or be asleep by it */
+  time?: string
   insightId?: string
 }
 

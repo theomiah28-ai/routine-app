@@ -20,6 +20,7 @@ const ICON: Record<Milestone['section'], string> = {
   routine: '✓',
   screentime: '◌',
   health: '❦',
+  sleep: '☾',
 }
 
 export function You() {

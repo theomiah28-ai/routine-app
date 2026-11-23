@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { todayKey } from '../dates'
 import { uid } from '../seed'
 import { linkChangeImpact } from '../domain/progression'
+import { timeIn } from '../domain/sleep'
 import { useStore } from '../store'
 import { Back, useNav } from '../nav'
 import { Moon, Screen, Stepper, Sun } from '../ui'
@@ -13,6 +14,7 @@ const LINKS: { id: Habit['link']; label: string; hint: string }[] = [
   { id: 'stillness', label: 'Stillness', hint: 'Meditation: opens the Eye' },
   { id: 'gym', label: 'Gym', hint: 'Ticked when you finish a workout' },
   { id: 'health', label: 'Health', hint: 'No vaping, weed, smoking: heals the lungs' },
+  { id: 'sleep', label: 'Sleep', hint: 'Wake-up and bedtime: fills the moon' },
 ]
 
 // Mon-first display, stored as JS weekday numbers
@@ -30,15 +32,16 @@ export function HabitEditor({ id, timeOfDay: presetTime, kind: presetKind }: { i
   const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(existing?.timeOfDay ?? presetTime ?? 'anytime')
   const [link, setLink] = useState<Habit['link']>(existing?.link)
   const [minutes, setMinutes] = useState(existing?.minutes ?? 30)
+  const [time, setTime] = useState(existing?.time ?? timeIn(existing?.name ?? '') ?? '')
 
   const save = () => {
     if (!name.trim() || !days.length) return
     const warning = linkChangeImpact(state, id, link, link === 'stillness' ? minutes : undefined)
     if (warning && !confirm(warning + '\n\nSave anyway?')) return
-    const fields = { name: name.trim(), kind, days: days.length === 7 ? [] : days, timeOfDay, link, minutes: link === 'stillness' ? minutes : undefined }
+    const fields = { name: name.trim(), kind, days: days.length === 7 ? [] : days, timeOfDay, link, minutes: link === 'stillness' ? minutes : undefined, time: link === 'sleep' && time ? time : undefined }
     update((s) => {
       // Only one habit can be linked to each section
-      if (fields.link && fields.link !== 'health') s.habits.forEach((h) => h.link === fields.link && h.id !== id && (h.link = undefined))
+      if (fields.link && fields.link !== 'health' && fields.link !== 'sleep') s.habits.forEach((h) => h.link === fields.link && h.id !== id && (h.link = undefined))
       const h = s.habits.find((h) => h.id === id)
       if (h) Object.assign(h, fields)
       else s.habits.push({ id: uid(), createdAt: todayKey(), ...fields })
@@ -120,6 +123,13 @@ export function HabitEditor({ id, timeOfDay: presetTime, kind: presetKind }: { i
         <div className="field row" style={{ background: 'var(--surface)', borderRadius: 12, padding: '10px 14px' }}>
           <span style={{ fontSize: 15 }}>Minutes each time<div className="sub" style={{ fontSize: 12 }}>More minutes open the Eye faster</div></span>
           <Stepper value={minutes} step={5} min={5} onChange={setMinutes} />
+        </div>
+      )}
+
+      {link === 'sleep' && (
+        <div className="field row" style={{ background: 'var(--surface)', borderRadius: 12, padding: '10px 14px' }}>
+          <span style={{ fontSize: 15 }}>Target time<div className="sub" style={{ fontSize: 12 }}>{kind === 'build' && timeOfDay === 'evening' ? 'Asleep by' : 'Wake up by'}</div></span>
+          <input className="time-in" type="time" value={time} onChange={(e) => setTime(e.target.value)} aria-label="Target time" />
         </div>
       )}
 

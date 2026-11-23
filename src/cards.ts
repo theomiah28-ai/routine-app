@@ -56,6 +56,15 @@ function glyph(c: CanvasRenderingContext2D, section: Section) {
       c.lineTo(210, 50)
       c.stroke()
       break
+    case 'sleep':
+      // A crescent: inside the moon's disc, fill everything except a second, offset disc
+      c.arc(0, 0, 190, 0, Math.PI * 2)
+      c.clip()
+      c.beginPath()
+      c.rect(-200, -200, 400, 400)
+      c.arc(90, -60, 170, 0, Math.PI * 2)
+      c.fill('evenodd')
+      break
     case 'work':
       c.lineWidth = 26
       c.arc(0, 0, 170, -Math.PI / 2, Math.PI * 1.25)

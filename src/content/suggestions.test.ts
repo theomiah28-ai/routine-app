@@ -10,6 +10,6 @@ describe('suggestFor', () => {
   })
   it('no goals, no suggestions', () => expect(suggestFor([])).toEqual([]))
   it('only links to the app sections', () => {
-    expect(SUGGESTIONS.every((x) => !x.link || ['transmutation', 'stillness', 'gym', 'health'].includes(x.link))).toBe(true)
+    expect(SUGGESTIONS.every((x) => !x.link || ['transmutation', 'stillness', 'gym', 'health', 'sleep'].includes(x.link))).toBe(true)
   })
 })
