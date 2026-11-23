@@ -113,10 +113,6 @@ export function You() {
         <span>Gym rest timer<div className="sub" style={{ fontSize: 12 }}>{Math.floor(set.restSeconds / 60)}:{String(set.restSeconds % 60).padStart(2, '0')}</div></span>
         <Stepper value={set.restSeconds} step={15} min={15} onChange={(v) => update((s) => void (s.settings.restSeconds = v))} />
       </div>
-      <div className="setting">
-        <span>Show esoteric teachings<div className="sub" style={{ fontSize: 12 }}>Deeper material in Learn, off unless you want it</div></span>
-        <Toggle on={set.showEsoteric} onChange={(v) => update((s) => void (s.settings.showEsoteric = v))} />
-      </div>
       <div className="setting" style={{ opacity: 0.6 }}>
         <span>Reminders<div className="sub" style={{ fontSize: 12 }}>Morning, wind-down and nudges</div></span>
         <span className="placeholder-tag">coming soon</span>

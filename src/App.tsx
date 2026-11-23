@@ -16,13 +16,10 @@ import { Stillness } from './screens/Stillness'
 import { Sit } from './screens/Sit'
 import { Breath } from './screens/Breath'
 import { Visualise } from './screens/Visualise'
-import { ScreenTime } from './screens/ScreenTime'
 import { Health } from './screens/Health'
 import { Sleep } from './screens/Sleep'
 import { Journey } from './screens/Journey'
 import { Progress } from './screens/Progress'
-import { Learn } from './screens/Learn'
-import { Article } from './screens/Article'
 import { MilestoneModal } from './screens/MilestoneModal'
 import { Flow } from './screens/Flow'
 import { You } from './screens/You'
@@ -57,13 +54,10 @@ function screenFor(r: Route): ReactNode {
     case 'sit': return <Sit />
     case 'breath': return <Breath id={r.id} />
     case 'visualise': return <Visualise id={r.id} />
-    case 'screentime': return <ScreenTime />
     case 'health': return <Health />
     case 'sleep': return <Sleep />
     case 'journey': return <Journey />
     case 'progress': return <Progress />
-    case 'learn': return <Learn />
-    case 'article': return <Article id={r.id} />
     case 'morning': return <Flow kind="morning" />
     case 'evening': return <Flow kind="evening" />
     default: return <Soon title={r.name} />
@@ -73,7 +67,7 @@ function screenFor(r: Route): ReactNode {
 const ROOT: Record<Tab, Route> = {
   today: { name: 'today' },
   journey: { name: 'journey' },
-  learn: { name: 'learn' },
+  gym: { name: 'gym' },
   you: { name: 'you' },
 }
 
@@ -91,10 +85,9 @@ const ICONS: Record<Tab, ReactNode> = {
       <circle cx="17" cy="3" r="1.6" />
     </svg>
   ),
-  learn: (
+  gym: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5z" />
-      <path d="M12 6.5v13" />
+      <path d="M6.5 7v10M17.5 7v10M3.5 9.5v5M20.5 9.5v5M6.5 12h11" />
     </svg>
   ),
   you: (
@@ -105,19 +98,16 @@ const ICONS: Record<Tab, ReactNode> = {
   ),
 }
 
-const LABELS: Record<Tab, string> = { today: 'Today', journey: 'Journey', learn: 'Learn', you: 'You' }
+const LABELS: Record<Tab, string> = { today: 'Today', journey: 'Journey', gym: 'Gym', you: 'You' }
 
 export function App() {
   const { state, update } = useStore()
-  const [tab, setTab] = useState<Tab>('today')
+  // A workout left running reopens on the Gym tab
+  const [tab, setTab] = useState<Tab>(state.active ? 'gym' : 'today')
   const [stacks, setStacks] = useState<Record<Tab, Route[]>>(() => ({
-    today: state.active
-      ? [ROOT.today, { name: 'gym' }, { name: 'workout' }]
-      : state.stillness.activeSit
-        ? [ROOT.today, { name: 'sit' }]
-        : [ROOT.today],
+    today: state.stillness.activeSit ? [ROOT.today, { name: 'sit' }] : [ROOT.today],
     journey: [ROOT.journey],
-    learn: [ROOT.learn],
+    gym: state.active ? [ROOT.gym, { name: 'workout' }] : [ROOT.gym],
     you: [ROOT.you],
   }))
   const stack = stacks[tab]
@@ -175,7 +165,6 @@ export function App() {
           <li><b>No PMO</b> climbs the Ascent, seven stages to 365 days.</li>
           <li><b>Meditate</b> opens the Eye. Fully awake at 365 hours.</li>
           <li><b>Gym</b> carves your statue. Every PB carves deeper.</li>
-          <li>Your <b>Screen Time</b> brain is in Journey too. <b>Learn</b> holds the teachings.</li>
         </ul>
         <button className="btn" onClick={() => update((s) => void (s.settings.whatsNew = false))}>Let's go</button>
       </Sheet>

@@ -1,14 +1,12 @@
 import type { ReactNode } from 'react'
 import { sectionProgress, ascentDays, meditationMinutes, statuePoints, statueStage, type SectionProgress } from '../domain/progression'
 import { eyeStage } from '../domain/stillness'
-import { avgMinutes, brainState, todayMinutes } from '../domain/screentime'
 import { consistency } from '../domain/progress'
 import { addDays, todayKey } from '../dates'
 import { useStore } from '../store'
 import { useNav, type Route } from '../nav'
 import { Ascent } from '../symbols/Ascent'
 import { Eye } from '../symbols/Eye'
-import { Brain } from '../symbols/Brain'
 import { Statue } from '../symbols/Statue'
 import { Lungs } from '../symbols/Lungs'
 import { lungScore, lungState } from '../domain/health'
@@ -47,12 +45,6 @@ export function Journey() {
   const today = todayKey()
   const progress = sectionProgress(state, today)
   const month = consistency(state, addDays(today, -29), today, 'all')
-  const st = state.screenTime
-  const brains = [
-    { label: 'Today', mins: todayMinutes(st, today) },
-    { label: '7 days', mins: avgMinutes(st, today, 7) },
-    { label: '30 days', mins: avgMinutes(st, today, 30) },
-  ]
 
   const symbols: Record<string, ReactNode> = {
     transmutation: (
@@ -90,22 +82,10 @@ export function Journey() {
 
       <div style={{ marginTop: 8 }}>
         {progress.map((p) => (
-          <Row key={p.section} p={p} symbol={symbols[p.section]} onClick={() => push(ROUTE[p.section])} />
+          <Row key={p.section} p={p} symbol={symbols[p.section]} onClick={() => (p.section === 'gym' ? switchTab('gym') : push(ROUTE[p.section]))} />
         ))}
       </div>
 
-      <button className="jr-row" style={{ display: 'block' }} onClick={() => push({ name: 'screentime' })}>
-        <span className="label gold">Screen time · your brain</span>
-        <div className="brains">
-          {brains.map((b) => (
-            <div key={b.label} style={{ opacity: b.mins === null ? 0.35 : 1 }}>
-              <Brain state={brainState(b.mins ?? 0, st)} width={82} />
-              <b>{b.label}</b>
-              <small>{b.mins === null ? 'No entries yet' : `${Math.floor(b.mins / 60)}h ${b.mins % 60}m${b.label === 'Today' ? '' : ' / day'}`}</small>
-            </div>
-          ))}
-        </div>
-      </button>
     </Screen>
   )
 }

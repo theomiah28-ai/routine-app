@@ -39,7 +39,7 @@ export function useBreathClock(running: boolean) {
 
 export function Urge() {
   const { state } = useStore()
-  const { pop, reset, push } = useNav()
+  const { pop, reset, push, switchTab } = useNav()
   const [step, setStep] = useState<0 | 1 | 2>(0)
   const ms = useBreathClock(step === 0)
   const b = breathAt(BOX_60, ms)
@@ -99,7 +99,7 @@ export function Urge() {
           <div className="label gold">Transmute it</div>
           <h1 style={{ marginTop: 10 }}>Put it into something</h1>
           <div style={{ marginTop: 22 }}>
-            <button className="card" onClick={() => go({ name: 'gym' })}><span className="grow">Train<small>Start your next workout</small></span><span className="chev">›</span></button>
+            <button className="card" onClick={() => { reset(); switchTab('gym') }}><span className="grow">Train<small>Start your next workout</small></span><span className="chev">›</span></button>
             <button className="card" onClick={() => go({ name: 'sit' })}><span className="grow">Sit in stillness<small>Watch the urge without acting on it</small></span><span className="chev">›</span></button>
           </div>
           <button className="btn ghost" style={{ marginTop: 14 }} onClick={pop}>I'm good now</button>
