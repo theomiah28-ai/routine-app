@@ -66,7 +66,8 @@ export function normaliseV2(s: State, now: number): State {
   }
   out.journal = { ...out.journal }
   for (const [k, d] of Object.entries(out.faith?.days ?? {})) if (d.note && out.journal[k] === undefined) out.journal[k] = d.note
-  if (!out.settings.journeyStart && out.settings.onboarded) out.settings.journeyStart = firstDay(out.habits, today)
+  // Only saves from before journeyStart existed; '' means "started again, not begun yet"
+  if (out.settings.journeyStart === undefined && out.settings.onboarded) out.settings.journeyStart = firstDay(out.habits, today)
   return out
 }
 

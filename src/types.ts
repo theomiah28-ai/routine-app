@@ -161,7 +161,7 @@ export interface Settings {
   faith: boolean
   /** Goals picked in onboarding */
   goals: string[]
-  /** Day "Begin your journey" was pressed; tracking counts from here. Unset while building the routine */
+  /** Day "Begin your journey" was pressed; tracking counts from here. Unset (or '' after "Start again") while building the routine */
   journeyStart?: string
 }
 

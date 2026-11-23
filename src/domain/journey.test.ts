@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { migrate } from '../migrate'
 import { beginJourney, journeyStarted, resetProgress } from './journey'
 import { seedState } from '../seed'
 import { addDays, todayKey } from '../dates'
@@ -51,5 +52,17 @@ describe('start again from day 1', () => {
     expect(r.habits.map((h) => h.name)).toEqual(['No PMO'])
     expect(r.days).toEqual(s.days)
     expect(r.settings).toMatchObject({ name: 'Theo', onboarded: true })
+  })
+})
+
+describe('start again survives saving', () => {
+  it('a reset state saved and loaded again (or imported as a backup) is still not begun', () => {
+    const s = beginJourney(seedState(), addDays(today, -30))
+    s.settings.onboarded = true
+    s.habits = [{ id: 'a', name: 'Gym', kind: 'build', days: [], createdAt: addDays(today, -30), timeOfDay: 'morning', link: 'gym' }]
+    const loaded = migrate(JSON.parse(JSON.stringify(resetProgress(s, today, Date.now()))), Date.now())
+    expect(journeyStarted(loaded)).toBe(false)
+    expect(journeyStarted(beginJourney(loaded, today))).toBe(true)
+    expect(beginJourney(loaded, today).settings.journeyStart).toBe(today)
   })
 })

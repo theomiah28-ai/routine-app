@@ -23,7 +23,8 @@ export function resetProgress(s: State, today: string, now: number): State {
     ...s,
     ...fresh,
     stillness: { ...fresh.stillness, sitMinutes: s.stillness.sitMinutes },
-    settings: { ...s.settings, journeyStart: undefined, whatsNew: false },
+    // '' (not undefined) so it survives saving and loading doesn't backfill a start date
+    settings: { ...s.settings, journeyStart: '', whatsNew: false },
     habits: s.habits.map((h) => ({ ...h, createdAt: today })),
     checks: {},
     sessions: [],
