@@ -46,12 +46,12 @@ export function Ascent({ days, onStage, compact }: { days: number; onStage?: (i:
         <filter id="asc-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" /></filter>
         <filter id="asc-here" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="9" /></filter>
         <linearGradient id="asc-line" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0" stopColor="#c9a043" />
-          <stop offset="1" stopColor="#fff0c4" />
+          <stop offset="0" stopColor="#2f6fe4" />
+          <stop offset="1" stopColor="#dce8ff" />
         </linearGradient>
       </defs>
-      <path ref={path} d={PATH} fill="none" stroke="#221e15" strokeWidth="3" strokeLinecap="round" />
-      <path d={PATH} fill="none" stroke="#e8c46a" strokeWidth="5" strokeLinecap="round" pathLength={1} strokeDasharray={`${f} 1`} filter="url(#asc-glow)" opacity="0.8" className="asc-draw" />
+      <path ref={path} d={PATH} fill="none" stroke="#222226" strokeWidth="3" strokeLinecap="round" />
+      <path d={PATH} fill="none" stroke="#4d8dff" strokeWidth="5" strokeLinecap="round" pathLength={1} strokeDasharray={`${f} 1`} filter="url(#asc-glow)" opacity="0.8" className="asc-draw" />
       <path d={PATH} fill="none" stroke="url(#asc-line)" strokeWidth="2.4" strokeLinecap="round" pathLength={1} strokeDasharray={`${f} 1`} className="asc-draw" />
 
       {ASCENT.map((s, i) => {
@@ -62,26 +62,26 @@ export function Ascent({ days, onStage, compact }: { days: number; onStage?: (i:
             <rect x={X - 20} y={y - 18} width={W - X + 10} height={36} fill="transparent" />
             {on ? (
               <>
-                <circle cx={X} cy={y} r={6} fill="#ffe7a3" filter="url(#asc-glow)" opacity="0.7" />
-                <circle cx={X} cy={y} r={4.5} fill="#ffe7a3" />
+                <circle cx={X} cy={y} r={6} fill="#cfe0ff" filter="url(#asc-glow)" opacity="0.7" />
+                <circle cx={X} cy={y} r={4.5} fill="#cfe0ff" />
               </>
             ) : (
-              <circle cx={X} cy={y} r={4.5} fill="#0b0b0c" stroke="#4a4130" strokeWidth={1.5} />
+              <circle cx={X} cy={y} r={4.5} fill="#0b0b0c" stroke="#3a4a66" strokeWidth={1.5} />
             )}
             {!compact && (
-              <text x={X + 30} y={y + 4.5} fontFamily="-apple-system, Inter, sans-serif" fontSize="12.5" fill={on ? '#8a8578' : '#4a473f'} letterSpacing="0.08em" fontWeight="600">
+              <text x={X + 30} y={y + 4.5} fontFamily="-apple-system, Inter, sans-serif" fontSize="12.5" fill={on ? '#8a8a93' : '#4a4a50'} letterSpacing="0.08em" fontWeight="600">
                 DAY {s.day}
-                <tspan dx="9" fontSize="15" letterSpacing="0" fill={on ? '#f2f2f2' : '#55524a'} fontWeight={on ? 600 : 500}>
+                <tspan dx="9" fontSize="15" letterSpacing="0" fill={on ? '#f4f4f5' : '#55555c'} fontWeight={on ? 600 : 500}>
                   {s.name}
                 </tspan>
-                {!on && <tspan dx="7" fontSize="11" fill="#4a473f">🔒︎</tspan>}
+                {!on && <tspan dx="7" fontSize="11" fill="#4a4a50">🔒︎</tspan>}
               </text>
             )}
           </g>
         )
       })}
 
-      <circle cx={here.x} cy={here.y} r={16} fill="#ffd36b" filter="url(#asc-here)" className="asc-pulse" />
+      <circle cx={here.x} cy={here.y} r={16} fill="#7fb0ff" filter="url(#asc-here)" className="asc-pulse" />
       <circle cx={here.x} cy={here.y} r={5.5} fill="#fff" />
     </svg>
   )

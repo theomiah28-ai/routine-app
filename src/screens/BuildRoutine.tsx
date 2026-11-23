@@ -45,7 +45,7 @@ export function BuildRoutine() {
               <div key={h.id} className="item">
                 <button className="name" onClick={() => push({ name: 'habitEdit', id: h.id })}>
                   {h.name}
-                  {h.link && <small className="sub" style={{ display: 'block', fontSize: 11.5, color: 'var(--gold-dim)' }}>{GROWS[h.link]}</small>}
+                  {h.link && <small className="sub" style={{ display: 'block', fontSize: 11.5, color: 'var(--accent-dim)' }}>{GROWS[h.link]}</small>}
                 </button>
                 <button className="del" onClick={() => remove(h.id)} aria-label={`Remove ${h.name}`}>×</button>
               </div>

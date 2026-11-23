@@ -61,7 +61,7 @@ export function Stillness() {
         <div style={{ fontSize: 21, fontWeight: 700, marginTop: 6 }}>{s.sitMinutes} min of pure awareness</div>
         <p className="note" style={{ marginTop: 4 }}>No intention, no guidance. Watch each thought arrive and let it pass.</p>
         {done ? (
-          <div className="sub" style={{ color: 'var(--gold)', marginTop: 10, fontWeight: 600 }}>Done today</div>
+          <div className="sub" style={{ color: 'var(--accent)', marginTop: 10, fontWeight: 600 }}>Done today</div>
         ) : (
           <button className="btn small" style={{ marginTop: 12 }} onClick={() => push({ name: 'sit' })}>Begin the sit</button>
         )}

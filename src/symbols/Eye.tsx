@@ -16,28 +16,28 @@ export function Eye({ openness, width = 240 }: { openness: number; width?: numbe
       <defs>
         <filter id="eye-glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="14" /></filter>
         <radialGradient id="eye-iris" cx="50%" cy="50%" r="50%">
-          <stop offset="0" stopColor="#fff8e6" />
-          <stop offset="0.35" stopColor="#ffd36b" />
-          <stop offset="0.8" stopColor="#a87a28" />
-          <stop offset="1" stopColor="#5a4418" />
+          <stop offset="0" stopColor="#dce8ff" />
+          <stop offset="0.35" stopColor="#7fb0ff" />
+          <stop offset="0.8" stopColor="#2a5fc2" />
+          <stop offset="1" stopColor="#173470" />
         </radialGradient>
         <clipPath id="eye-clip"><path d={lid} /></clipPath>
       </defs>
       <g style={{ opacity: 0.12 + 0.6 * o, transition: 'opacity 1s' }} className="eye-rays">
         {rays.map((r, i) => (
-          <line key={i} {...r} stroke="#e8c46a" strokeWidth="2" strokeLinecap="round" />
+          <line key={i} {...r} stroke="#4d8dff" strokeWidth="2" strokeLinecap="round" />
         ))}
       </g>
-      <circle cx="135" cy="100" r="54" fill="#e8c46a" filter="url(#eye-glow)" style={{ opacity: 0.12 + 0.45 * o }} />
-      <path d="M25 100 Q135 24 245 100 Q135 170 25 100 Z" fill="#100e09" stroke="#3a3324" strokeWidth="1.4" />
+      <circle cx="135" cy="100" r="54" fill="#4d8dff" filter="url(#eye-glow)" style={{ opacity: 0.12 + 0.45 * o }} />
+      <path d="M25 100 Q135 24 245 100 Q135 170 25 100 Z" fill="#0b0d12" stroke="#2a3346" strokeWidth="1.4" />
       <g clipPath="url(#eye-clip)">
-        <rect x="20" y="20" width="230" height="160" fill="#1a160d" />
+        <rect x="20" y="20" width="230" height="160" fill="#121722" />
         <circle cx="135" cy="100" r="38" fill="url(#eye-iris)" />
-        <circle cx="135" cy="100" r="12" fill="#120d04" />
+        <circle cx="135" cy="100" r="12" fill="#05070c" />
         <circle cx="146" cy="89" r="5" fill="#fff" />
       </g>
-      <path d={`M25 100 Q135 ${top} 245 100`} fill="none" stroke="#e8c46a" strokeWidth="2.6" strokeLinecap="round" style={{ transition: 'd 1.2s' }} />
-      <path d={`M25 100 Q135 ${bot} 245 100`} fill="none" stroke="#8a7240" strokeWidth="1.6" />
+      <path d={`M25 100 Q135 ${top} 245 100`} fill="none" stroke="#4d8dff" strokeWidth="2.6" strokeLinecap="round" style={{ transition: 'd 1.2s' }} />
+      <path d={`M25 100 Q135 ${bot} 245 100`} fill="none" stroke="#3d5a8c" strokeWidth="1.6" />
     </svg>
   )
 }

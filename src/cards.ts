@@ -7,12 +7,12 @@ const H = 1350
 function glyph(c: CanvasRenderingContext2D, section: Section) {
   c.save()
   c.translate(W / 2, 560)
-  c.strokeStyle = '#fff0c4'
-  c.fillStyle = '#fff0c4'
+  c.strokeStyle = '#dce8ff'
+  c.fillStyle = '#dce8ff'
   c.lineWidth = 14
   c.lineCap = 'round'
   c.lineJoin = 'round'
-  c.shadowColor = 'rgba(255, 211, 107, 0.9)'
+  c.shadowColor = 'rgba(127, 176, 255, 0.9)'
   c.shadowBlur = 50
   c.beginPath()
   switch (section) {
@@ -80,7 +80,7 @@ function glyph(c: CanvasRenderingContext2D, section: Section) {
   c.restore()
 }
 
-/** A 4:5 milestone card in the app's gold style, ready to post. */
+/** A 4:5 milestone card in the app's style, ready to post. */
 export async function renderCard(m: Milestone): Promise<Blob> {
   const canvas = document.createElement('canvas')
   canvas.width = W
@@ -89,22 +89,22 @@ export async function renderCard(m: Milestone): Promise<Blob> {
   c.fillStyle = '#0b0b0c'
   c.fillRect(0, 0, W, H)
   const glow = c.createRadialGradient(W / 2, 560, 0, W / 2, 560, 620)
-  glow.addColorStop(0, 'rgba(232, 196, 106, 0.42)')
-  glow.addColorStop(0.45, 'rgba(232, 196, 106, 0.1)')
-  glow.addColorStop(1, 'rgba(232, 196, 106, 0)')
+  glow.addColorStop(0, 'rgba(77, 141, 255, 0.42)')
+  glow.addColorStop(0.45, 'rgba(77, 141, 255, 0.1)')
+  glow.addColorStop(1, 'rgba(77, 141, 255, 0)')
   c.fillStyle = glow
   c.fillRect(0, 0, W, H)
   glyph(c, m.section)
 
   const font = '-apple-system, "SF Pro Display", Inter, system-ui, sans-serif'
   c.textAlign = 'center'
-  c.fillStyle = '#f2f2f2'
+  c.fillStyle = '#f4f4f5'
   c.font = `700 120px ${font}`
   c.fillText(m.value, W / 2, 970)
-  c.fillStyle = '#e8c46a'
+  c.fillStyle = '#4d8dff'
   c.font = `600 46px ${font}`
   c.fillText(m.title, W / 2, 1050)
-  c.fillStyle = '#8a7a55'
+  c.fillStyle = '#5d7cad'
   c.font = `800 30px ${font}`
   c.letterSpacing = '12px'
   c.fillText(APP_NAME.toUpperCase(), W / 2, 1250)

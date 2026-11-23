@@ -15,7 +15,7 @@ export function Check({ on, onClick }: { on: boolean; onClick?: () => void }) {
       }}
     >
       <svg width="14" height="14" viewBox="0 0 14 14">
-        <path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#1a1405" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </span>
   )
@@ -46,7 +46,7 @@ export function Card({ children, onClick, glow, style }: { children: ReactNode; 
   )
 }
 
-export function GoldButton({ children, onClick, dock, disabled, overTabs }: { children: ReactNode; onClick: () => void; dock?: boolean; disabled?: boolean; overTabs?: boolean }) {
+export function PrimaryButton({ children, onClick, dock, disabled, overTabs }: { children: ReactNode; onClick: () => void; dock?: boolean; disabled?: boolean; overTabs?: boolean }) {
   const btn = <button className="btn" onClick={onClick} disabled={disabled}>{children}</button>
   return dock ? <div className={'dock' + (overTabs ? ' over-tabs' : '')}>{btn}</div> : btn
 }
@@ -55,8 +55,8 @@ export function GhostButton({ children, onClick, style }: { children: ReactNode;
   return <button className="btn ghost" onClick={onClick} style={style}>{children}</button>
 }
 
-/** Circular progress. Glows gold when complete. */
-export function Ring({ pct, size, stroke = 8, children, track = '#221f18' }: { pct: number; size: number; stroke?: number; children?: ReactNode; track?: string }) {
+/** Circular progress. Glows when complete. */
+export function Ring({ pct, size, stroke = 8, children, track = '#222226' }: { pct: number; size: number; stroke?: number; children?: ReactNode; track?: string }) {
   const r = (size - stroke) / 2
   const c = 2 * Math.PI * r
   const p = Math.max(0, Math.min(1, pct))
@@ -64,10 +64,10 @@ export function Ring({ pct, size, stroke = 8, children, track = '#221f18' }: { p
     <div className={'ring' + (p >= 1 ? ' full' : '')} style={{ width: size, height: size }}>
       <svg width={size} height={size}>
         <defs>
-          <linearGradient id="ring-gold" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#fff0c4" />
-            <stop offset="0.5" stopColor="#e8c46a" />
-            <stop offset="1" stopColor="#c9a043" />
+          <linearGradient id="ring-accent" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#dce8ff" />
+            <stop offset="0.5" stopColor="#4d8dff" />
+            <stop offset="1" stopColor="#2f6fe4" />
           </linearGradient>
         </defs>
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={track} strokeWidth={stroke} />
@@ -76,7 +76,7 @@ export function Ring({ pct, size, stroke = 8, children, track = '#221f18' }: { p
           cy={size / 2}
           r={r}
           fill="none"
-          stroke="url(#ring-gold)"
+          stroke="url(#ring-accent)"
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={c}
@@ -221,7 +221,7 @@ export function SortableList<T extends { id: string }>({
   )
 }
 
-/** The add-habit button shown under each routine group. Gold and dashed so it never looks like a habit. */
+/** The add-habit button shown under each routine group. Accent-coloured and dashed so it never looks like a habit. */
 export function AddHabitButton({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button className="add-habit" onClick={onClick}>

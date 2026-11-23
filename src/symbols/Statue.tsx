@@ -17,26 +17,26 @@ function Carving({ stage, size }: { stage: number; size: number }) {
     <svg width={size} height={size * 1.1} viewBox="0 0 180 210" style={{ display: 'block', margin: '0 auto', overflow: 'visible' }}>
       <defs>
         <linearGradient id="stone" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#8a857a" />
-          <stop offset="1" stopColor="#4a463e" />
+          <stop offset="0" stopColor="#8a8a8f" />
+          <stop offset="1" stopColor="#48484d" />
         </linearGradient>
         <linearGradient id="marble" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor={t > 0.8 ? '#fff6dc' : '#d8d2c4'} />
-          <stop offset="1" stopColor={t > 0.8 ? '#c9a043' : '#8a857a'} />
+          <stop offset="0" stopColor={t > 0.8 ? '#dce8ff' : '#d4d4d8'} />
+          <stop offset="1" stopColor={t > 0.8 ? '#2f6fe4' : '#8a8a8f'} />
         </linearGradient>
         <filter id="statue-glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="10" /></filter>
         <clipPath id="above-block"><rect x="0" y="0" width="180" height={blockTop} /></clipPath>
       </defs>
-      {t > 0.6 && <path d={TORSO} fill="#e8c46a" opacity={(t - 0.6) * 0.9} filter="url(#statue-glow)" />}
+      {t > 0.6 && <path d={TORSO} fill="#4d8dff" opacity={(t - 0.6) * 0.9} filter="url(#statue-glow)" />}
       <path d={TORSO} fill="url(#marble)" clipPath="url(#above-block)" />
-      <g stroke="#2b2720" strokeWidth="2" fill="none" strokeLinecap="round" clipPath="url(#above-block)" opacity={0.25 + 0.6 * t}>
+      <g stroke="#2a2a2f" strokeWidth="2" fill="none" strokeLinecap="round" clipPath="url(#above-block)" opacity={0.25 + 0.6 * t}>
         {DETAIL.slice(0, Math.max(0, stage - 2)).map((d) => <path key={d} d={d} />)}
       </g>
       <rect x="10" y={blockTop} width="160" height={200 - blockTop} rx="4" fill="url(#stone)" />
       {Array.from({ length: 6 }, (_, i) => (
-        <path key={i} d={`M${20 + i * 26} ${blockTop + 6} l10 12 l-6 10`} stroke="#3a362c" strokeWidth="1.5" fill="none" opacity={blockTop < 190 ? 0.8 : 0} />
+        <path key={i} d={`M${20 + i * 26} ${blockTop + 6} l10 12 l-6 10`} stroke="#3a3a40" strokeWidth="1.5" fill="none" opacity={blockTop < 190 ? 0.8 : 0} />
       ))}
-      <rect x="0" y="198" width="180" height="8" rx="2" fill="#2b2720" />
+      <rect x="0" y="198" width="180" height="8" rx="2" fill="#2a2a2f" />
     </svg>
   )
 }

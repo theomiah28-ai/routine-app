@@ -22,7 +22,7 @@ export function StageDetail({ index }: { index: number }) {
       </div>
       <span className="pill">STAGE {index + 1} · DAY {s.day}</span>
       <h1 style={{ marginTop: 12 }}>{s.name}</h1>
-      <div style={{ color: 'var(--gold-dim)', fontSize: 14 }}>{s.subtitle}</div>
+      <div style={{ color: 'var(--accent-dim)', fontSize: 14 }}>{s.subtitle}</div>
 
       {reached ? (
         <>

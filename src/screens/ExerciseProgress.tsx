@@ -21,15 +21,15 @@ function Chart({ points }: { points: { t: number; w: number }[] }) {
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block', marginTop: 8 }}>
       <defs>
         <linearGradient id="fill" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor="#e8c46a" stopOpacity="0.18" />
-          <stop offset="1" stopColor="#e8c46a" stopOpacity="0" />
+          <stop offset="0" stopColor="#4d8dff" stopOpacity="0.18" />
+          <stop offset="1" stopColor="#4d8dff" stopOpacity="0" />
         </linearGradient>
       </defs>
       <line x1="0" y1={H - 1} x2={W} y2={H - 1} stroke="#1f1f22" />
       {points.length > 1 && <polygon points={area} fill="url(#fill)" />}
-      <polyline fill="none" stroke="#e8c46a" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" points={line} />
-      <circle cx={x(last.t)} cy={y(last.w)} r="4.5" fill="#e8c46a" />
-      <text x={Math.min(x(last.t), W - 60)} y={y(last.w) - 12} fill="#f2f2f2" fontSize="13" fontWeight="700" textAnchor={points.length > 1 ? 'middle' : 'start'}>
+      <polyline fill="none" stroke="#4d8dff" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" points={line} />
+      <circle cx={x(last.t)} cy={y(last.w)} r="4.5" fill="#4d8dff" />
+      <text x={Math.min(x(last.t), W - 60)} y={y(last.w) - 12} fill="#f4f4f5" fontSize="13" fontWeight="700" textAnchor={points.length > 1 ? 'middle' : 'start'}>
         {formatWeight(last.w)}kg
       </text>
       {max !== min && <text x="2" y={y(min) - 6} fill="#55555a" fontSize="11">{formatWeight(min)}kg</text>}

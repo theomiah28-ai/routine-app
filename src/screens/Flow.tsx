@@ -131,7 +131,7 @@ export function Flow({ kind }: { kind: 'morning' | 'evening' }) {
       id: 'sleep',
       render: () => (
         <div style={{ textAlign: 'center', marginTop: 120 }}>
-          <div style={{ color: 'var(--gold)', display: 'flex', justifyContent: 'center' }}><Moon size={56} /></div>
+          <div style={{ color: 'var(--accent)', display: 'flex', justifyContent: 'center' }}><Moon size={56} /></div>
           <h1 style={{ marginTop: 22 }}>Phone down. Sleep.</h1>
           <p className="note">Rest is part of the work.</p>
         </div>

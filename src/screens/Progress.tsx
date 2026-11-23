@@ -15,12 +15,12 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: 'sleep', label: 'Sleep' },
 ]
 
-/** Faint → gold by completion. */
+/** Faint → accent by completion. */
 function shade(p: number | null) {
-  if (p === null) return { background: 'transparent', color: '#3a362c', boxShadow: 'inset 0 0 0 1px #1d1a14' }
-  if (p === 0) return { background: '#1d1a14', color: '#55524a' }
+  if (p === null) return { background: 'transparent', color: '#3a3a40', boxShadow: 'inset 0 0 0 1px #1c1c1f' }
+  if (p === 0) return { background: '#1c1c1f', color: '#55555c' }
   const a = 0.18 + 0.82 * p
-  return { background: `rgba(232, 196, 106, ${a})`, color: p > 0.55 ? '#1a1405' : '#d8d2c4' }
+  return { background: `rgba(77, 141, 255, ${a})`, color: p > 0.55 ? '#ffffff' : '#d4d4d8' }
 }
 
 export function Progress() {

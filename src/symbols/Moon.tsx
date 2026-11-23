@@ -20,22 +20,22 @@ export function Moon({ state, width = 200 }: { state: MoonState; width?: number 
     <svg width={width} height={width} viewBox="0 0 220 220" style={{ display: 'block', margin: '0 auto', overflow: 'visible' }}>
       <defs>
         <radialGradient id={`${id}-f`} cx="40%" cy="35%" r="70%">
-          <stop offset="0" stopColor="#fff6dc" />
-          <stop offset="1" stopColor="#e8c46a" />
+          <stop offset="0" stopColor="#f7f9ff" />
+          <stop offset="1" stopColor="#b9c7e2" />
         </radialGradient>
         <filter id={`${id}-g`} x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="14" /></filter>
         <clipPath id={`${id}-c`}><circle cx="110" cy="110" r="64" /></clipPath>
       </defs>
       {STARS.slice(0, l.stars).map(([x, y, r], i) => (
-        <circle key={i} cx={x} cy={y} r={r} fill="#fff0c4" className="moon-star" style={{ animationDelay: `${i * 0.7}s` }} />
+        <circle key={i} cx={x} cy={y} r={r} fill="#dce8ff" className="moon-star" style={{ animationDelay: `${i * 0.7}s` }} />
       ))}
-      {l.glow && <circle cx="110" cy="110" r="64" fill="#ffd36b" opacity={0.45 * l.lit} filter={`url(#${id}-g)`} className="moon-glow" />}
+      {l.glow && <circle cx="110" cy="110" r="64" fill="#8fb6ff" opacity={0.45 * l.lit} filter={`url(#${id}-g)`} className="moon-glow" />}
       <circle cx="110" cy="110" r="64" fill={`url(#${id}-f)`} />
-      <g fill="#c9a043" opacity="0.35">
+      <g fill="#8d9dbd" opacity="0.4">
         <circle cx="88" cy="92" r="9" /><circle cx="128" cy="124" r="12" /><circle cx="104" cy="140" r="6" /><circle cx="134" cy="88" r="5" />
       </g>
-      <circle cx={shadowX} cy="110" r="64" fill="#15130f" opacity="0.92" clipPath={`url(#${id}-c)`} style={{ transition: 'cx 0.9s' }} />
-      <circle cx="110" cy="110" r="64" fill="none" stroke="#fff0c4" strokeOpacity="0.25" strokeWidth="1.5" />
+      <circle cx={shadowX} cy="110" r="64" fill="#0e0f13" opacity="0.92" clipPath={`url(#${id}-c)`} style={{ transition: 'cx 0.9s' }} />
+      <circle cx="110" cy="110" r="64" fill="none" stroke="#eef3ff" strokeOpacity="0.25" strokeWidth="1.5" />
     </svg>
   )
 }

@@ -9,7 +9,7 @@ import { useStore } from '../store'
 import { Back, useNav } from '../nav'
 import { Ascent } from '../symbols/Ascent'
 import { DayStats } from './DayStats'
-import { Check, GoldButton, Screen, Sheet } from '../ui'
+import { Check, PrimaryButton, Screen, Sheet } from '../ui'
 
 export function useNow(intervalMs = 30_000) {
   const [now, setNow] = useState(Date.now())
@@ -67,10 +67,10 @@ export function Transmutation() {
       </div>
       {next ? (
         <div className="sub" style={{ marginTop: 8 }}>
-          Next: <b style={{ color: 'var(--gold)' }}>Day {next.day} · {next.name}</b>, {toGo} {toGo === 1 ? 'day' : 'days'} to go
+          Next: <b style={{ color: 'var(--accent)' }}>Day {next.day} · {next.name}</b>, {toGo} {toGo === 1 ? 'day' : 'days'} to go
         </div>
       ) : (
-        <div className="sub" style={{ marginTop: 8, color: 'var(--gold)' }}>Mastery reached</div>
+        <div className="sub" style={{ marginTop: 8, color: 'var(--accent)' }}>Mastery reached</div>
       )}
       {habit && <DayStats habit={habit} word="clean day" noCurrent />}
 
@@ -93,7 +93,7 @@ export function Transmutation() {
 
       {habit && <button className="btn danger" style={{ marginTop: 18 }} onClick={() => setConfirm(true)}>I relapsed</button>}
 
-      <GoldButton dock onClick={() => push({ name: 'urge' })}>Transmute an urge</GoldButton>
+      <PrimaryButton dock onClick={() => push({ name: 'urge' })}>Transmute an urge</PrimaryButton>
 
       <Sheet open={confirm} onClose={() => setConfirm(false)}>
         <h2 className="title">Reset to day 0?</h2>
