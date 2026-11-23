@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { exerciseHistory, formatWeight, nextDayId, sessionsThisWeek, topWeight } from '../domain/gym'
+import { bestSet, exerciseHistory, formatWeight, nextDayId, sessionsThisWeek, trend } from '../domain/gym'
 import { uid } from '../seed'
 import { useStore } from '../store'
 import { useNav } from '../nav'
@@ -35,7 +35,7 @@ export function Gym() {
     <button key={d.id} className={'card' + (!editing && d.id === nextId ? ' next' : '')} onClick={() => push({ name: 'dayEdit', id: d.id })}>
       <span className="grow">
         {d.name}
-        <small>{d.exercises.map((e) => state.exercises[e.exerciseId]?.name).join(', ') || 'No exercises yet'}</small>
+        <small>{d.exercises.map((e) => `${state.exercises[e.exerciseId]?.name} ${e.sets}×${e.reps || '?'}`).join(' · ') || 'No exercises yet'}</small>
       </span>
       {!editing && d.id === nextId ? <span className="pill">Next up</span> : <span className="chev">›</span>}
     </button>
@@ -85,18 +85,25 @@ export function Gym() {
 
       {exercises.length > 0 && !editing && (
         <>
-          <div className="sec">Progress</div>
+          <div className="sec">Progressive overload</div>
           {exercises.map((e) => {
             const h = exerciseHistory(state, e.id)
-            const last = h.length ? topWeight(h[h.length - 1].sets) : null
+            const best = bestSet(h[h.length - 1].sets)
+            const tr = trend(state, e.id)
             return (
               <button key={e.id} className="item" onClick={() => push({ name: 'exercise', id: e.id })}>
-                <span className="name">{e.name}</span>
-                <span className="sub">{last !== null ? `${formatWeight(last)}kg` : '—'}</span>
+                <span className="name">
+                  {e.name}
+                  <small className="sub" style={{ display: 'block', fontSize: 12 }}>Last best {formatWeight(best.weight)}kg × {best.reps}</small>
+                </span>
+                <span className={'trend ' + tr.kind}>
+                  {tr.kind === 'up' ? `↑ ${tr.text}` : tr.kind === 'flat' ? `Stuck ${tr.sessions} ${tr.sessions === 1 ? 'session' : 'sessions'}` : 'New'}
+                </span>
                 <span className="chev">›</span>
               </button>
             )
           })}
+          <p className="note" style={{ marginTop: 10 }}>Compared with the session before. Stuck for 3 or more? Try a deload or change the rep range.</p>
         </>
       )}
 

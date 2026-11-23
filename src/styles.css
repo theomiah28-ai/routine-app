@@ -440,3 +440,17 @@ textarea.input { resize: none; min-height: 90px; line-height: 1.45; }
 @keyframes moon-star { 50% { opacity: 0.35; } }
 .day-dots.sleep i.clean { background: #e8c46a; box-shadow: 0 0 6px rgba(232, 196, 106, 0.5); }
 .time-in { background: var(--surface); border: 1px solid #2a261d; border-radius: 10px; color: var(--text); font: inherit; font-size: 15px; padding: 6px 10px; color-scheme: dark; }
+
+/* Gym plan: sets × reps per exercise */
+.plan-item { flex-direction: column; align-items: stretch; gap: 8px; padding: 12px 0; }
+.plan-top { display: flex; align-items: center; gap: 12px; }
+.plan-row { display: flex; align-items: center; gap: 8px; }
+.reps-in { width: 68px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 7px 8px; text-align: center; font-size: 15px; }
+.reps-in.bad { border-color: var(--danger); }
+.target { margin-top: 6px; font-size: 12.5px; color: var(--muted); }
+.target b { color: var(--text); }
+.target.up b { color: var(--gold); }
+.trend { font-size: 12px; font-weight: 600; white-space: nowrap; }
+.trend.up { color: var(--gold); }
+.trend.flat { color: var(--danger); opacity: 0.85; }
+.trend.new { color: var(--faint); }

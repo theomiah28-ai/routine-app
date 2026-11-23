@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { formatWeight, isPersonalBest, lastSets, summarise } from '../domain/gym'
+import { formatWeight, isPersonalBest, lastSets, nextTarget, summarise } from '../domain/gym'
 import { bell, unlockAudio } from '../audio'
 import { Screen, Toast } from '../ui'
 import { todayKey } from '../dates'
@@ -125,25 +125,34 @@ export function Workout() {
       {active.entries.map((entry, ei) => {
         const prev = lastSets(state, entry.exerciseId)
         const name = state.exercises[entry.exerciseId]?.name
+        const plan = day?.exercises.find((e) => e.exerciseId === entry.exerciseId)
+        const target = nextTarget(state, entry.exerciseId, plan?.reps, plan?.sets ?? entry.sets.length)
         const ghosts: { weight: string; reps: string }[] = []
         return (
           <div className="ex" key={ei}>
             <div className="ex-head">
               <div>
                 <h3>{name}</h3>
-                <div className="last">{prev.length ? `Last time: ${summarise(prev)}` : 'First time, set your baseline'}</div>
+                <div className="last">{prev.length ? `Last time: ${summarise(prev)}` : `First time, set your baseline${plan?.reps ? ` · aim for ${plan.reps} reps` : ''}`}</div>
+                {target && (
+                  <div className={'target' + (target.up ? ' up' : '')}>
+                    Today: <b>{formatWeight(target.weight)}kg × {target.reps}</b> · {target.why}
+                  </div>
+                )}
               </div>
               <button className="chev" onClick={() => push({ name: 'exercise', id: entry.exerciseId })} aria-label="Progress">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 18l5-6 4 3 7-9" /></svg>
               </button>
             </div>
             {entry.sets.map((set, si) => {
-              // Ghost values: same set last session, else the set above in this session
+              // Ghost values: today's overload target, else the same set last session, else the set above
               const p = prev[si]
               const above = ghosts[si - 1]
-              const ghost = p
-                ? { weight: formatWeight(p.weight), reps: String(p.reps) }
-                : { weight: entry.sets[si - 1]?.weight || above?.weight || '', reps: entry.sets[si - 1]?.reps || above?.reps || '' }
+              const ghost = target
+                ? { weight: formatWeight(target.weight), reps: String(target.reps) }
+                : p
+                  ? { weight: formatWeight(p.weight), reps: String(p.reps) }
+                  : { weight: entry.sets[si - 1]?.weight || above?.weight || '', reps: entry.sets[si - 1]?.reps || above?.reps || '' }
               ghosts[si] = ghost
               return (
                 <div className={'set' + (set.done ? ' done' : '')} key={si}>

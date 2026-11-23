@@ -4,6 +4,7 @@ import { useStore } from '../store'
 import { Back, useNav } from '../nav'
 import { SortableList } from '../ui'
 import { startWorkout } from './Workout'
+import { repRange } from '../domain/gym'
 import type { SplitDay } from '../types'
 
 export function DayEditor({ id }: { id: string }) {
@@ -24,7 +25,7 @@ export function DayEditor({ id }: { id: string }) {
         ex = { id: uid(), name }
         s.exercises[ex.id] = ex
       }
-      s.days.find((d) => d.id === id)!.exercises.push({ exerciseId: ex.id, sets: 3 })
+      s.days.find((d) => d.id === id)!.exercises.push({ exerciseId: ex.id, sets: 3, reps: '8-12' })
     })
     setNewName('')
   }
@@ -58,20 +59,34 @@ export function DayEditor({ id }: { id: string }) {
       <div className="sec">Exercises</div>
       <SortableList
         items={rows}
-        onReorder={(items) => edit((d) => void (d.exercises = items.map(({ exerciseId, sets }) => ({ exerciseId, sets }))))}
+        onReorder={(items) => edit((d) => void (d.exercises = items.map(({ exerciseId, sets, reps }) => ({ exerciseId, sets, reps }))))}
         render={(r) => (
-          <div className="item" style={{ padding: '10px 0' }}>
-            <span className="name">{state.exercises[r.exerciseId]?.name}</span>
-            <div className="seg">
-              <button onClick={() => edit((d) => void (d.exercises[r.i].sets = Math.max(1, r.sets - 1)))}>−</button>
-              <button className="on" style={{ minWidth: 54 }}>{r.sets} sets</button>
-              <button onClick={() => edit((d) => void (d.exercises[r.i].sets = Math.min(10, r.sets + 1)))}>+</button>
+          <div className="item plan-item">
+            <div className="plan-top">
+              <span className="name">{state.exercises[r.exerciseId]?.name}</span>
+              <button className="del" onClick={() => edit((d) => void d.exercises.splice(r.i, 1))} aria-label="Remove">×</button>
             </div>
-            <button className="del" onClick={() => edit((d) => void d.exercises.splice(r.i, 1))} aria-label="Remove">×</button>
+            <div className="plan-row">
+              <div className="seg">
+                <button onClick={() => edit((d) => void (d.exercises[r.i].sets = Math.max(1, r.sets - 1)))}>−</button>
+                <button className="on" style={{ minWidth: 54 }}>{r.sets} sets</button>
+                <button onClick={() => edit((d) => void (d.exercises[r.i].sets = Math.min(10, r.sets + 1)))}>+</button>
+              </div>
+              <span className="sub">×</span>
+              <input
+                className={'reps-in' + (r.reps && !repRange(r.reps) ? ' bad' : '')}
+                value={r.reps ?? ''}
+                placeholder="8-12"
+                onChange={(e) => edit((d) => void (d.exercises[r.i].reps = e.target.value))}
+                aria-label="Target reps"
+              />
+              <span className="sub">reps</span>
+            </div>
           </div>
         )}
       />
       {!rows.length && <div className="empty">No exercises yet. Add one below.</div>}
+      {rows.length > 0 && <p className="note" style={{ marginTop: 10 }}>Use a rep range like 8-12. Hit the top on every set and the next workout tells you to add 2.5kg.</p>}
 
       <div className="row" style={{ marginTop: 14 }}>
         <input

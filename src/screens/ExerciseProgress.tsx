@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { exerciseHistory, formatWeight, summarise, topWeight } from '../domain/gym'
+import { exerciseHistory, formatWeight, nextTarget, summarise, topWeight } from '../domain/gym'
 import { useStore } from '../store'
 import { Back } from '../nav'
 
@@ -47,12 +47,25 @@ export function ExerciseProgress({ id }: { id: string }) {
   const points = inRange.map((h) => ({ t: h.session.end, w: topWeight(h.sets) }))
   const gain = points.length > 1 ? points[points.length - 1].w - points[0].w : 0
   const best = history.length ? Math.max(...history.map((h) => topWeight(h.sets))) : 0
+  // The plan this lift is in, for its rep range
+  const plan = state.days.flatMap((d) => d.exercises).find((e) => e.exerciseId === id)
+  const target = nextTarget(state, id, plan?.reps, plan?.sets ?? 1)
 
   return (
     <div className="screen">
       <div className="topbar"><Back /></div>
       <div className="date" style={{ marginTop: 18 }}>Exercise</div>
       <h1>{ex?.name}</h1>
+
+      {plan && <div className="sub" style={{ marginTop: 2 }}>Plan: {plan.sets} sets × {plan.reps || '—'} reps</div>}
+      {target && (
+        <div className={'card' + (target.up ? ' next' : '')} style={{ marginTop: 14, cursor: 'default' }}>
+          <span className="grow">
+            Next time: {formatWeight(target.weight)}kg × {target.reps}
+            <small>{target.why}</small>
+          </span>
+        </div>
+      )}
 
       <div className="seg" style={{ margin: '12px 0 4px' }}>
         {(Object.keys(RANGES) as Range[]).map((r) => (

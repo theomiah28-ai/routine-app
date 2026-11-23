@@ -29,6 +29,8 @@ export interface Exercise {
 export interface DayExercise {
   exerciseId: string
   sets: number
+  /** Target reps: a range like "8-12" or a fixed number like "5" */
+  reps?: string
 }
 
 export interface SplitDay {

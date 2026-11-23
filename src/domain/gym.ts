@@ -43,3 +43,71 @@ export function isPersonalBest(state: State, exerciseId: string, weight: number)
   const h = exerciseHistory(state, exerciseId)
   return h.length > 0 && weight > Math.max(...h.map((x) => topWeight(x.sets)))
 }
+
+/** "8-12" → [8, 12], "5" → [5, 5]. Null when unset or unreadable. */
+export function repRange(reps: string | undefined): [number, number] | null {
+  const m = reps?.match(/^\s*(\d+)\s*(?:[-–to]+\s*(\d+))?\s*$/)
+  if (!m) return null
+  const lo = +m[1]
+  const hi = m[2] ? +m[2] : lo
+  return lo > 0 && hi >= lo ? [lo, hi] : null
+}
+
+/** The best set of a session: heaviest, then most reps at that weight. */
+export function bestSet(sets: SetLog[]): SetLog {
+  return sets.reduce((b, s) => (s.weight > b.weight || (s.weight === b.weight && s.reps > b.reps) ? s : b), sets[0])
+}
+
+const beats = (a: SetLog, b: SetLog) => a.weight > b.weight || (a.weight === b.weight && a.reps > b.reps)
+
+export interface Target {
+  weight: number
+  reps: number
+  /** Why this is the target */
+  why: string
+  up: boolean
+}
+
+const STEP = 2.5
+
+/**
+ * Progressive overload, double-progression style: work up the rep range at a weight, and once every
+ * set at that weight hits the top of the range, add 2.5kg and start again at the bottom.
+ */
+export function nextTarget(state: State, exerciseId: string, reps: string | undefined, plannedSets: number): Target | null {
+  const last = lastSets(state, exerciseId)
+  if (!last.length) return null
+  const top = topWeight(last)
+  const atTop = last.filter((s) => s.weight === top)
+  const range = repRange(reps)
+  const fewest = Math.min(...atTop.map((s) => s.reps))
+  if (range) {
+    const [lo, hi] = range
+    if (atTop.length >= plannedSets && fewest >= hi) {
+      return { weight: top + STEP, reps: lo, why: `You hit ${hi} reps on every set. Add ${STEP}kg.`, up: true }
+    }
+    return { weight: top, reps: Math.min(hi, Math.max(lo, fewest + 1)), why: `Same weight. Get every set to ${hi} reps, then add weight.`, up: false }
+  }
+  return { weight: top, reps: fewest + 1, why: 'Same weight, one more rep than last time.', up: false }
+}
+
+export type Trend = { kind: 'up'; text: string } | { kind: 'flat'; sessions: number } | { kind: 'new' }
+
+/** Did the best set improve on the session before, and how many sessions has it been stuck? */
+export function trend(state: State, exerciseId: string): Trend {
+  const best = exerciseHistory(state, exerciseId).map((h) => bestSet(h.sets))
+  if (best.length < 2) return { kind: 'new' }
+  const [prev, last] = best.slice(-2)
+  if (beats(last, prev)) {
+    const text = last.weight > prev.weight ? `+${fmt(last.weight - prev.weight)}kg` : `+${last.reps - prev.reps} ${last.reps - prev.reps === 1 ? 'rep' : 'reps'}`
+    return { kind: 'up', text }
+  }
+  // Sessions since the best set last beat everything before it
+  let n = 0
+  for (let i = best.length - 1; i > 0; i--) {
+    const before = best.slice(0, i).reduce((b, s) => (beats(s, b) ? s : b))
+    if (beats(best[i], before)) break
+    n++
+  }
+  return { kind: 'flat', sessions: n }
+}
