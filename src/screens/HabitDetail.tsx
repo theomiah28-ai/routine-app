@@ -1,6 +1,6 @@
 import { addDays, todayKey, weekStart } from '../dates'
-import { bestStreak, isChecked, isScheduled } from '../domain/streaks'
-import { habitStreak } from '../domain/progression'
+import { isChecked, isScheduled } from '../domain/streaks'
+import { DayStats } from './DayStats'
 import { useStore } from '../store'
 import { Back, useNav } from '../nav'
 
@@ -32,16 +32,9 @@ export function HabitDetail({ id }: { id: string }) {
       <div className="date" style={{ marginTop: 18 }}>{quit ? 'Quit' : 'Build'}</div>
       <h1>{habit.name}</h1>
 
-      <div className="stats" style={{ marginTop: 16 }}>
-        <div className="stat">
-          <b className={quit ? 'quit-c' : 'acc'}>{habitStreak(state, habit, today)}</b>
-          <span>{quit ? 'days clean' : 'day streak'}</span>
-        </div>
-        <div className="stat"><b>{habit.link === 'transmutation' ? Math.max(state.transmutation.longestDays, habitStreak(state, habit, today)) : bestStreak(habit, state.checks, today)}</b><span>best streak</span></div>
-        <div className="stat"><b>{scheduled ? Math.round((done / scheduled) * 100) : 0}%</b><span>last 13 weeks</span></div>
-      </div>
+      <DayStats habit={habit} word={quit ? 'clean day' : 'day'} />
 
-      <div className="sec">Last 13 weeks</div>
+      <div className="sec">Last 13 weeks · {scheduled ? Math.round((done / scheduled) * 100) : 0}% done</div>
       <div className={'grid' + (quit ? ' quit' : '')}>
         {cells.map((c, i) => <i key={i} className={c} />)}
       </div>

@@ -6,6 +6,7 @@ import { useStore } from '../store'
 import { Back, useNav } from '../nav'
 import { Lungs } from '../symbols/Lungs'
 import { Check, Screen } from '../ui'
+import { DayRow } from './DayStats'
 
 const LINE = {
   healthy: 'Breathing easy. Your lungs are healing every clean day.',
@@ -60,6 +61,9 @@ export function Health() {
               </div>
             )
           })}
+
+          <div className="sec">Days clean</div>
+          {habits.map((h) => <DayRow key={h.id} habit={h} />)}
 
           <div className="sec">Last 14 days</div>
           <div className="day-dots">

@@ -7,6 +7,7 @@ import { useStore } from '../store'
 import { Back, useNav } from '../nav'
 import { Eye } from '../symbols/Eye'
 import { Check, Screen } from '../ui'
+import { DayStats } from './DayStats'
 
 export function formatMinutes(m: number) {
   const h = Math.floor(m / 60)
@@ -24,6 +25,7 @@ export function Stillness() {
   const today = todayKey()
   const done = sitDoneOn(s, today)
   const streak = sitStreak(s, today)
+  const habit = state.habits.find((h) => h.link === 'stillness')
 
   const breaths = BREATHS.filter((b) => b.intents.includes(intent))
   const visuals = VISUALISATIONS.filter((v) => v.intents.includes(intent))
@@ -43,6 +45,13 @@ export function Stillness() {
         </div>
         {eye.nextAt !== null && <div className="sub" style={{ fontSize: 12, color: 'var(--faint)', marginTop: 2 }}>The eye opens further at {formatMinutes(eye.nextAt)}</div>}
       </div>
+
+      {habit && (
+        <>
+          <div className="sec">Meditation days · {habit.name}</div>
+          <DayStats habit={habit} />
+        </>
+      )}
 
       <div className="sit-card">
         <div className="row">

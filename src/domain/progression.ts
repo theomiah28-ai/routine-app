@@ -1,6 +1,6 @@
 import { ASCENT } from '../content/ascent'
-import { dateKey } from '../dates'
-import { currentStreak } from './streaks'
+import { addDays, dateKey } from '../dates'
+import { bestStreak, currentStreak, isChecked, isScheduled } from './streaks'
 import { EYE_STAGES, eyeStage } from './stillness'
 import { LUNG_NAMES, healthStreak, lungScore, lungState } from './health'
 import { MOON_NAMES, moonState, sleepScore, sleepStreak } from './sleep'
@@ -173,3 +173,29 @@ export function linkChangeImpact(s: State, habitId: string | undefined, link: Ha
 }
 
 const fmtH = (m: number) => `${Math.round((m / 60) * 10) / 10}h`
+
+export interface HabitDays {
+  /** The run going right now */
+  current: number
+  best: number
+  /** Every day it was ticked, ever */
+  total: number
+  /** First day of the current run, or null when there isn't one */
+  since: string | null
+}
+
+/** How long you've kept a habit going: the current run, the best run, all-time days and when this run began. */
+export function habitDays(s: State, h: Habit, today: string): HabitDays {
+  const current = habitStreak(s, h, today)
+  const best = h.link === 'transmutation' ? Math.max(s.transmutation.longestDays, current) : bestStreak(h, s.checks, today)
+  let total = 0
+  for (const [k, ids] of Object.entries(s.checks)) if (k >= h.createdAt && k <= today && ids.includes(h.id)) total++
+  let since: string | null = null
+  let key = isScheduled(h, today) && !isChecked(s.checks, h.id, today) ? addDays(today, -1) : today
+  for (let n = 0; n < current; key = addDays(key, -1)) {
+    if (!isScheduled(h, key)) continue
+    since = key
+    n++
+  }
+  return { current, best: Math.max(best, current), total, since }
+}

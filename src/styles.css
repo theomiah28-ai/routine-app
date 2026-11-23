@@ -454,3 +454,11 @@ textarea.input { resize: none; min-height: 90px; line-height: 1.45; }
 .trend.up { color: var(--gold); }
 .trend.flat { color: var(--danger); opacity: 0.85; }
 .trend.new { color: var(--faint); }
+
+/* Day counters: how long each habit has gone */
+.day-row { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.day-row > div { flex: 1; min-width: 0; }
+.day-row b { display: block; font-size: 16px; font-weight: 600; }
+.day-row small { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+.day-count { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; text-align: right; line-height: 1; font-variant-numeric: tabular-nums; }
+.day-count small { font-size: 11px; font-weight: 600; color: var(--muted); margin-top: 3px; }

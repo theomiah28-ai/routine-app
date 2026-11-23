@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ascentDays, meditationMinutes, relapseToday, sectionProgress, statuePoints, statueStage } from './progression'
+import { ascentDays, habitDays, meditationMinutes, relapseToday, sectionProgress, statuePoints, statueStage } from './progression'
 import { eyeStage } from './stillness'
 import { seedState } from '../seed'
 import { addDays, parseKey, todayKey } from '../dates'
@@ -112,4 +112,30 @@ describe('minor fixes', () => {
     expect(statuePoints(s)).toBe(6)
   })
 
+})
+
+describe('habitDays', () => {
+  const today = todayKey()
+  const h = (extra: Partial<Habit> = {}): Habit => ({ id: 'h', name: 'No vaping', kind: 'quit', days: [], createdAt: addDays(today, -30), timeOfDay: 'anytime', ...extra })
+  const withTicks = (days: number[]) => {
+    const s = seedState()
+    s.habits = [h()]
+    for (const d of days) s.checks[addDays(today, -d)] = ['h']
+    return s
+  }
+
+  it('counts the current run, when it began, the best run and all-time days', () => {
+    // Clean 20–15 days ago, slipped, then clean the last 5 days (today not ticked yet)
+    const s = withTicks([20, 19, 18, 17, 16, 15, 5, 4, 3, 2, 1])
+    expect(habitDays(s, s.habits[0], today)).toEqual({ current: 5, best: 6, total: 11, since: addDays(today, -5) })
+  })
+
+  it('today ticked starts the run today', () => {
+    const s = withTicks([0])
+    expect(habitDays(s, s.habits[0], today)).toMatchObject({ current: 1, since: today })
+  })
+
+  it('no run means no start date', () => {
+    expect(habitDays(withTicks([10]), h(), today)).toMatchObject({ current: 0, since: null, total: 1 })
+  })
 })

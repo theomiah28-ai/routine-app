@@ -8,6 +8,7 @@ import { uid } from '../seed'
 import { useStore } from '../store'
 import { Back, useNav } from '../nav'
 import { Ascent } from '../symbols/Ascent'
+import { DayStats } from './DayStats'
 import { Check, GoldButton, Screen, Sheet } from '../ui'
 
 export function useNow(intervalMs = 30_000) {
@@ -71,6 +72,7 @@ export function Transmutation() {
       ) : (
         <div className="sub" style={{ marginTop: 8, color: 'var(--gold)' }}>Mastery reached</div>
       )}
+      {habit && <DayStats habit={habit} word="clean day" noCurrent />}
 
       {habit && !relapsedToday && (
         <button className={'card' + (tickedToday ? ' glow' : '')} style={{ marginTop: 16 }} onClick={tickToday}>
