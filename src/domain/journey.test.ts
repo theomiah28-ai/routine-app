@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { beginJourney, journeyStarted } from './journey'
+import { beginJourney, journeyStarted, resetProgress } from './journey'
 import { seedState } from '../seed'
 import { addDays, todayKey } from '../dates'
 
@@ -25,5 +25,31 @@ describe('begin your journey', () => {
   it('beginning twice keeps the first start', () => {
     const s = beginJourney(seedState(), addDays(today, -3))
     expect(beginJourney(s, today).settings.journeyStart).toBe(addDays(today, -3))
+  })
+})
+
+describe('start again from day 1', () => {
+  it('clears all progress but keeps the routine and gym plan', () => {
+    const s = beginJourney(seedState(), addDays(today, -30))
+    s.settings.name = 'Theo'
+    s.settings.onboarded = true
+    s.habits = [{ id: 'a', name: 'No PMO', kind: 'quit', days: [], createdAt: addDays(today, -30), timeOfDay: 'anytime', link: 'transmutation' }]
+    s.checks = { [addDays(today, -1)]: ['a'] }
+    s.days = [{ id: 'up', name: 'Upper', exercises: [{ exerciseId: 'bp', sets: 3, reps: '8-12' }] }]
+    s.sessions = [{ id: 's', dayId: 'up', dayName: 'Upper', start: 1, end: 2, entries: [] }]
+    s.milestones = [{ id: 'm', section: 'gym', title: 't', value: 'v', at: 1, seen: true }]
+    s.transmutation = { start: null, longestDays: 40, relapses: [1] }
+    s.stillness = { sitMinutes: 20, logs: [{ kind: 'sit', start: 1, minutes: 20 } as never] }
+
+    const r = resetProgress(s, today, Date.now())
+    expect(journeyStarted(r)).toBe(false)
+    expect(r.checks).toEqual({})
+    expect(r.sessions).toEqual([])
+    expect(r.milestones).toEqual([])
+    expect(r.transmutation).toEqual({ start: null, longestDays: 0, relapses: [] })
+    expect(r.stillness).toEqual({ sitMinutes: 20, logs: [] })
+    expect(r.habits.map((h) => h.name)).toEqual(['No PMO'])
+    expect(r.days).toEqual(s.days)
+    expect(r.settings).toMatchObject({ name: 'Theo', onboarded: true })
   })
 })

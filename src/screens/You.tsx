@@ -6,6 +6,7 @@ import { del } from 'idb-keyval'
 import { pushRemote, signOut } from '../cloud'
 import { useAccount } from '../account'
 import { todayKey } from '../dates'
+import { resetProgress } from '../domain/journey'
 import { useStore } from '../store'
 import { useNav } from '../nav'
 import { Screen, Sheet, Stepper, Toggle } from '../ui'
@@ -39,7 +40,7 @@ export function You() {
     await signOut()
     location.reload()
   }
-  const { push } = useNav()
+  const { push, switchTab } = useNav()
   const file = useRef<HTMLInputElement>(null)
   const [guide, setGuide] = useState(false)
   const set = state.settings
@@ -145,6 +146,20 @@ export function You() {
         }}
       />
       <button className="add-row" style={{ marginTop: 6 }} onClick={() => setGuide(true)}>Get the new name and icon on your home screen ›</button>
+
+      <div className="sec">Start again</div>
+      <p className="note">Clears every tick, streak, workout and milestone. Your habits and gym plan stay, ready for you to begin your journey again.</p>
+      <button
+        className="btn danger"
+        style={{ marginTop: 12 }}
+        onClick={() => {
+          if (!confirm('Start again from day 1? All your progress is wiped. Your habits and gym plan stay.')) return
+          replace(resetProgress(state, todayKey(), Date.now()))
+          switchTab('today')
+        }}
+      >
+        Start again from day 1
+      </button>
 
       <p className="hint" style={{ marginTop: 26 }}>{APP_NAME} · v{APP_VERSION} · by Foundry</p>
 
