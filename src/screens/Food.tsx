@@ -4,7 +4,8 @@ import { useNow } from './Transmutation'
 import { useStore } from '../store'
 import { useNav } from '../nav'
 import { Check, Ring } from '../ui'
-import { MAX_TOPUPS, SLOTS, WATER_STEP, active, dayScore, editFoodDay, foodTargets, formatLitres, macroLine, scoreLabel, suppStreak, totals } from '../domain/food'
+import { MAX_TOPUPS, SLOTS, WATER_STEP, active, dayScore, editFoodDay, foodTargets, formatLitres, macroLine, nutrientTargets, nutrientTotals, scoreLabel, suppStreak, totals } from '../domain/food'
+import { NUTRIENTS, NUTRIENT_GROUPS, formatAmount } from '../domain/nutrients'
 import type { FoodDay, FoodSlot } from '../types'
 
 export function Food() {
@@ -25,6 +26,9 @@ export function Food() {
   const pick = (slot: FoodSlot, id: string) => edit((d) => void (d[slot] = d[slot] === id ? null : id))
   const count = (id: string, by: number) => edit((d) => void (d.counters[id] = Math.max(0, Math.min(MAX_TOPUPS, (d.counters[id] ?? 0) + by))))
   const water = log?.waterMl ?? 0
+  const nut = nutrientTotals(food, log)
+  const nutTarget = nutrientTargets(food)
+  const nutHit = NUTRIENTS.filter((n) => nutTarget[n.key] > 0 && nut[n.key] >= nutTarget[n.key])
 
   const macros: { label: string; got: number; target: number }[] = [
     { label: 'Protein', got: t.protein, target: targets.protein },
@@ -69,6 +73,9 @@ export function Food() {
             <div className="jr-bar"><i style={{ width: `${m.target ? Math.min(100, (m.got / m.target) * 100) : 0}%`, opacity: m.got ? 1 : 0 }} /></div>
           </div>
         ))}
+        <div className="sub" style={{ marginTop: 12, fontSize: 12 }}>
+          Nutrients: <b style={{ color: 'var(--text)' }}>{nutHit.length} of {NUTRIENTS.length}</b> on target
+        </div>
       </div>
 
       {SLOTS.map((slot) => {
@@ -139,6 +146,34 @@ export function Food() {
           <button className="on" onClick={() => edit((d) => void (d.waterMl += WATER_STEP))}>+{WATER_STEP}ml</button>
         </div>
       </div>
+
+      <div className="sec">Nutrients</div>
+      <p className="note" style={{ margin: '0 0 4px' }}>From what you ate and the supplements you ticked. Estimates, good for spotting gaps.</p>
+      {NUTRIENT_GROUPS.map((g) => (
+        <div key={g.title} className="nut-group">
+          <div className="label gold" style={{ marginTop: 14 }}>{g.title}</div>
+          {g.items.map((n) => {
+            const got = nut[n.key]
+            const target = nutTarget[n.key]
+            const hit = target > 0 && got >= target
+            return (
+              <div key={n.key} className={'macro nut' + (hit ? ' hit' : '')}>
+                <div className="macro-top">
+                  <span>
+                    {n.name}
+                    <small className="sub"> · {n.why}</small>
+                  </span>
+                  <span className={hit ? 'acc' : 'sub'}>
+                    {formatAmount(got)} / {formatAmount(target)}
+                    {n.unit}
+                  </span>
+                </div>
+                <div className="jr-bar"><i style={{ width: `${target ? Math.min(100, (got / target) * 100) : 0}%`, opacity: got ? 1 : 0 }} /></div>
+              </div>
+            )
+          })}
+        </div>
+      ))}
     </div>
   )
 }

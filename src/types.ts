@@ -167,6 +167,14 @@ export interface Settings {
   foodTargets?: Macros
 }
 
+export type NutrientKey =
+  | 'zinc' | 'vitaminD' | 'magnesium' | 'vitaminA'
+  | 'selenium' | 'iodine' | 'iron'
+  | 'omega3' | 'choline' | 'b12' | 'folate' | 'b6'
+  | 'potassium' | 'vitaminC' | 'calcium' | 'fibre'
+
+export type Nutrients = Partial<Record<NutrientKey, number>>
+
 export type FoodSlot = 'preworkout' | 'breakfast' | 'lunch' | 'dinner'
 
 export interface Macros {
@@ -180,6 +188,8 @@ export interface Meal extends Macros {
   id: string
   name: string
   ingredients: string
+  /** Micronutrients per portion */
+  nutrients?: Nutrients
   /** Deleted from the menu; kept so past days keep their totals */
   archived?: boolean
 }
@@ -190,6 +200,8 @@ export interface Supplement {
   note?: string
   /** Doesn't count against the daily score when not ticked */
   optional?: boolean
+  /** What one dose adds */
+  nutrients?: Nutrients
   archived?: boolean
 }
 
@@ -211,6 +223,8 @@ export interface FoodState {
   counters: Meal[]
   supplements: Supplement[]
   waterGoalMl: number
+  /** Daily micronutrient targets */
+  nutrientTargets?: Record<NutrientKey, number>
   /** dateKey → what was eaten */
   log: Record<string, FoodDay>
 }

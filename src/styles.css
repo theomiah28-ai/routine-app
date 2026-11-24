@@ -487,3 +487,14 @@ textarea.input { resize: none; min-height: 90px; line-height: 1.45; }
 .macro-in label { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; color: var(--muted); font-weight: 600; }
 .macro-in .num { width: 100%; }
 .setting .num { width: 76px; }
+.nut .macro-top small { font-size: 11px; font-weight: 500; }
+.nut.hit .jr-bar i { box-shadow: 0 0 6px rgba(var(--accent-rgb), 0.5); }
+.nut-edit summary { list-style: none; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--accent); padding: 4px 0; }
+.nut-edit summary::-webkit-details-marker { display: none; }
+.nut-edit summary::after { content: ' ›'; }
+.nut-edit[open] summary::after { content: ' ⌄'; }
+.nut-in { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; margin-top: 8px; }
+.nut-in label { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 12px; color: var(--soft); }
+.nut-in label i { font-style: normal; color: var(--faint); }
+.nut-in .num { width: 62px; font-size: 14px; padding: 6px; }
+.nut .macro-top > span:last-child { white-space: nowrap; padding-left: 8px; }

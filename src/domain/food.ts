@@ -1,5 +1,6 @@
 import { addDays } from '../dates'
-import type { FoodDay, FoodSlot, FoodState, Macros, Meal, State, Supplement } from '../types'
+import { DEFAULT_MEAL_NUTRIENTS, DEFAULT_SUPP_NUTRIENTS, NUTRIENTS, defaultNutrientTargets } from './nutrients'
+import type { FoodDay, FoodSlot, FoodState, Macros, Meal, NutrientKey, Nutrients, State, Supplement } from '../types'
 
 export const SLOTS: { key: FoodSlot; title: string }[] = [
   { key: 'preworkout', title: 'Pre-workout' },
@@ -14,7 +15,7 @@ export const WATER_STEP = 750
 /** Protein that counts as a high-protein day on Today */
 export const HIGH_PROTEIN_G = 150
 
-const meal = (id: string, name: string, ingredients: string, kcal: number, protein: number, carbs: number, fat: number): Meal => ({ id, name, ingredients, kcal, protein, carbs, fat })
+const meal = (id: string, name: string, ingredients: string, kcal: number, protein: number, carbs: number, fat: number): Meal => ({ id, name, ingredients, kcal, protein, carbs, fat, nutrients: { ...DEFAULT_MEAL_NUTRIENTS[id] } })
 
 export function defaultFood(): FoodState {
   return {
@@ -39,11 +40,12 @@ export function defaultFood(): FoodState {
       meal('extra-sourdough', 'Extra Sourdough Slice', '1 slice', 120, 4, 24, 1),
     ],
     supplements: [
-      { id: 'creatine', name: 'Creatine 5g' },
-      { id: 'vitamin-d3', name: 'Vitamin D3 10µg', note: 'Take with a meal containing fat' },
-      { id: 'magnesium', name: 'Magnesium', note: 'Evening', optional: true },
+      { id: 'creatine', name: 'Creatine 5g', nutrients: {} },
+      { id: 'vitamin-d3', name: 'Vitamin D3 10µg', note: 'Take with a meal containing fat', nutrients: { ...DEFAULT_SUPP_NUTRIENTS['vitamin-d3'] } },
+      { id: 'magnesium', name: 'Magnesium', note: 'Evening', optional: true, nutrients: { ...DEFAULT_SUPP_NUTRIENTS.magnesium } },
     ],
     waterGoalMl: 3000,
+    nutrientTargets: defaultNutrientTargets(),
     log: {},
   }
 }
@@ -52,7 +54,31 @@ export function defaultFood(): FoodState {
 export function withFoodDefaults(food: Partial<FoodState> | undefined): FoodState {
   const def = defaultFood()
   if (!food) return def
-  return { ...def, ...food, meals: { ...def.meals, ...food.meals } }
+  const out: FoodState = structuredClone({ ...def, ...food, meals: { ...def.meals, ...food.meals } })
+  // Nutrients arrived after the menu: fill them in for the seeded items that don't have any yet
+  for (const m of [...Object.values(out.meals).flat(), ...out.counters]) if (!m.nutrients && DEFAULT_MEAL_NUTRIENTS[m.id]) m.nutrients = { ...DEFAULT_MEAL_NUTRIENTS[m.id] }
+  for (const x of out.supplements) if (!x.nutrients && DEFAULT_SUPP_NUTRIENTS[x.id]) x.nutrients = { ...DEFAULT_SUPP_NUTRIENTS[x.id] }
+  out.nutrientTargets = { ...defaultNutrientTargets(), ...out.nutrientTargets }
+  return out
+}
+
+export const nutrientTargets = (food: FoodState) => food.nutrientTargets ?? defaultNutrientTargets()
+
+/** Micronutrients for a day: meals and top-ups eaten, plus supplements ticked. */
+export function nutrientTotals(food: FoodState, day: FoodDay | undefined): Record<NutrientKey, number> {
+  const t = Object.fromEntries(NUTRIENTS.map((n) => [n.key, 0])) as Record<NutrientKey, number>
+  if (!day) return t
+  const add = (n: Nutrients | undefined, times: number) => {
+    if (!n || times <= 0) return
+    for (const [k, v] of Object.entries(n) as [NutrientKey, number][]) if (k in t) t[k] += (v || 0) * times
+  }
+  for (const slot of SLOTS) {
+    const id = day[slot.key]
+    if (id) add(findMeal(food, id)?.nutrients, 1)
+  }
+  for (const [id, n] of Object.entries(day.counters)) add(findMeal(food, id)?.nutrients, n)
+  for (const x of food.supplements) if (day.supplements[x.id]) add(x.nutrients, 1)
+  return t
 }
 
 export const emptyDay = (): FoodDay => ({ preworkout: null, breakfast: null, lunch: null, dinner: null, counters: {}, supplements: {}, waterMl: 0 })

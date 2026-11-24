@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_TARGETS, dayScore, defaultFood, editFoodDay, emptyDay, fuelDays, fuelStage, fuelStreak, scoreLabel, suppStreak, totals } from './food'
+import { DEFAULT_TARGETS, dayScore, defaultFood, editFoodDay, emptyDay, fuelDays, fuelStage, fuelStreak, nutrientTotals, scoreLabel, suppStreak, totals } from './food'
 import { migrate } from '../migrate'
 import { seedState } from '../seed'
 import { addDays, todayKey } from '../dates'
@@ -172,5 +172,34 @@ describe('Fuel', () => {
     f.log = { [addDays(today, -2)]: day({ supplements: { creatine: true } }), [addDays(today, -1)]: day({ supplements: { creatine: true } }) }
     expect(suppStreak(f, 'creatine', today)).toBe(2)
     expect(suppStreak(f, 'magnesium', today)).toBe(0)
+  })
+})
+
+describe('nutrients', () => {
+  it('adds up meals, top-ups and ticked supplements', () => {
+    const f = defaultFood()
+    const n = nutrientTotals(f, day({ breakfast: 'eggs-shake', lunch: 'shrimp-rice', counters: { 'whey-shake': 2 }, supplements: { 'vitamin-d3': true } }))
+    // 3 eggs + butter + D3
+    expect(n.vitaminD).toBeCloseTo(3 * 1.1 + 0.15 + 10)
+    expect(n.omega3).toBe(3 * 30 + 700)
+    expect(n.calcium).toBeCloseTo(3 * 28 + 2 + 25 + 120 + 175 + 15 + 35 + 2 * 120)
+    // Magnesium unticked adds nothing
+    expect(nutrientTotals(f, day({ supplements: { magnesium: true } })).magnesium).toBe(200)
+  })
+
+  it('a menu saved before nutrients gets them, without touching edited ones', () => {
+    const s = seedState() as unknown as Record<string, any>
+    s.settings.onboarded = true
+    for (const m of [...Object.values(s.food.meals).flat(), ...s.food.counters] as any[]) delete m.nutrients
+    for (const x of s.food.supplements) delete x.nutrients
+    delete s.food.nutrientTargets
+    s.food.meals.lunch[0].kcal = 700
+    s.food.meals.dinner[0].nutrients = { zinc: 99 }
+    const n = migrate(JSON.parse(JSON.stringify(s)), Date.now())
+    expect(n.food.meals.lunch[0].kcal).toBe(700)
+    expect(n.food.meals.lunch[0].nutrients?.selenium).toBeGreaterThan(0)
+    expect(n.food.meals.dinner[0].nutrients).toEqual({ zinc: 99 })
+    expect(n.food.supplements.find((x) => x.id === 'vitamin-d3')?.nutrients).toEqual({ vitaminD: 10 })
+    expect(n.food.nutrientTargets?.omega3).toBe(500)
   })
 })

@@ -2,8 +2,9 @@ import { uid } from '../seed'
 import { useStore } from '../store'
 import { Back } from '../nav'
 import { SortableList, Toggle } from '../ui'
-import { DEFAULT_TARGETS, SLOTS, active } from '../domain/food'
-import type { FoodState, Macros, Meal, State, Supplement } from '../types'
+import { DEFAULT_TARGETS, SLOTS, active, nutrientTargets } from '../domain/food'
+import { NUTRIENTS, NUTRIENT_GROUPS } from '../domain/nutrients'
+import type { FoodState, Macros, Meal, NutrientKey, Nutrients, State, Supplement } from '../types'
 
 const MACROS: { key: keyof Macros; label: string; unit: string }[] = [
   { key: 'kcal', label: 'Calories', unit: 'kcal' },
@@ -15,6 +16,24 @@ const MACROS: { key: keyof Macros; label: string; unit: string }[] = [
 const num = (v: string) => {
   const n = parseFloat(v.replace(',', '.'))
   return Number.isFinite(n) && n >= 0 ? n : 0
+}
+
+/** Collapsible per-portion nutrient inputs for a meal, top-up or supplement. */
+function NutrientInputs({ value, onChange }: { value: Nutrients | undefined; onChange: (k: NutrientKey, v: number) => void }) {
+  const filled = NUTRIENTS.filter((n) => (value?.[n.key] ?? 0) > 0).length
+  return (
+    <details className="nut-edit">
+      <summary>Nutrients <span className="sub">· {filled} of {NUTRIENTS.length} filled</span></summary>
+      <div className="nut-in">
+        {NUTRIENTS.map((n) => (
+          <label key={n.key}>
+            <span>{n.name} <i>{n.unit}</i></span>
+            <input className="num" inputMode="decimal" defaultValue={value?.[n.key] ? String(value[n.key]) : ''} placeholder="0" onChange={(e) => onChange(n.key, num(e.target.value))} />
+          </label>
+        ))}
+      </div>
+    </details>
+  )
 }
 
 /** Where a meal list lives: one of the four slots, or the top-ups. */
@@ -59,6 +78,7 @@ export function FoodEdit() {
                   </label>
                 ))}
               </div>
+              <NutrientInputs value={m.nutrients} onChange={(k, v) => change(m.id, (x) => void (x.nutrients = { ...x.nutrients, [k]: v }))} />
             </div>
           )}
         />
@@ -99,6 +119,30 @@ export function FoodEdit() {
         </span>
       </div>
 
+      <details className="nut-edit" style={{ marginTop: 4 }}>
+        <summary>Nutrient targets</summary>
+        {NUTRIENT_GROUPS.map((g) => (
+          <div key={g.title}>
+            <div className="label gold" style={{ margin: '12px 0 6px' }}>{g.title}</div>
+            {g.items.map((n) => (
+              <div key={n.key} className="setting">
+                <span>{n.name}</span>
+                <span className="row" style={{ gap: 6, alignItems: 'center' }}>
+                  <input
+                    className="num"
+                    inputMode="decimal"
+                    defaultValue={String(nutrientTargets(food)[n.key])}
+                    onChange={(e) => editFood((f) => void (f.nutrientTargets = { ...nutrientTargets(f), [n.key]: num(e.target.value) }))}
+                    aria-label={`${n.name} target`}
+                  />
+                  <span className="sub" style={{ width: 30 }}>{n.unit}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        ))}
+      </details>
+
       {SLOTS.map((slot) => mealSection(slot.title, { get: (f) => f.meals[slot.key], set: (f, l) => void (f.meals[slot.key] = l) }))}
       {mealSection('Top-ups', { get: (f) => f.counters, set: (f, l) => void (f.counters = l) })}
 
@@ -123,6 +167,7 @@ export function FoodEdit() {
               <span className="sub">Optional: doesn't count against the score</span>
               <Toggle on={!!x.optional} onChange={(v) => changeSupp(x.id, (y) => void (y.optional = v || undefined))} />
             </div>
+            <NutrientInputs value={x.nutrients} onChange={(k, v) => changeSupp(x.id, (y) => void (y.nutrients = { ...y.nutrients, [k]: v }))} />
           </div>
         )}
       />
