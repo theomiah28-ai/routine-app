@@ -25,12 +25,6 @@ export function Health() {
   const streak = healthStreak(state, today)
   const days = Array.from({ length: 14 }, (_, i) => addDays(today, i - 13))
 
-  const toggle = (id: string) =>
-    update((s) => {
-      const list = s.checks[today] ?? []
-      s.checks[today] = list.includes(id) ? list.filter((x) => x !== id) : [...list, id]
-    })
-
   const addHabit = (name: string) =>
     update((s) => void s.habits.push({ id: uid(), name, kind: 'quit', days: [], createdAt: today, timeOfDay: 'anytime', link: 'health' }))
 
@@ -56,7 +50,7 @@ export function Health() {
             const done = isChecked(state.checks, h.id, today)
             return (
               <div key={h.id} className={'item quit' + (done ? ' done' : '')}>
-                <Check on={done} onClick={() => toggle(h.id)} />
+                <Check on={done} />
                 <span className="name">{h.name}</span>
               </div>
             )
@@ -72,7 +66,7 @@ export function Health() {
               return <i key={k} className={(c ? 'clean' : c === false && k < today ? 'miss' : '') + (k === today ? ' today' : '')} />
             })}
           </div>
-          <p className="note" style={{ marginTop: 10 }}>Recent days count most. A clean day heals; a missed one shows straight away.</p>
+          <p className="note" style={{ marginTop: 10 }}>Tick them on Today. Recent days count most. A clean day heals; a missed one shows straight away.</p>
         </>
       ) : (
         <>

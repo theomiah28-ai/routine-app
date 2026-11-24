@@ -9,7 +9,7 @@ import { completion } from '../domain/completion'
 import { useStore } from '../store'
 import { useNav, type Route } from '../nav'
 import { AddHabitButton, Check, Ring, Screen, SortableList } from '../ui'
-import { GROUPS, type Group } from './groups'
+import { GROUPS, GROWS, scheduleText, type Group } from './groups'
 import type { Habit } from '../types'
 
 
@@ -67,6 +67,12 @@ function Tracking() {
         {!editing && (reset ? <span className="chk" style={{ opacity: 0.35 }} /> : <Check on={done} onClick={() => toggle(h.id)} />)}
         <button className="name" onClick={() => push(editing ? { name: 'habitEdit', id: h.id } : { name: 'habit', id: h.id })}>
           {h.name}
+          {editing && (
+            <small className="edit-sub">
+              {scheduleText(h)}
+              {h.link && <span> · {GROWS[h.link]}</span>}
+            </small>
+          )}
         </button>
         {editing ? <span className="chev">›</span> : reset ? <span className="streak zero">reset</span> : <span className={'streak' + (streak ? '' : ' zero')}>{streak}d</span>}
       </div>
@@ -80,11 +86,18 @@ function Tracking() {
     <Screen>
       <div className="topbar">
         <span className="date">{formatLong(key)}</span>
-        <button className="link" onClick={() => setEditing(!editing)}>{editing ? 'Done' : 'Edit'}</button>
+        <button className="link" onClick={() => setEditing(!editing)}>{editing ? 'Save' : 'Edit'}</button>
       </div>
 
       {editing ? (
-        <h1>Edit routine</h1>
+        <>
+          <h1>Edit routine</h1>
+          <ul className="edit-help">
+            <li>Tap a habit to rename it, change its days or delete it</li>
+            <li>Drag ⋮⋮ to reorder</li>
+            <li>Add new habits under each section</li>
+          </ul>
+        </>
       ) : (
         <>
           <h1 style={{ marginBottom: 16 }}>
@@ -120,14 +133,21 @@ function Tracking() {
             {items.length > 0 ? (
               <SortableList items={items} onReorder={(i) => reorder(g, i)} render={row} handle={editing} />
             ) : (
-              <div className="group-empty">{g.key === 'quit' ? 'Nothing to quit yet.' : `No ${g.title.toLowerCase()} habits${day === 'today' ? ' today' : ''}.`}</div>
+              <div className="group-empty">{g.key === 'quit' ? 'Nothing to quit yet.' : `No ${g.title.toLowerCase()} habits${editing ? ' yet' : day === 'today' ? ' today' : ''}.`}</div>
             )}
-            {!editing && <AddHabitButton label={g.add} onClick={() => push({ name: 'habitEdit', ...g.preset })} />}
+            {editing && <AddHabitButton label={g.add} onClick={() => push({ name: 'habitEdit', ...g.preset })} />}
           </div>
         )
       })}
 
-      {visible.length > 1 && <p className="hint">{editing ? 'Drag ⋮⋮ to reorder' : 'Press and hold a habit, then drag to reorder'}</p>}
+      {!editing && visible.length > 1 && <p className="hint">Press and hold a habit, then drag to reorder</p>}
+
+      {editing && <div style={{ height: 76 }} />}
+      {editing && (
+        <div className="dock over-tabs">
+          <button className="btn" onClick={() => setEditing(false)}>Save routine</button>
+        </div>
+      )}
 
     </Screen>
   )

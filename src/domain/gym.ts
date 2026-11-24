@@ -1,4 +1,4 @@
-import { dateKey, todayKey, weekStart } from '../dates'
+import { addDays, dateKey, todayKey, weekStart } from '../dates'
 import type { SetLog, Session, State } from '../types'
 
 /** Sessions (oldest first) that include this exercise, with only that exercise's sets. */
@@ -110,4 +110,29 @@ export function trend(state: State, exerciseId: string): Trend {
     n++
   }
   return { kind: 'flat', sessions: n }
+}
+
+/** Sessions in each of the last `n` weeks (Monday start), oldest first. */
+export function weeklySessions(sessions: Session[], today: string, n: number): { week: string; count: number }[] {
+  const thisWeek = weekStart(today)
+  return Array.from({ length: n }, (_, i) => {
+    const week = addDays(thisWeek, (i - n + 1) * 7)
+    const end = addDays(week, 7)
+    return { week, count: sessions.filter((s) => { const k = dateKey(new Date(s.end)); return k >= week && k < end }).length }
+  })
+}
+
+/** Total kg moved in a session: weight × reps over every set. */
+export const sessionVolume = (s: Session) => s.entries.reduce((t, e) => t + e.sets.reduce((u, x) => u + x.weight * x.reps, 0), 0)
+
+/** Each logged lift's best set the first time and the latest time, most-trained first. */
+export function strengthGains(state: State) {
+  return Object.values(state.exercises)
+    .map((e) => {
+      const h = exerciseHistory(state, e.id)
+      if (!h.length) return null
+      return { id: e.id, name: e.name, sessions: h.length, first: bestSet(h[0].sets), last: bestSet(h[h.length - 1].sets) }
+    })
+    .filter((x): x is NonNullable<typeof x> => x !== null)
+    .sort((a, b) => b.sessions - a.sessions)
 }

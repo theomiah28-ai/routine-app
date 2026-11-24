@@ -11,3 +11,11 @@ export const GROUPS: Group[] = [
   { key: 'evening', title: 'Evening', add: 'Add evening habit', preset: { timeOfDay: 'evening', kind: 'build' }, icon: <Moon />, match: (h) => h.kind === 'build' && h.timeOfDay === 'evening' },
   { key: 'quit', title: 'Quit', add: 'Add habit to quit', preset: { timeOfDay: 'anytime', kind: 'quit' }, match: (h) => h.kind === 'quit' },
 ]
+
+/** What a linked habit grows in Journey */
+export const GROWS: Record<string, string> = { transmutation: 'Grows the Ascent', stillness: 'Opens the Eye', gym: 'Carves the statue', health: 'Heals the lungs', sleep: 'Fills the moon' }
+
+const DAY_LETTERS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+/** "Every day" or the weekdays it's on, e.g. "Mon, Wed, Fri" */
+export const scheduleText = (h: Habit) => (!h.days.length || h.days.length === 7 ? 'Every day' : [...h.days].sort().map((d) => DAY_LETTERS[d]).join(', '))

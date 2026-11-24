@@ -62,3 +62,18 @@ describe('trend', () => {
     expect(trend(sessions([[60, 10]], [[62.5, 8]], [[62.5, 8]], [[60, 12]]), 'bp')).toEqual({ kind: 'flat', sessions: 2 })
   })
 })
+
+describe('transformation stats', () => {
+  it('counts sessions per week, oldest first', async () => {
+    const { weeklySessions } = await import('./gym')
+    const at = (key: string) => new Date(key + 'T12:00:00').getTime()
+    const s = (key: string) => ({ id: key, dayId: 'd', dayName: 'Push', start: at(key), end: at(key), entries: [] })
+    // 2026-11-24 is a Tuesday; its week starts Monday 23 Nov
+    const weeks = weeklySessions([s('2026-11-10'), s('2026-11-16'), s('2026-11-18'), s('2026-11-23')], '2026-11-24', 3)
+    expect(weeks).toEqual([
+      { week: '2026-11-09', count: 1 },
+      { week: '2026-11-16', count: 2 },
+      { week: '2026-11-23', count: 1 },
+    ])
+  })
+})

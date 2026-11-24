@@ -498,3 +498,11 @@ textarea.input { resize: none; min-height: 90px; line-height: 1.45; }
 .nut-in label i { font-style: normal; color: var(--faint); }
 .nut-in .num { width: 62px; font-size: 14px; padding: 6px; }
 .nut .macro-top > span:last-child { white-space: nowrap; padding-left: 8px; }
+.edit-sub { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+.edit-sub span { color: var(--accent-dim); }
+.edit-help { margin: 4px 0 0; padding: 12px 14px 12px 30px; background: var(--surface); border-radius: 14px; font-size: 13px; color: var(--soft); line-height: 1.6; }
+.week-bars { display: flex; align-items: flex-end; gap: 6px; height: 96px; margin-top: 10px; }
+.week-bar { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; }
+.week-bar i { width: 100%; min-height: 3px; border-radius: 5px 5px 2px 2px; background: #2a2f3a; }
+.week-bar.now i, .week-bar:has(span:not(:empty)) i { background: var(--accent-grad); }
+.week-bar span { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }

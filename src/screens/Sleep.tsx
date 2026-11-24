@@ -32,12 +32,6 @@ export function Sleep() {
   const adopt = sleepLike(state)
   const [times, setTimes] = useState<Record<string, string>>({ wake: '06:30', bed: '23:00' })
 
-  const toggle = (id: string) =>
-    update((s) => {
-      const list = s.checks[today] ?? []
-      s.checks[today] = list.includes(id) ? list.filter((x) => x !== id) : [...list, id]
-    })
-
   const add = (role: 'wake' | 'bed', timeOfDay: Habit['timeOfDay'], time: string) =>
     update((s) => void s.habits.push({ id: uid(), name: sleepName(role, time), kind: 'build', days: [], createdAt: today, timeOfDay, link: 'sleep', time }))
 
@@ -85,7 +79,7 @@ export function Sleep() {
             const done = isChecked(state.checks, h.id, today)
             return (
               <div key={h.id} className={'item' + (done ? ' done' : '')}>
-                <Check on={done} onClick={() => toggle(h.id)} />
+                <Check on={done} />
                 <span className="name">{h.name}</span>
                 <input className="time-in" type="time" value={h.time ?? timeIn(h.name) ?? ''} onChange={(e) => setTime(h.id, e.target.value)} aria-label={`Time for ${h.name}`} />
               </div>
@@ -99,7 +93,7 @@ export function Sleep() {
               return <i key={k} className={(c ? 'clean' : c === false && k < today ? 'miss' : '') + (k === today ? ' today' : '')} />
             })}
           </div>
-          <p className="note" style={{ marginTop: 10 }}>A night counts when you tick both. Recent nights count most.</p>
+          <p className="note" style={{ marginTop: 10 }}>A night counts when you tick both on Today. Recent nights count most.</p>
         </>
       )}
 

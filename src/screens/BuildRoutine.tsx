@@ -6,10 +6,8 @@ import { uid } from '../seed'
 import { useStore } from '../store'
 import { useNav } from '../nav'
 import { AddHabitButton, Screen, Sheet } from '../ui'
-import { GROUPS } from './groups'
+import { GROUPS, GROWS } from './groups'
 import { timeIn } from '../domain/sleep'
-
-const GROWS: Record<string, string> = { transmutation: 'Grows the Ascent', stillness: 'Opens the Eye', gym: 'Carves the statue', health: 'Heals the lungs', sleep: 'Fills the moon' }
 
 /** Before tracking: build the routine, then "Begin your journey". */
 export function BuildRoutine() {

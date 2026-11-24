@@ -19,7 +19,7 @@ import { Ring, Screen } from '../ui'
 const ROUTE: Record<string, Route> = {
   transmutation: { name: 'transmutation' },
   stillness: { name: 'stillness' },
-  gym: { name: 'gym' },
+  gym: { name: 'gymProgress' },
   health: { name: 'health' },
   sleep: { name: 'sleep' },
 }
@@ -85,7 +85,7 @@ export function Journey() {
 
       <div style={{ marginTop: 8 }}>
         {progress.map((p) => (
-          <Row key={p.section} p={p} symbol={symbols[p.section]} onClick={() => (p.section === 'gym' || p.section === 'food' ? switchTab(p.section) : push(ROUTE[p.section]))} />
+          <Row key={p.section} p={p} symbol={symbols[p.section]} onClick={() => (p.section === 'food' ? switchTab('food') : push(ROUTE[p.section]))} />
         ))}
       </div>
 

@@ -20,6 +20,7 @@ export type Route =
   | { name: 'health' }
   | { name: 'sleep' }
   | { name: 'food' }
+  | { name: 'gymProgress' }
   | { name: 'foodEdit' }
   | { name: 'journey' }
   | { name: 'progress' }
