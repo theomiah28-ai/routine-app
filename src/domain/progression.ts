@@ -4,6 +4,7 @@ import { bestStreak, currentStreak, isChecked, isScheduled } from './streaks'
 import { EYE_STAGES, eyeStage } from './stillness'
 import { LUNG_NAMES, healthStreak, lungScore, lungState } from './health'
 import { MOON_NAMES, moonState, sleepScore, sleepStreak } from './sleep'
+import { fuelDays, fuelStage, fuelStreak } from './food'
 import type { Habit, HabitLink, Section, State } from '../types'
 
 export const linked = (s: State, link: HabitLink) => s.habits.find((h) => h.link === link)
@@ -141,6 +142,19 @@ export function sectionProgress(s: State, today: string): SectionProgress[] {
   } else {
     out.push({ section: 'sleep', title: 'Sleep', value: 'Not started', stage: '—', pct: 0, next: 'Set your wake-up and bedtime' })
   }
+
+  // Fuel grows with every day the food score reaches 80
+  const fd = fuelDays(s)
+  const fuel = fuelStage(fd)
+  const run = fuelStreak(s, today)
+  out.push({
+    section: 'food',
+    title: 'Fuel',
+    value: `${fd} ${fd === 1 ? 'day' : 'days'}`,
+    stage: `${fuel.name}${run ? ` · ${run}-day streak` : ''}`,
+    pct: fuel.pct,
+    next: fuel.next ? `${fuel.next.days} ${fuel.next.days === 1 ? 'day' : 'days'} · ${fuel.next.name}` : null,
+  })
   return out
 }
 

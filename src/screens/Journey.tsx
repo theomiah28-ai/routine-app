@@ -12,6 +12,8 @@ import { Lungs } from '../symbols/Lungs'
 import { lungScore, lungState } from '../domain/health'
 import { moonState, sleepScore } from '../domain/sleep'
 import { Moon } from '../symbols/Moon'
+import { Flame } from '../symbols/Flame'
+import { FUEL, fuelDays, fuelStage } from '../domain/food'
 import { Ring, Screen } from '../ui'
 
 const ROUTE: Record<string, Route> = {
@@ -56,6 +58,7 @@ export function Journey() {
     gym: <Statue stage={statueStage(statuePoints(state)).index} size={58} />,
     health: <Lungs state={lungState(lungScore(state, today) ?? 1)} width={70} />,
     sleep: <Moon state={moonState(sleepScore(state, today) ?? 1)} width={64} />,
+    food: <Flame level={fuelStage(fuelDays(state)).index / (FUEL.length - 1)} size={50} />,
   }
 
   return (
@@ -82,7 +85,7 @@ export function Journey() {
 
       <div style={{ marginTop: 8 }}>
         {progress.map((p) => (
-          <Row key={p.section} p={p} symbol={symbols[p.section]} onClick={() => (p.section === 'gym' ? switchTab('gym') : push(ROUTE[p.section]))} />
+          <Row key={p.section} p={p} symbol={symbols[p.section]} onClick={() => (p.section === 'gym' || p.section === 'food' ? switchTab(p.section) : push(ROUTE[p.section]))} />
         ))}
       </div>
 

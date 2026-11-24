@@ -1,7 +1,7 @@
 export type HabitKind = 'build' | 'quit'
 export type TimeOfDay = 'morning' | 'anytime' | 'evening'
 export type HabitLink = 'transmutation' | 'stillness' | 'gym' | 'health' | 'sleep'
-export type Section = 'routine' | 'gym' | 'transmutation' | 'stillness' | 'health' | 'sleep' | 'faith' | 'work' | 'screentime'
+export type Section = 'routine' | 'gym' | 'transmutation' | 'stillness' | 'health' | 'sleep' | 'food' | 'faith' | 'work' | 'screentime'
 
 export interface Habit {
   id: string
@@ -163,6 +163,56 @@ export interface Settings {
   goals: string[]
   /** Day "Begin your journey" was pressed; tracking counts from here. Unset (or '' after "Start again") while building the routine */
   journeyStart?: string
+  /** Daily food targets */
+  foodTargets?: Macros
+}
+
+export type FoodSlot = 'preworkout' | 'breakfast' | 'lunch' | 'dinner'
+
+export interface Macros {
+  kcal: number
+  protein: number
+  carbs: number
+  fat: number
+}
+
+export interface Meal extends Macros {
+  id: string
+  name: string
+  ingredients: string
+  /** Deleted from the menu; kept so past days keep their totals */
+  archived?: boolean
+}
+
+export interface Supplement {
+  id: string
+  name: string
+  note?: string
+  /** Doesn't count against the daily score when not ticked */
+  optional?: boolean
+  archived?: boolean
+}
+
+export interface FoodDay {
+  preworkout: string | null
+  breakfast: string | null
+  lunch: string | null
+  dinner: string | null
+  /** Top-up id → how many */
+  counters: Record<string, number>
+  supplements: Record<string, boolean>
+  waterMl: number
+}
+
+export interface FoodState {
+  /** Options per slot, pick one a day */
+  meals: Record<FoodSlot, Meal[]>
+  /** Top-ups, added 0-4 times a day */
+  counters: Meal[]
+  supplements: Supplement[]
+  waterGoalMl: number
+  /** dateKey → what was eaten */
+  log: Record<string, FoodDay>
 }
 
 export interface State {
@@ -184,6 +234,7 @@ export interface State {
   milestones: Milestone[]
   /** dateKey → evening gratitude note */
   journal: Record<string, string>
+  food: FoodState
   /** Sync bookkeeping: whose data this is and when it last changed */
   meta?: { updatedAt: number; ownerId?: string }
 }

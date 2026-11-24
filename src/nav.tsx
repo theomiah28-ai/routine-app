@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react'
 
-export type Tab = 'today' | 'journey' | 'gym' | 'you'
+export type Tab = 'today' | 'journey' | 'gym' | 'food' | 'you'
 
 export type Route =
   | { name: 'today' }
@@ -19,6 +19,8 @@ export type Route =
   | { name: 'visualise'; id: string }
   | { name: 'health' }
   | { name: 'sleep' }
+  | { name: 'food' }
+  | { name: 'foodEdit' }
   | { name: 'journey' }
   | { name: 'progress' }
   | { name: 'you' }

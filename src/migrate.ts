@@ -1,6 +1,7 @@
 import { addDays, dateKey, parseKey } from './dates'
 import { bestStreak, isChecked, isScheduled } from './domain/streaks'
 import { defaultSections } from './seed'
+import { DEFAULT_TARGETS, defaultFood, withFoodDefaults } from './domain/food'
 import type { Habit, State, TimeOfDay } from './types'
 
 export const V1_BACKUP_KEY = 'state-v1-backup'
@@ -68,6 +69,9 @@ export function normaliseV2(s: State, now: number): State {
   for (const [k, d] of Object.entries(out.faith?.days ?? {})) if (d.note && out.journal[k] === undefined) out.journal[k] = d.note
   // Only saves from before journeyStart existed; '' means "started again, not begun yet"
   if (out.settings.journeyStart === undefined && out.settings.onboarded) out.settings.journeyStart = firstDay(out.habits, today)
+  // Food arrived later: seed the menu and targets only where they're missing
+  out.food = withFoodDefaults(out.food)
+  if (!out.settings.foodTargets) out.settings.foodTargets = { ...DEFAULT_TARGETS }
   return out
 }
 
@@ -111,7 +115,7 @@ export function migrate(raw: unknown, now: number): State {
 
   return {
     version: 2,
-    settings: { name: v1.name ?? '', showEsoteric: false, onboarded: true, restSeconds: 120, whatsNew: true, faith: false, goals: [], journeyStart: firstDay(habits, today) },
+    settings: { name: v1.name ?? '', showEsoteric: false, onboarded: true, restSeconds: 120, whatsNew: true, faith: false, goals: [], journeyStart: firstDay(habits, today), foodTargets: { ...DEFAULT_TARGETS } },
     habits,
     checks: structuredClone(v1.checks),
     splitName: v1.splitName,
@@ -120,5 +124,6 @@ export function migrate(raw: unknown, now: number): State {
     sessions: v1.sessions,
     active: v1.active ? { ...v1.active, restEndsAt: null } : null,
     ...sections,
+    food: defaultFood(),
   }
 }

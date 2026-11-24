@@ -27,6 +27,8 @@ export function resetProgress(s: State, today: string, now: number): State {
     settings: { ...s.settings, journeyStart: '', whatsNew: false },
     habits: s.habits.map((h) => ({ ...h, createdAt: today })),
     checks: {},
+    // The menu, supplements and targets stay; only what was eaten goes
+    food: { ...s.food, log: {} },
     sessions: [],
     active: null,
   }

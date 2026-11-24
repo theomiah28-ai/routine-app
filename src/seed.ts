@@ -1,4 +1,5 @@
 import { todayKey } from './dates'
+import { DEFAULT_TARGETS, defaultFood } from './domain/food'
 import type { Exercise, SplitDay, State } from './types'
 
 export const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4)
@@ -45,7 +46,7 @@ export function seedState(): State {
   const createdAt = todayKey()
   return {
     version: 2,
-    settings: { name: '', showEsoteric: false, onboarded: false, restSeconds: 120, faith: true, goals: [] },
+    settings: { name: '', showEsoteric: false, onboarded: false, restSeconds: 120, faith: true, goals: [], foodTargets: { ...DEFAULT_TARGETS } },
     // Nothing forced: onboarding suggests, the user picks
     habits: [],
     checks: {},
@@ -54,5 +55,6 @@ export function seedState(): State {
     sessions: [],
     active: null,
     ...defaultSections(createdAt, Date.now()),
+    food: defaultFood(),
   }
 }

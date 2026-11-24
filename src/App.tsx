@@ -18,6 +18,8 @@ import { Breath } from './screens/Breath'
 import { Visualise } from './screens/Visualise'
 import { Health } from './screens/Health'
 import { Sleep } from './screens/Sleep'
+import { Food } from './screens/Food'
+import { FoodEdit } from './screens/FoodEdit'
 import { Journey } from './screens/Journey'
 import { Progress } from './screens/Progress'
 import { MilestoneModal } from './screens/MilestoneModal'
@@ -56,6 +58,8 @@ function screenFor(r: Route): ReactNode {
     case 'visualise': return <Visualise id={r.id} />
     case 'health': return <Health />
     case 'sleep': return <Sleep />
+    case 'food': return <Food />
+    case 'foodEdit': return <FoodEdit />
     case 'journey': return <Journey />
     case 'progress': return <Progress />
     case 'morning': return <Flow kind="morning" />
@@ -68,6 +72,7 @@ const ROOT: Record<Tab, Route> = {
   today: { name: 'today' },
   journey: { name: 'journey' },
   gym: { name: 'gym' },
+  food: { name: 'food' },
   you: { name: 'you' },
 }
 
@@ -90,6 +95,11 @@ const ICONS: Record<Tab, ReactNode> = {
       <path d="M6.5 7v10M17.5 7v10M3.5 9.5v5M20.5 9.5v5M6.5 12h11" />
     </svg>
   ),
+  food: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M7 3v18M4.5 3v5a2.5 2.5 0 0 0 5 0V3M17.5 21V3c-2.2 1.4-3.5 4.2-3.5 7.5v3h3.5" />
+    </svg>
+  ),
   you: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="8.5" r="3.8" />
@@ -98,7 +108,7 @@ const ICONS: Record<Tab, ReactNode> = {
   ),
 }
 
-const LABELS: Record<Tab, string> = { today: 'Today', journey: 'Journey', gym: 'Gym', you: 'You' }
+const LABELS: Record<Tab, string> = { today: 'Today', journey: 'Journey', gym: 'Gym', food: 'Food', you: 'You' }
 
 export function App() {
   const { state, update } = useStore()
@@ -108,6 +118,7 @@ export function App() {
     today: state.stillness.activeSit ? [ROOT.today, { name: 'sit' }] : [ROOT.today],
     journey: [ROOT.journey],
     gym: state.active ? [ROOT.gym, { name: 'workout' }] : [ROOT.gym],
+    food: [ROOT.food],
     you: [ROOT.you],
   }))
   const stack = stacks[tab]
