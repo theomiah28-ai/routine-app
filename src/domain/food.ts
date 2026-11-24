@@ -10,7 +10,7 @@ export const SLOTS: { key: FoodSlot; title: string }[] = [
 
 export const DEFAULT_TARGETS: Macros = { kcal: 2400, protein: 190, carbs: 255, fat: 67 }
 export const MAX_TOPUPS = 4
-export const WATER_STEP = 250
+export const WATER_STEP = 750
 /** Protein that counts as a high-protein day on Today */
 export const HIGH_PROTEIN_G = 150
 

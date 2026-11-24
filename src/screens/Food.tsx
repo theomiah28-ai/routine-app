@@ -135,8 +135,8 @@ export function Food() {
           <span className="jr-bar"><i style={{ width: `${Math.min(100, (water / food.waterGoalMl) * 100)}%`, opacity: water ? 1 : 0 }} /></span>
         </span>
         <div className="seg">
-          <button onClick={() => edit((d) => void (d.waterMl -= WATER_STEP))} disabled={!water} aria-label="Remove 250ml">−</button>
-          <button className="on" onClick={() => edit((d) => void (d.waterMl += WATER_STEP))}>+250ml</button>
+          <button onClick={() => edit((d) => void (d.waterMl -= WATER_STEP))} disabled={!water} aria-label={`Remove ${WATER_STEP}ml`}>−</button>
+          <button className="on" onClick={() => edit((d) => void (d.waterMl += WATER_STEP))}>+{WATER_STEP}ml</button>
         </div>
       </div>
     </div>
